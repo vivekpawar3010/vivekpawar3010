@@ -1,5 +1,5 @@
 - 👋 Hi, I’m @vivekpawar3010
-- 👀 I’m interested in learning the new thing in the TI and the new technolgies
+- 👀 I’m interested in learning the new thing in the IT and the new technolgies
 - 🌱 I’m currently learning the computer science and engg. at the sveri's college of engg. PANDHARPUR
 - 💞️ I’m looking to collaborate on ...
 - 📫 How to reach me my linkedin profile https://www.linkedin.com/in/vivek-pawar-16548a275/
