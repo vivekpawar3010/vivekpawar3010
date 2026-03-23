@@ -1,1 +1,0 @@
-const val = { name: "Vivek Pawar", role: "Full Stack Developer", about: "Passionate about Web, Android, AI/ML", github: "https://github.com/vivekpawar3010", linkedin: "https://linkedin.com/in/vivek-pawar-16548a275"}; export default val;
