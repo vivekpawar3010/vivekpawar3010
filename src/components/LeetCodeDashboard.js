@@ -275,8 +275,8 @@ export default function LeetCodeDashboard() {
   return (
     <section style={{ maxWidth: 1100, margin: "0 auto", padding: "20px", color: "#eff1f6", fontFamily: "system-ui, -apple-system, sans-serif" }}>
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: "28px", fontWeight: "700", marginBottom: "8px", color: "#eff1f6" }}>LeetCode Profile Overview</h1>
-        <p style={{ color: "#8a8a8a", margin: 0 }}>View your LeetCode statistics and recent activity.</p>
+        <h1 style={{ fontSize: "28px", fontWeight: "700", marginBottom: "8px", color: "#eff1f6" }}>My LeetCode Profile Overview</h1>
+        <p style={{ color: "#8a8a8a", margin: 0 }}>This is my LeetCode statistics and recent activity.</p>
       </div>
 
       {error && (
@@ -288,7 +288,7 @@ export default function LeetCodeDashboard() {
       {renderProfileCard(myProfile, myStats, myContest, mySubmissions, myBadges, myLanguages)}
 
       <div style={{ marginTop: 24, padding: 24, borderRadius: 16, background: "#282828", border: "1px solid #3e3e3e", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)" }}>
-        <h2 style={{ margin: 0, marginBottom: 16, fontSize: "20px", fontWeight: "600", color: "#eff1f6" }}>View another profile</h2>
+        <h2 style={{ margin: 0, marginBottom: 16, fontSize: "20px", fontWeight: "600", color: "#eff1f6" }}>View Your LeetCode Profile Overview</h2>
         <form onSubmit={handleSubmit} style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
           <input
             type="text"
