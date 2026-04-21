@@ -69,7 +69,7 @@ export default function LeetCodeDashboard() {
     // --- Calculate problems solved today (5:00 AM IST reset) ---
     const now = new Date();
     const istOffset = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30
-x
+
     // Convert current time to IST
     const istTime = new Date(now.getTime() + istOffset);
 
