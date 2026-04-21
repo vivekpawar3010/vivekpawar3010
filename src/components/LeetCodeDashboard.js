@@ -28,14 +28,16 @@ export default function LeetCodeDashboard() {
   const [error, setError] = useState("");
 
   const [myProfile, setMyProfile] = useState({ name: "LeetCode User", username: "vivek_pawar-3010", ranking: "--", avatar: "" });
-  const [myStats, setMyStats] = useState({ total: 0, easy: 0, medium: 0, hard: 0 });
+  // Updated state to include 'today'
+  const [myStats, setMyStats] = useState({ total: 0, easy: 0, medium: 0, hard: 0, today: 0 });
   const [myContest, setMyContest] = useState({ rating: "--", rank: "--", attended: 0 });
   const [myLanguages, setMyLanguages] = useState([]);
   const [mySubmissions, setMySubmissions] = useState([]);
   const [myBadges, setMyBadges] = useState([]);
 
   const [viewedProfile, setViewedProfile] = useState(null);
-  const [viewedStats, setViewedStats] = useState({ total: 0, easy: 0, medium: 0, hard: 0 });
+  // Updated state to include 'today'
+  const [viewedStats, setViewedStats] = useState({ total: 0, easy: 0, medium: 0, hard: 0, today: 0 });
   const [viewedContest, setViewedContest] = useState({ rating: "--", rank: "--", attended: 0 });
   const [viewedLanguages, setViewedLanguages] = useState([]);
   const [viewedSubmissions, setViewedSubmissions] = useState([]);
@@ -64,6 +66,27 @@ export default function LeetCodeDashboard() {
     const submissions = data.recentAcSubmissionList || [];
     const badges = matchedUser.badges || [];
 
+    // --- Calculate problems solved today (5:00 AM IST reset) ---
+    const now = new Date();
+    const istOffset = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30
+x
+    // Convert current time to IST
+    const istTime = new Date(now.getTime() + istOffset);
+
+    // Get today's date in IST and set time to 5:00 AM
+    const todayIST = new Date(istTime.getFullYear(), istTime.getMonth(), istTime.getDate(), 5, 0, 0, 0);
+
+    // Convert back to UTC for timestamp comparison
+    const startOfToday = new Date(todayIST.getTime() - istOffset);
+
+    const todaySubmissions = submissions.filter((sub) => {
+      const subTimeMs = sub.timestamp < 1e12 ? sub.timestamp * 1000 : sub.timestamp;
+      return subTimeMs >= startOfToday.getTime();
+    });
+
+    const uniqueProblemsToday = new Set(todaySubmissions.map((sub) => sub.title)).size;
+    // ---------------------------------------
+
     return {
       profile: {
         name: profile.realName || matchedUser.username || selected,
@@ -75,7 +98,8 @@ export default function LeetCodeDashboard() {
         total: submitStats.find((s) => s.difficulty === "All")?.count || 0,
         easy: submitStats.find((s) => s.difficulty === "Easy")?.count || 0,
         medium: submitStats.find((s) => s.difficulty === "Medium")?.count || 0,
-        hard: submitStats.find((s) => s.difficulty === "Hard")?.count || 0
+        hard: submitStats.find((s) => s.difficulty === "Hard")?.count || 0,
+        today: uniqueProblemsToday // Added to the returned object
       },
       contest: {
         rating: contest.rating ? Math.round(contest.rating) : "--",
@@ -86,12 +110,14 @@ export default function LeetCodeDashboard() {
         .map(lang => ({ name: lang.languageName, count: lang.problemsSolved }))
         .sort((a, b) => b.count - a.count)
         .slice(0, 5),
-      submissions: submissions.map((item) => ({
-        title: item.title || "Untitled",
-        status: item.statusDisplay || "Unknown",
-        lang: item.lang || "N/A",
-        time: item.timestamp || 0
-      })),
+      submissions: submissions
+        .slice(0, 10)
+        .map((item) => ({
+          title: item.title || "Untitled",
+          status: item.statusDisplay || "Unknown",
+          lang: item.lang || "N/A",
+          time: item.timestamp || 0
+        })),
       badges: badges
     };
   };
@@ -133,7 +159,7 @@ export default function LeetCodeDashboard() {
     } catch (err) {
       setError(err?.message || "Unable to load the requested profile.");
       setViewedProfile(null);
-      setViewedStats({ total: 0, easy: 0, medium: 0, hard: 0 });
+      setViewedStats({ total: 0, easy: 0, medium: 0, hard: 0, today: 0 }); // Added today: 0
       setViewedContest({ rating: "--", rank: "--", attended: 0 });
       setViewedLanguages([]);
       setViewedSubmissions([]);
@@ -171,6 +197,11 @@ export default function LeetCodeDashboard() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 16, marginTop: 16 }}>
+        {/* NEW: Solved Today Box */}
+        <div style={{ background: "#3e3e3e", padding: "16px", borderRadius: "12px", textAlign: "center" }}>
+          <div style={{ fontSize: 13, color: "#8a8a8a", marginBottom: 8, fontWeight: "500" }}>Solved Today</div>
+          <div style={{ fontSize: 26, fontWeight: 700, color: "#a855f7" }}>{formatValue(statsData.today)}</div>
+        </div>
         <div style={{ background: "#3e3e3e", padding: "16px", borderRadius: "12px", textAlign: "center" }}>
           <div style={{ fontSize: 13, color: "#8a8a8a", marginBottom: 8, fontWeight: "500" }}>Total Solved</div>
           <div style={{ fontSize: 26, fontWeight: 700, color: "#eff1f6" }}>{formatValue(statsData.total)}</div>
