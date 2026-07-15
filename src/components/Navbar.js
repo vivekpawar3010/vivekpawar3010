@@ -19,8 +19,11 @@ export default function Navbar() {
         <Link href="/" style={{ color: "#dbeafe", textDecoration: "none" }}>
           Home
         </Link>
-        <Link href="/about" style={{ color: "#dbeafe", textDecoration: "none" }}>
-          About
+        <Link href="/contact" style={{ color: "#dbeafe", textDecoration: "none" }}>
+          Contact
+        </Link>
+        <Link href="/projects" style={{ color: "#dbeafe", textDecoration: "none" }}>
+          Projects
         </Link>
         <Link href="/about" style={{ textDecoration: "none" }}>
           <button
