@@ -2,6 +2,7 @@
   "/_global-error/page": "/_global-error",
   "/_not-found/page": "/_not-found",
   "/about/page": "/about",
+  "/api/leetcode/[username]/route": "/api/leetcode/[username]",
   "/contact/page": "/contact",
   "/page": "/",
   "/projects/page": "/projects"
