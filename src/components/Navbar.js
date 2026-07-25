@@ -39,6 +39,20 @@ export default function Navbar() {
             LeetCode
           </button>
         </Link>
+        <Link href="/github" style={{ textDecoration: "none" }}>
+          <button
+            style={{
+              border: "none",
+              borderRadius: "8px",
+              padding: "8px 12px",
+              background: "#16a34a",
+              color: "white",
+              cursor: "pointer",
+            }}
+          >
+            GitHub
+          </button>
+        </Link>
       </div>
     </nav>
   );
