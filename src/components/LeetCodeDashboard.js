@@ -280,78 +280,79 @@ export default function LeetCodeDashboard() {
     submissionsData, badgesData, languagesData,
     fromCache, fetchedAt
   ) => (
-    <div style={{ border: "1px solid #3e3e3e", borderRadius: 16, background: "#282828", padding: 24, marginTop: 18, color: "#eff1f6", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06)" }}>
+    <div className="glass-card" style={{ padding: 24, marginTop: 18 }}>
 
       {/* Header row */}
       <div style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap", marginBottom: 20 }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={profileData.avatar || "https://via.placeholder.com/80?text=LC"}
           alt="avatar"
-          style={{ width: 84, height: 84, borderRadius: "12px", border: "2px solid #3e3e3e", objectFit: "cover" }}
+          style={{ width: 84, height: 84, borderRadius: "12px", border: "2px solid var(--border-subtle)", objectFit: "cover" }}
         />
         <div style={{ flex: 1 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-            <h2 style={{ margin: 0, fontSize: "24px", fontWeight: "600", color: "#eff1f6" }}>{profileData.name}</h2>
+            <h2 style={{ margin: 0, fontSize: "24px", fontWeight: "700", color: "var(--text-primary)" }}>{profileData.name}</h2>
             <CacheBadge fromCache={fromCache} fetchedAt={fetchedAt} />
           </div>
-          <p style={{ margin: "4px 0 0", color: "#8a8a8a", fontSize: "14px" }}>@{profileData.username}</p>
-          <p style={{ margin: "6px 0 0", fontSize: "14px" }}>
-            Ranking: <span style={{ fontWeight: "600", color: "#eff1f6" }}>{formatValue(profileData.ranking)}</span>
+          <p style={{ margin: "4px 0 0", color: "var(--text-muted)", fontSize: "14px" }}>@{profileData.username}</p>
+          <p style={{ margin: "6px 0 0", fontSize: "14px", color: "var(--text-secondary)" }}>
+            Ranking: <span style={{ fontWeight: "600", color: "var(--text-primary)" }}>{formatValue(profileData.ranking)}</span>
           </p>
         </div>
       </div>
 
       {/* Stats grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 16, marginTop: 16 }}>
-        <div style={{ background: "#3e3e3e", padding: "16px", borderRadius: "12px", textAlign: "center" }}>
-          <div style={{ fontSize: 13, color: "#8a8a8a", marginBottom: 8, fontWeight: "500" }}>Solved Today</div>
+        <div style={{ background: "var(--badge-bg)", border: "1px solid var(--border-subtle)", padding: "16px", borderRadius: "12px", textAlign: "center" }}>
+          <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 8, fontWeight: "500" }}>Solved Today</div>
           <div style={{ fontSize: 26, fontWeight: 700, color: "#a855f7" }}>{formatValue(statsData.today)}</div>
         </div>
-        <div style={{ background: "#3e3e3e", padding: "16px", borderRadius: "12px", textAlign: "center" }}>
-          <div style={{ fontSize: 13, color: "#8a8a8a", marginBottom: 8, fontWeight: "500" }}>Total Solved</div>
-          <div style={{ fontSize: 26, fontWeight: 700, color: "#eff1f6" }}>{formatValue(statsData.total)}</div>
+        <div style={{ background: "var(--badge-bg)", border: "1px solid var(--border-subtle)", padding: "16px", borderRadius: "12px", textAlign: "center" }}>
+          <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 8, fontWeight: "500" }}>Total Solved</div>
+          <div style={{ fontSize: 26, fontWeight: 700, color: "var(--text-primary)" }}>{formatValue(statsData.total)}</div>
         </div>
-        <div style={{ background: "#3e3e3e", padding: "16px", borderRadius: "12px", textAlign: "center" }}>
-          <div style={{ fontSize: 13, color: "#8a8a8a", marginBottom: 8, fontWeight: "500" }}>Easy</div>
-          <div style={{ fontSize: 26, fontWeight: 700, color: "#00b8a3" }}>{formatValue(statsData.easy)}</div>
+        <div style={{ background: "var(--badge-bg)", border: "1px solid var(--border-subtle)", padding: "16px", borderRadius: "12px", textAlign: "center" }}>
+          <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 8, fontWeight: "500" }}>Easy</div>
+          <div style={{ fontSize: 26, fontWeight: 700, color: "#059669" }}>{formatValue(statsData.easy)}</div>
         </div>
-        <div style={{ background: "#3e3e3e", padding: "16px", borderRadius: "12px", textAlign: "center" }}>
-          <div style={{ fontSize: 13, color: "#8a8a8a", marginBottom: 8, fontWeight: "500" }}>Medium</div>
-          <div style={{ fontSize: 26, fontWeight: 700, color: "#ffc01e" }}>{formatValue(statsData.medium)}</div>
+        <div style={{ background: "var(--badge-bg)", border: "1px solid var(--border-subtle)", padding: "16px", borderRadius: "12px", textAlign: "center" }}>
+          <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 8, fontWeight: "500" }}>Medium</div>
+          <div style={{ fontSize: 26, fontWeight: 700, color: "#d97706" }}>{formatValue(statsData.medium)}</div>
         </div>
-        <div style={{ background: "#3e3e3e", padding: "16px", borderRadius: "12px", textAlign: "center" }}>
-          <div style={{ fontSize: 13, color: "#8a8a8a", marginBottom: 8, fontWeight: "500" }}>Hard</div>
-          <div style={{ fontSize: 26, fontWeight: 700, color: "#ff375f" }}>{formatValue(statsData.hard)}</div>
+        <div style={{ background: "var(--badge-bg)", border: "1px solid var(--border-subtle)", padding: "16px", borderRadius: "12px", textAlign: "center" }}>
+          <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 8, fontWeight: "500" }}>Hard</div>
+          <div style={{ fontSize: 26, fontWeight: 700, color: "#e11d48" }}>{formatValue(statsData.hard)}</div>
         </div>
       </div>
 
       {/* Contest stats */}
       <div style={{ marginTop: 16, display: "flex", gap: 16, flexWrap: "wrap" }}>
-        <div style={{ flex: "1 1 150px", background: "#3e3e3e", padding: "16px", borderRadius: "12px" }}>
-          <div style={{ fontSize: 13, color: "#8a8a8a", marginBottom: 8, fontWeight: "500" }}>Contest Rating</div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: "#eff1f6" }}>{formatValue(contestData.rating)}</div>
+        <div style={{ flex: "1 1 150px", background: "var(--badge-bg)", border: "1px solid var(--border-subtle)", padding: "16px", borderRadius: "12px" }}>
+          <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 8, fontWeight: "500" }}>Contest Rating</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: "var(--text-primary)" }}>{formatValue(contestData.rating)}</div>
         </div>
-        <div style={{ flex: "1 1 150px", background: "#3e3e3e", padding: "16px", borderRadius: "12px" }}>
-          <div style={{ fontSize: 13, color: "#8a8a8a", marginBottom: 8, fontWeight: "500" }}>Global Rank</div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: "#eff1f6" }}>{formatValue(contestData.rank)}</div>
+        <div style={{ flex: "1 1 150px", background: "var(--badge-bg)", border: "1px solid var(--border-subtle)", padding: "16px", borderRadius: "12px" }}>
+          <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 8, fontWeight: "500" }}>Global Rank</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: "var(--text-primary)" }}>{formatValue(contestData.rank)}</div>
         </div>
-        <div style={{ flex: "1 1 150px", background: "#3e3e3e", padding: "16px", borderRadius: "12px" }}>
-          <div style={{ fontSize: 13, color: "#8a8a8a", marginBottom: 8, fontWeight: "500" }}>Contests</div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: "#eff1f6" }}>{formatValue(contestData.attended)}</div>
+        <div style={{ flex: "1 1 150px", background: "var(--badge-bg)", border: "1px solid var(--border-subtle)", padding: "16px", borderRadius: "12px" }}>
+          <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 8, fontWeight: "500" }}>Contests Attended</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: "var(--text-primary)" }}>{formatValue(contestData.attended)}</div>
         </div>
       </div>
 
       {/* Top Languages */}
       {languagesData && languagesData.length > 0 && (
         <div style={{ marginTop: 24 }}>
-          <h3 style={{ marginBottom: 12, fontSize: "18px", color: "#eff1f6", fontWeight: "600" }}>
-            Top Languages <span style={{ color: "#8a8a8a", fontSize: "15px", fontWeight: "500" }}>({languagesData.length})</span>
+          <h3 style={{ marginBottom: 12, fontSize: "18px", color: "var(--text-primary)", fontWeight: "600" }}>
+            Top Languages <span style={{ color: "var(--text-muted)", fontSize: "15px", fontWeight: "500" }}>({languagesData.length})</span>
           </h3>
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
             {languagesData.map((lang, idx) => (
-              <div key={idx} style={{ background: "#3e3e3e", padding: "8px 12px", borderRadius: "10px", display: "flex", alignItems: "center", gap: "8px" }}>
-                <div style={{ fontSize: "14px", fontWeight: "600", color: "#eff1f6" }}>{lang.name}</div>
-                <div style={{ fontSize: "12px", color: "#8a8a8a", background: "#282828", padding: "2px 8px", borderRadius: "12px" }}>{formatValue(lang.count)} solved</div>
+              <div key={idx} style={{ background: "var(--badge-bg)", border: "1px solid var(--border-subtle)", padding: "8px 12px", borderRadius: "10px", display: "flex", alignItems: "center", gap: "8px" }}>
+                <div style={{ fontSize: "14px", fontWeight: "600", color: "var(--text-primary)" }}>{lang.name}</div>
+                <div style={{ fontSize: "12px", color: "var(--text-muted)", background: "rgba(0,0,0,0.06)", padding: "2px 8px", borderRadius: "12px" }}>{formatValue(lang.count)} solved</div>
               </div>
             ))}
           </div>
@@ -361,18 +362,19 @@ export default function LeetCodeDashboard() {
       {/* Badges */}
       {badgesData && badgesData.length > 0 && (
         <div style={{ marginTop: 24 }}>
-          <h3 style={{ marginBottom: 12, fontSize: "18px", color: "#eff1f6", fontWeight: "600" }}>
-            Badges <span style={{ color: "#8a8a8a", fontSize: "15px", fontWeight: "500" }}>({badgesData.length})</span>
+          <h3 style={{ marginBottom: 12, fontSize: "18px", color: "var(--text-primary)", fontWeight: "600" }}>
+            Badges <span style={{ color: "var(--text-muted)", fontSize: "15px", fontWeight: "500" }}>({badgesData.length})</span>
           </h3>
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
             {badgesData.map((badge, idx) => (
-              <div key={idx} style={{ background: "#3e3e3e", padding: "8px 12px", borderRadius: "10px", display: "flex", alignItems: "center", gap: "8px" }} title={badge.hoverText}>
+              <div key={idx} style={{ background: "var(--badge-bg)", border: "1px solid var(--border-subtle)", padding: "8px 12px", borderRadius: "10px", display: "flex", alignItems: "center", gap: "8px" }} title={badge.hoverText}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={badge.icon.startsWith('/') ? `https://leetcode.com${badge.icon}` : badge.icon}
                   alt={badge.name}
                   style={{ width: 36, height: 36, objectFit: "contain" }}
                 />
-                <div style={{ fontSize: "14px", fontWeight: "500", color: "#eff1f6" }}>{badge.name}</div>
+                <div style={{ fontSize: "14px", fontWeight: "500", color: "var(--text-primary)" }}>{badge.name}</div>
               </div>
             ))}
           </div>
@@ -381,19 +383,20 @@ export default function LeetCodeDashboard() {
 
       {/* Recent Submissions */}
       <div style={{ marginTop: 24 }}>
-        <h3 style={{ marginBottom: 12, fontSize: "18px", color: "#eff1f6", fontWeight: "600" }}>Recent Submissions</h3>
+        <h3 style={{ marginBottom: 12, fontSize: "18px", color: "var(--text-primary)", fontWeight: "600" }}>Recent Submissions</h3>
         {submissionsData.length === 0 ? (
-          <p style={{ color: "#8a8a8a", fontSize: "14px" }}>No recent submissions available.</p>
+          <p style={{ color: "var(--text-muted)", fontSize: "14px" }}>No recent submissions available.</p>
         ) : (
           <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 12 }}>
             {submissionsData.map((item, idx) => {
               const accepted = item.status && item.status.toLowerCase().includes("accepted");
-              const statusColor = accepted ? "#00b8a3" : "#ff375f";
+              const statusColor = accepted ? "#059669" : "#e11d48";
               return (
                 <li
                   key={idx}
                   style={{
-                    background: "#3e3e3e",
+                    background: "var(--badge-bg)",
+                    border: "1px solid var(--border-subtle)",
                     borderRadius: 8,
                     padding: "12px 16px",
                     display: "flex",
@@ -403,13 +406,13 @@ export default function LeetCodeDashboard() {
                     gap: 8,
                   }}
                 >
-                  <strong style={{ color: "#eff1f6", fontSize: "15px" }}>{item.title}</strong>
+                  <strong style={{ color: "var(--text-primary)", fontSize: "15px" }}>{item.title}</strong>
                   <div style={{ display: "flex", gap: "12px", fontSize: "13px", alignItems: "center" }}>
                     <span style={{ color: statusColor, fontWeight: "600" }}>{item.status}</span>
-                    <span style={{ color: "#8a8a8a" }}>•</span>
-                    <span style={{ color: "#8a8a8a", background: "#282828", padding: "2px 8px", borderRadius: "12px", fontSize: "12px" }}>{item.lang}</span>
-                    <span style={{ color: "#8a8a8a" }}>•</span>
-                    <span style={{ color: "#8a8a8a" }}>{formatDate(item.time)}</span>
+                    <span style={{ color: "var(--text-muted)" }}>•</span>
+                    <span style={{ color: "var(--text-secondary)", background: "var(--badge-bg)", border: "1px solid var(--border-subtle)", padding: "2px 8px", borderRadius: "12px", fontSize: "12px" }}>{item.lang}</span>
+                    <span style={{ color: "var(--text-muted)" }}>•</span>
+                    <span style={{ color: "var(--text-muted)" }}>{formatDate(item.time)}</span>
                   </div>
                 </li>
               );
@@ -422,52 +425,49 @@ export default function LeetCodeDashboard() {
 
   // ── Render ──────────────────────────────────────────────────────────────
   return (
-    <section style={{ maxWidth: 1100, margin: "0 auto", padding: "20px", color: "#eff1f6", fontFamily: "system-ui, -apple-system, sans-serif" }}>
+    <section style={{ maxWidth: 1100, margin: "0 auto", padding: "20px", color: "var(--text-primary)", fontFamily: "var(--font-main)" }}>
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: "28px", fontWeight: "700", marginBottom: "8px", color: "#eff1f6" }}>My LeetCode Profile Overview</h1>
-        <p style={{ color: "#8a8a8a", margin: 0 }}>This is my LeetCode statistics and recent activity.</p>
+        <h1 style={{ fontSize: "28px", fontWeight: "800", marginBottom: "8px", color: "var(--text-primary)" }}>My LeetCode Profile Overview</h1>
+        <p style={{ color: "var(--text-secondary)", margin: 0 }}>This is my LeetCode statistics and algorithmic progress.</p>
       </div>
 
       {error && (
-        <div style={{ color: "#ff375f", background: "rgba(255, 55, 95, 0.1)", padding: 12, borderRadius: 8, marginBottom: 16, border: "1px solid rgba(255, 55, 95, 0.2)" }}>
+        <div style={{ color: "#fb7185", background: "rgba(244, 63, 94, 0.12)", padding: 12, borderRadius: 8, marginBottom: 16, border: "1px solid rgba(244, 63, 94, 0.3)" }}>
           {error}
         </div>
       )}
 
       {loading ? (
-        <div style={{ textAlign: "center", padding: 40, color: "#8a8a8a" }}>Loading profile…</div>
+        <div style={{ textAlign: "center", padding: 40, color: "var(--text-secondary)" }}>Loading LeetCode profile…</div>
       ) : (
         renderProfileCard(myProfile, myStats, myContest, mySubmissions, myBadges, myLanguages, myFromCache, myFetchedAt)
       )}
 
       {/* Search other profile */}
-      <div style={{ marginTop: 24, padding: 24, borderRadius: 16, background: "#282828", border: "1px solid #3e3e3e", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06)" }}>
-        <h2 style={{ margin: 0, marginBottom: 16, fontSize: "20px", fontWeight: "600", color: "#eff1f6" }}>View Your LeetCode Profile Overview</h2>
+      <div className="glass-card" style={{ marginTop: 24, padding: 24 }}>
+        <h2 style={{ margin: 0, marginBottom: 16, fontSize: "20px", fontWeight: "700", color: "var(--text-primary)" }}>Search Any LeetCode Profile</h2>
         <form onSubmit={handleSubmit} style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Enter username or LeetCode profile URL"
-            style={{ flex: "1 1 320px", minWidth: 0, padding: "12px 16px", borderRadius: 8, border: "1px solid #4a4a4a", background: "#3e3e3e", color: "#eff1f6", outline: "none", fontSize: "15px", transition: "border-color 0.2s" }}
-            onFocus={(e) => (e.target.style.borderColor = "#ffa116")}
-            onBlur={(e) => (e.target.style.borderColor = "#4a4a4a")}
+            placeholder="Enter username or LeetCode profile URL..."
+            style={{ flex: "1 1 320px", minWidth: 0, padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border-light)", background: "var(--input-bg)", color: "var(--text-primary)", outline: "none", fontSize: "15px" }}
           />
           <button
             type="submit"
             disabled={loading}
-            style={{ padding: "12px 24px", borderRadius: 8, border: "none", background: "#ffa116", color: "#1a1a1a", fontWeight: "600", fontSize: "15px", cursor: loading ? "not-allowed" : "pointer", transition: "opacity 0.2s" }}
-            onMouseOver={(e) => !loading && (e.target.style.opacity = "0.9")}
-            onMouseOut={(e) => !loading && (e.target.style.opacity = "1")}
+            className="btn-primary"
+            style={{ padding: "12px 24px", fontSize: "15px" }}
           >
             {loading ? "Loading..." : "Load Profile"}
           </button>
         </form>
-        <p style={{ margin: "14px 0 0", color: "#8a8a8a", fontSize: "14px" }}>
+        <p style={{ margin: "14px 0 0", color: "var(--text-muted)", fontSize: "14px" }}>
           Example:{" "}
-          <code style={{ background: "#3e3e3e", padding: "2px 6px", borderRadius: "4px", color: "#eff1f6" }}>username</code>
+          <code style={{ background: "var(--badge-bg)", padding: "2px 6px", borderRadius: "4px", color: "var(--accent-cyan)" }}>username</code>
           {" "}or{" "}
-          <code style={{ background: "#3e3e3e", padding: "2px 6px", borderRadius: "4px", color: "#eff1f6" }}>https://leetcode.com/u/username</code>
+          <code style={{ background: "var(--badge-bg)", padding: "2px 6px", borderRadius: "4px", color: "var(--accent-cyan)" }}>https://leetcode.com/u/username</code>
         </p>
       </div>
 
@@ -475,8 +475,8 @@ export default function LeetCodeDashboard() {
       {viewedProfile && (
         <>
           <div style={{ marginTop: 24, display: "flex", alignItems: "center", gap: 12 }}>
-            <h2 style={{ margin: 0, fontSize: "20px", color: "#eff1f6" }}>Viewed Profile</h2>
-            <span style={{ color: "#8a8a8a" }}>@{viewedProfile.username}</span>
+            <h2 style={{ margin: 0, fontSize: "20px", color: "var(--text-primary)" }}>Viewed Profile</h2>
+            <span style={{ color: "var(--text-muted)" }}>@{viewedProfile.username}</span>
           </div>
           {renderProfileCard(viewedProfile, viewedStats, viewedContest, viewedSubmissions, viewedBadges, viewedLanguages, viewedFromCache, viewedFetchedAt)}
         </>

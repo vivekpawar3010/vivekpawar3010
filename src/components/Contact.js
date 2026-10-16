@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import profile from "../data/profile";
 
 const initialForm = {
   name: "",
@@ -17,15 +18,18 @@ export default function Contact() {
 
   const validateField = (field, value) => {
     if (!value.trim()) {
-      return `${field} is required`;
+      if (field === "name") return "Please enter your name.";
+      if (field === "email") return "Please enter your email address.";
+      if (field === "message") return "Please write your message.";
+      return `${field.charAt(0).toUpperCase() + field.slice(1)} is required.`;
     }
 
     if (field === "email" && !emailPattern.test(value)) {
-      return "Enter a valid email address";
+      return "Please enter a valid email address (e.g. name@example.com).";
     }
 
     if (field === "message" && value.trim().length < 10) {
-      return "Message should be at least 10 characters";
+      return "Message must be at least 10 characters.";
     }
 
     return "";
@@ -38,7 +42,6 @@ export default function Contact() {
       const err = validateField(key, form[key]);
       if (err) {
         nextErrors[key] = err;
-        // check each line one by one: stop at first missing field to guide user step-by-step.
         break;
       }
     }
@@ -58,80 +61,281 @@ export default function Contact() {
     });
   };
 
-  const onSubmit = (evt) => {
+  const [submitting, setSubmitting] = useState(false);
+
+  const onSubmit = async (evt) => {
     evt.preventDefault();
     setStatus("");
 
     if (!validateAll()) {
-      setStatus("Please fix the highlighted error before submitting.");
+      setStatus("Please review and fix the highlighted field before sending.");
       return;
     }
 
-    // Simulated submit flow
-    setStatus("Message sent successfully!");
-    setForm(initialForm);
-    setErrors({});
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setStatus("Thank you! Your message has been sent successfully. I will get back to you soon.");
+        setForm(initialForm);
+        setErrors({});
+      } else {
+        setStatus(data.error || "Unable to send your message. Please try again.");
+      }
+    } catch (err) {
+      setStatus("Network connection error. Please verify your connection and try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
-    <main style={{ padding: "2rem", maxWidth: "640px", margin: "0 auto" }}>
-      <h1>Contact Me</h1>
-      <p>Fill in each field (check line by line). We validate one field at a time to guide you.</p>
+    <div className="container" style={{ maxWidth: 1000, margin: "0 auto", padding: "1.5rem 0 3.5rem" }}>
+      {/* Header */}
+      <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
+        <span
+          style={{
+            display: "inline-block",
+            fontSize: 13,
+            fontWeight: 600,
+            color: "var(--accent-cyan)",
+            background: "rgba(56, 189, 248, 0.1)",
+            padding: "4px 14px",
+            borderRadius: 20,
+            border: "1px solid rgba(56, 189, 248, 0.25)",
+            marginBottom: 12,
+          }}
+        >
+          Let&apos;s Connect
+        </span>
+        <h1 style={{ fontSize: "2.5rem", marginBottom: "0.75rem" }}>
+          Get In <span className="gradient-text">Touch</span>
+        </h1>
+        <p style={{ color: "var(--text-secondary)", maxWidth: 550, margin: "0 auto", fontSize: "1.05rem" }}>
+          Have an exciting project, internship opportunity, or question? Send a message or connect directly.
+        </p>
+      </div>
 
-      <form onSubmit={onSubmit} noValidate>
-        {[["name", "Name"], ["email", "Email"], ["message", "Message"]].map(([field, label]) => (
-          <div key={field} style={{ marginBottom: "1rem" }}>
-            <label htmlFor={field} style={{ display: "block", fontWeight: 600 }}>
-              {label}
-            </label>
-            {field !== "message" ? (
-              <input
-                type={field === "email" ? "email" : "text"}
-                id={field}
-                name={field}
-                value={form[field]}
-                onChange={onChange}
-                onBlur={(e) => {
-                  const error = validateField(field, e.target.value);
-                  setErrors((prev) => {
-                    const next = { ...prev };
-                    if (error) next[field] = error;
-                    else delete next[field];
-                    return next;
-                  });
-                }}
-                style={{ width: "100%", padding: "0.5rem", borderColor: errors[field] ? "red" : "#ccc" }}
-              />
-            ) : (
-              <textarea
-                id={field}
-                name={field}
-                value={form[field]}
-                onChange={onChange}
-                onBlur={(e) => {
-                  const error = validateField(field, e.target.value);
-                  setErrors((prev) => {
-                    const next = { ...prev };
-                    if (error) next[field] = error;
-                    else delete next[field];
-                    return next;
-                  });
-                }}
-                rows={6}
-                style={{ width: "100%", padding: "0.5rem", borderColor: errors[field] ? "red" : "#ccc" }}
-              />
-            )}
-            {errors[field] && <p style={{ color: "red", margin: "0.35rem 0 0" }}>{errors[field]}</p>}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+          gap: "2rem",
+          alignItems: "start",
+        }}
+      >
+        {/* Contact Info Sidebar */}
+        <div className="glass-card" style={{ padding: "2rem" }}>
+          <h2 style={{ fontSize: "1.35rem", marginBottom: "1rem" }}>Contact Details</h2>
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", lineHeight: 1.6, marginBottom: "1.5rem" }}>
+            I am always open to discussing new opportunities, open source projects, or collaborating on innovative ideas.
+          </p>
+
+          <div style={{ display: "grid", gap: "1.2rem" }}>
+            <a
+              href={`mailto:${profile.email}`}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 14,
+                padding: "12px 16px",
+                background: "rgba(255, 255, 255, 0.03)",
+                borderRadius: 12,
+                border: "1px solid var(--border-subtle)",
+                color: "var(--text-primary)",
+              }}
+            >
+              <span style={{ fontSize: 22 }}>✉️</span>
+              <div>
+                <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>
+                  Email
+                </div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: "var(--accent-cyan)" }}>{profile.email}</div>
+              </div>
+            </a>
+
+            <a
+              href={profile.linkedin}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 14,
+                padding: "12px 16px",
+                background: "rgba(255, 255, 255, 0.03)",
+                borderRadius: 12,
+                border: "1px solid var(--border-subtle)",
+                color: "var(--text-primary)",
+              }}
+            >
+              <span style={{ fontSize: 22 }}>💼</span>
+              <div>
+                <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>
+                  LinkedIn
+                </div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: "#60a5fa" }}>linkedin.com/in/vivek-pawar</div>
+              </div>
+            </a>
+
+            <a
+              href={profile.github}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 14,
+                padding: "12px 16px",
+                background: "rgba(255, 255, 255, 0.03)",
+                borderRadius: 12,
+                border: "1px solid var(--border-subtle)",
+                color: "var(--text-primary)",
+              }}
+            >
+              <span style={{ fontSize: 22 }}>🐙</span>
+              <div>
+                <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>
+                  GitHub
+                </div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: "#34d399" }}>github.com/{profile.githubUsername}</div>
+              </div>
+            </a>
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 14,
+                padding: "12px 16px",
+                background: "rgba(255, 255, 255, 0.03)",
+                borderRadius: 12,
+                border: "1px solid var(--border-subtle)",
+              }}
+            >
+              <span style={{ fontSize: 22 }}>📍</span>
+              <div>
+                <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase" }}>
+                  Location
+                </div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>{profile.location}</div>
+              </div>
+            </div>
           </div>
-        ))}
+        </div>
 
-        <button type="submit" style={{ padding: "0.75rem 1.2rem", fontSize: "1rem" }}>
-          Send Message
-        </button>
-      </form>
+        {/* Contact Form */}
+        <div className="glass-card" style={{ padding: "2rem" }}>
+          <h2 style={{ fontSize: "1.35rem", marginBottom: "1.2rem" }}>Send a Message</h2>
 
-      {status && <p style={{ marginTop: "1rem", color: status.includes("success") ? "green" : "darkred" }}>{status}</p>}
-    </main>
+          <form onSubmit={onSubmit} noValidate>
+            <div style={{ marginBottom: "1.2rem" }}>
+              <label htmlFor="name" style={{ display: "block", fontSize: 13, fontWeight: 600, marginBottom: 6 }}>
+                Your Name
+              </label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={form.name}
+                onChange={onChange}
+                placeholder="e.g. Alex Smith"
+                style={{
+                  width: "100%",
+                  padding: "10px 14px",
+                  background: "var(--input-bg)",
+                  border: `1px solid ${errors.name ? "#f43f5e" : "var(--border-light)"}`,
+                  borderRadius: 10,
+                  color: "var(--text-primary)",
+                  fontSize: "0.95rem",
+                  outline: "none",
+                }}
+              />
+              {errors.name && <p style={{ color: "#fb7185", margin: "4px 0 0", fontSize: "0.82rem" }}>{errors.name}</p>}
+            </div>
+
+            <div style={{ marginBottom: "1.2rem" }}>
+              <label htmlFor="email" style={{ display: "block", fontSize: 13, fontWeight: 600, marginBottom: 6 }}>
+                Your Email Address
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={form.email}
+                onChange={onChange}
+                placeholder="e.g. alex@example.com"
+                style={{
+                  width: "100%",
+                  padding: "10px 14px",
+                  background: "var(--input-bg)",
+                  border: `1px solid ${errors.email ? "#f43f5e" : "var(--border-light)"}`,
+                  borderRadius: 10,
+                  color: "var(--text-primary)",
+                  fontSize: "0.95rem",
+                  outline: "none",
+                }}
+              />
+              {errors.email && <p style={{ color: "#fb7185", margin: "4px 0 0", fontSize: "0.82rem" }}>{errors.email}</p>}
+            </div>
+
+            <div style={{ marginBottom: "1.5rem" }}>
+              <label htmlFor="message" style={{ display: "block", fontSize: 13, fontWeight: 600, marginBottom: 6 }}>
+                Message
+              </label>
+              <textarea
+                id="message"
+                name="message"
+                value={form.message}
+                onChange={onChange}
+                rows={5}
+                placeholder="Write your message or inquiry here..."
+                style={{
+                  width: "100%",
+                  padding: "10px 14px",
+                  background: "var(--input-bg)",
+                  border: `1px solid ${errors.message ? "#f43f5e" : "var(--border-light)"}`,
+                  borderRadius: 10,
+                  color: "var(--text-primary)",
+                  fontSize: "0.95rem",
+                  outline: "none",
+                  resize: "vertical",
+                  fontFamily: "inherit",
+                }}
+              />
+              {errors.message && (
+                <p style={{ color: "#fb7185", margin: "4px 0 0", fontSize: "0.82rem" }}>{errors.message}</p>
+              )}
+            </div>
+
+            <button type="submit" className="btn-primary" style={{ width: "100%", justifyContent: "center" }}>
+              Send Message 🚀
+            </button>
+          </form>
+
+          {status && (
+            <div
+              style={{
+                marginTop: "1.2rem",
+                padding: "10px 14px",
+                borderRadius: 8,
+                fontSize: "0.9rem",
+                fontWeight: 500,
+                background: status.includes("successfully") ? "rgba(16, 185, 129, 0.15)" : "rgba(244, 63, 94, 0.15)",
+                border: `1px solid ${status.includes("successfully") ? "rgba(16, 185, 129, 0.3)" : "rgba(244, 63, 94, 0.3)"}`,
+                color: status.includes("successfully") ? "#34d399" : "#fb7185",
+              }}
+            >
+              {status}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
-

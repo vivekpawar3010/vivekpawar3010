@@ -1,0 +1,17 @@
+{
+  "id": "profile-1",
+  "name": "Vivek Pawar",
+  "role": "Full-Stack Developer & Android App Developer",
+  "tagline": "Turning ideas into high-performance, scalable, and impactful digital products.",
+  "about": "Final-year B.Tech CSE student (2022–2026) at SVERI's College of Engineering, Pandharpur. Passionate about Full-Stack Web Development, native Android apps, System Design, and AI integration. Driven by problem-solving with strong foundations in DSA.",
+  "degree": "B.Tech in Computer Science and Engineering",
+  "institution": "SVERI's College of Engineering, Pandharpur",
+  "period": "2022 – 2026",
+  "location": "Maharashtra, India 🇮🇳",
+  "status": "Building with Prisma Postgres & Next.js 16",
+  "email": "vivekpawar.dev@gmail.com",
+  "github": "https://github.com/vivekpawar3010",
+  "linkedin": "https://linkedin.com/in/vivek-pawar-16548a275",
+  "leetcode": "https://leetcode.com/u/vivek_pawar-3010/",
+  "updatedAt": "2026-10-16T17:20:18.537Z"
+}

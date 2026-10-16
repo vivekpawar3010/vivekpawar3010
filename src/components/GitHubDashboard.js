@@ -65,13 +65,13 @@ const CacheBadge = ({ fromCache, fetchedAt }) => {
   );
 };
 
-const StatCard = ({ label, value, color = "#e2e8f0", icon }) => (
-  <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "18px 16px", textAlign: "center", transition: "transform 0.18s, border-color 0.18s" }}
-    onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.18)"; }}
-    onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; }}
+const StatCard = ({ label, value, color = "var(--text-primary)", icon }) => (
+  <div style={{ background: "var(--badge-bg)", border: "1px solid var(--border-subtle)", borderRadius: 14, padding: "18px 16px", textAlign: "center", transition: "transform 0.18s, border-color 0.18s" }}
+    onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.borderColor = "var(--border-highlight)"; }}
+    onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.borderColor = "var(--border-subtle)"; }}
   >
     {icon && <div style={{ fontSize: 20, marginBottom: 6 }}>{icon}</div>}
-    <div style={{ fontSize: 12, color: "#6b7280", marginBottom: 6, fontWeight: 500, letterSpacing: "0.04em", textTransform: "uppercase" }}>{label}</div>
+    <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 6, fontWeight: 500, letterSpacing: "0.04em", textTransform: "uppercase" }}>{label}</div>
     <div style={{ fontSize: 24, fontWeight: 700, color }}>{value}</div>
   </div>
 );
@@ -90,8 +90,8 @@ const LangBar = ({ languages }) => {
         {languages.map((l, i) => (
           <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13 }}>
             <span style={{ width: 10, height: 10, borderRadius: "50%", background: getLangColor(l.name), display: "inline-block" }} />
-            <span style={{ color: "#e2e8f0" }}>{l.name}</span>
-            <span style={{ color: "#6b7280" }}>{((l.count / total) * 100).toFixed(0)}%</span>
+            <span style={{ color: "var(--text-primary)" }}>{l.name}</span>
+            <span style={{ color: "var(--text-muted)" }}>{((l.count / total) * 100).toFixed(0)}%</span>
           </div>
         ))}
       </div>
@@ -238,23 +238,24 @@ export default function GitHubDashboard() {
   ];
 
   const cardStyle = {
-    background: "rgba(255,255,255,0.03)",
-    border: "1px solid rgba(255,255,255,0.08)",
+    background: "var(--bg-card)",
+    border: "1px solid var(--border-subtle)",
     borderRadius: 16,
     padding: 24,
     marginBottom: 20,
+    boxShadow: "var(--shadow-card)",
   };
 
   const sectionTitle = (title, sub) => (
     <div style={{ marginBottom: 18 }}>
-      <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#e2e8f0" }}>{title}</h2>
-      {sub && <p style={{ margin: "4px 0 0", fontSize: 13, color: "#6b7280" }}>{sub}</p>}
+      <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "var(--text-primary)" }}>{title}</h2>
+      {sub && <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--text-secondary)" }}>{sub}</p>}
     </div>
   );
 
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
-    <section style={{ maxWidth: 1100, margin: "0 auto", padding: "24px 20px 40px", color: "#e2e8f0", fontFamily: "'Inter', system-ui, -apple-system, sans-serif" }}>
+    <section style={{ maxWidth: 1100, margin: "0 auto", padding: "24px 20px 40px", color: "var(--text-primary)", fontFamily: "var(--font-main)" }}>
 
       {/* Page header */}
       <div style={{ marginBottom: 28 }}>
@@ -264,9 +265,9 @@ export default function GitHubDashboard() {
           </h1>
           {fetchedAt && <CacheBadge fromCache={fromCache} fetchedAt={fetchedAt} />}
         </div>
-        <p style={{ margin: 0, color: "#6b7280", fontSize: 14 }}>
+        <p style={{ margin: 0, color: "var(--text-secondary)", fontSize: 14 }}>
           Live stats for{" "}
-          <a href={`https://github.com/${DEFAULT_USERNAME}`} target="_blank" rel="noopener noreferrer" style={{ color: "#60a5fa", textDecoration: "none", fontWeight: 600 }}>
+          <a href={`https://github.com/${DEFAULT_USERNAME}`} target="_blank" rel="noopener noreferrer" style={{ color: "var(--accent-blue)", textDecoration: "none", fontWeight: 600 }}>
             @{DEFAULT_USERNAME}
           </a>
         </p>
@@ -285,16 +286,11 @@ export default function GitHubDashboard() {
                  error.includes("lacks required scopes") ? "GitHub Token Missing Scopes" :
                  "GitHub API Error"}
               </div>
-              <div style={{ color: "#fca5a5", fontSize: 13, lineHeight: 1.6, marginBottom: 10 }}>{error}</div>
-              {error.includes("PAT is not configured") && (
-                <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: 8, padding: "12px 14px", fontSize: 12, color: "#d1d5db", fontFamily: "monospace" }}>
-                  <div style={{ color: "#86efac", marginBottom: 4 }}># Add to your .env.local file:</div>
-                  <div>GITHUB_PAT=ghp_xxxxxxxxxxxxxxxxxxxx</div>
-                  <div style={{ marginTop: 8, color: "#93c5fd", fontFamily: "sans-serif", fontSize: 11 }}>
-                    Generate at: GitHub → Settings → Developer Settings → Personal Access Tokens → Fine-grained tokens
-                  </div>
-                </div>
-              )}
+              <div style={{ color: "#fca5a5", fontSize: 13, lineHeight: 1.6, marginBottom: 10 }}>
+                {error.includes("PAT is not configured")
+                  ? "GitHub live statistics are currently running in public mode. Full analytics will resume shortly."
+                  : error}
+              </div>
               {(error.includes("invalid or expired") || error.includes("lacks required scopes")) && (
                 <a
                   href="https://github.com/settings/tokens"

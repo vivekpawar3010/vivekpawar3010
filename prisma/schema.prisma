@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Profile {
+  id          String   @id @default("profile-1")
+  name        String   @default("Vivek Pawar")
+  role        String   @default("Full-Stack Developer & Android App Developer")
+  tagline     String   @default("Turning ideas into high-performance, scalable, and impactful digital products.")
+  about       String   @default("Final-year B.Tech CSE student (2022–2026) at SVERI's College of Engineering, Pandharpur. Passionate about Full-Stack Web Development, native Android apps, System Design, and AI integration.")
+  degree      String   @default("B.Tech in Computer Science and Engineering")
+  institution String   @default("SVERI's College of Engineering, Pandharpur")
+  period      String   @default("2022 – 2026")
+  location    String   @default("Maharashtra, India 🇮🇳")
+  status      String   @default("Open to Internships & Opportunities 🚀")
+  email       String   @default("vivekpawar.dev@gmail.com")
+  github      String   @default("https://github.com/vivekpawar3010")
+  linkedin    String   @default("https://linkedin.com/in/vivek-pawar-16548a275")
+  leetcode    String   @default("https://leetcode.com/u/vivek_pawar-3010/")
+  updatedAt   DateTime @updatedAt
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  subtitle    String?
+  description String
+  category    String   @default("Full Stack")
+  tags        String   @default("React,Next.js") // Comma-separated or JSON
+  link        String
+  github      String?
+  featured    Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Skill {
+  id        String   @id @default(cuid())
+  category  String
+  name      String
+  level     String   @default("Intermediate")
+  badge     String?
+  createdAt DateTime @default(now())
+}
+
+model Task {
+  id        String   @id @default(cuid())
+  title     String
+  category  String   @default("General")
+  priority  String   @default("Medium")
+  status    String   @default("todo") // todo, in_progress, completed
+  dueDate   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Friend {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  name         String?
+  isUser       Boolean  @default(false)
+  totalSolved  Int      @default(0)
+  easySolved   Int      @default(0)
+  mediumSolved Int      @default(0)
+  hardSolved   Int      @default(0)
+  ranking      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model VaultNote {
+  id        String   @id @default("main-notes")
+  content   String   @default("")
+  updatedAt DateTime @updatedAt
+}

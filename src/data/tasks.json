@@ -1,0 +1,56 @@
+[
+  {
+    "id": "task-1",
+    "title": "Solve Daily LeetCode Challenge & maintain streak",
+    "category": "LeetCode",
+    "priority": "High",
+    "status": "todo",
+    "dueDate": "Today",
+    "createdAt": "2026-10-16"
+  },
+  {
+    "id": "task-2",
+    "title": "Practice 3 Dynamic Programming problems on LeetCode",
+    "category": "LeetCode",
+    "priority": "High",
+    "status": "in_progress",
+    "dueDate": "Tomorrow",
+    "createdAt": "2026-10-16"
+  },
+  {
+    "id": "task-3",
+    "title": "Complete final-year project documentation for SVERI COE",
+    "category": "College",
+    "priority": "Medium",
+    "status": "in_progress",
+    "dueDate": "Oct 25",
+    "createdAt": "2026-10-15"
+  },
+  {
+    "id": "task-4",
+    "title": "Deploy Pandharpur Darshan updates with interactive map",
+    "category": "Projects",
+    "priority": "Medium",
+    "status": "todo",
+    "dueDate": "Oct 28",
+    "createdAt": "2026-10-14"
+  },
+  {
+    "id": "task-5",
+    "title": "Prepare System Design notes on Caching & Message Queues",
+    "category": "Career",
+    "priority": "High",
+    "status": "todo",
+    "dueDate": "Nov 02",
+    "createdAt": "2026-10-13"
+  },
+  {
+    "id": "task-6",
+    "title": "Update Resume with Next.js 16 & AI integration achievements",
+    "category": "Career",
+    "priority": "Low",
+    "status": "completed",
+    "dueDate": "Done",
+    "createdAt": "2026-10-12"
+  }
+]

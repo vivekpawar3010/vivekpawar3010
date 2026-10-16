@@ -1,0 +1,127 @@
+[
+  {
+    "id": "proj-1792172228564",
+    "name": "AI Portfolio Engine",
+    "subtitle": "Real-time database-backed developer deck",
+    "description": "Built with Next.js 16, Prisma ORM, and PostgreSQL. Features dynamic admin control.",
+    "category": "Full Stack",
+    "tags": [
+      "Next.js",
+      "Prisma",
+      "PostgreSQL"
+    ],
+    "link": "",
+    "github": "",
+    "featured": false
+  },
+  {
+    "id": "proj-1792171849228",
+    "name": "AI Portfolio Engine",
+    "subtitle": "Real-time database-backed developer deck",
+    "description": "Built with Next.js 16, Prisma ORM, and PostgreSQL. Features dynamic admin control.",
+    "category": "Full Stack",
+    "tags": [
+      "Next.js",
+      "Prisma",
+      "PostgreSQL"
+    ],
+    "link": "",
+    "github": "",
+    "featured": false
+  },
+  {
+    "id": "proj-1792171502416",
+    "name": "AI Portfolio Engine",
+    "subtitle": "Real-time database-backed developer deck",
+    "description": "Built with Next.js 16, Prisma ORM, and PostgreSQL. Features dynamic admin control.",
+    "category": "Full Stack",
+    "tags": [
+      "Next.js",
+      "Prisma",
+      "PostgreSQL"
+    ],
+    "link": "",
+    "github": "",
+    "featured": true
+  },
+  {
+    "id": "pandharpurdarshan",
+    "name": "Pandharpur Darshan",
+    "subtitle": "Cultural & Tourism Information Portal",
+    "description": "A comprehensive digital guide and exploration platform for devotees and tourists visiting the holy city of Pandharpur. Features temple schedules, accommodation guides, interactive maps, and travel planning.",
+    "category": "Full Stack",
+    "tags": [
+      "React",
+      "Next.js",
+      "JavaScript",
+      "Responsive Design",
+      "Tourism"
+    ],
+    "link": "https://github.com/vivekpawar3010/pandharpurdarshan",
+    "github": "https://github.com/vivekpawar3010/pandharpurdarshan",
+    "featured": true,
+    "order": 0,
+    "createdAt": "2026-10-16T17:16:44.069Z",
+    "updatedAt": "2026-10-16T17:16:44.069Z"
+  },
+  {
+    "id": "studybuddy-ai",
+    "name": "StudyBuddy AI",
+    "subtitle": "AI-Powered Learning & Doubt Resolution Assistant",
+    "description": "An intelligent educational assistant designed to help students study smarter. Integrates AI reasoning to break down complex concepts, summarize notes, generate practice quizzes, and explain solutions step-by-step.",
+    "category": "AI & Web",
+    "tags": [
+      "Next.js",
+      "AI Integration",
+      "React",
+      "Node.js",
+      "OpenAI / Gemini"
+    ],
+    "link": "https://github.com/vivekpawar3010/atudybudd-ai",
+    "github": "https://github.com/vivekpawar3010/atudybudd-ai",
+    "featured": true,
+    "order": 1,
+    "createdAt": "2026-10-16T17:16:44.919Z",
+    "updatedAt": "2026-10-16T17:16:44.919Z"
+  },
+  {
+    "id": "genzday",
+    "name": "GenZDay",
+    "subtitle": "Modern Lifestyle & Trend Curation App",
+    "description": "A trendy, engaging platform tailored for Gen-Z audiences featuring curated viral topics, dynamic mood trackers, daily inspirations, and interactive community polls.",
+    "category": "Frontend",
+    "tags": [
+      "React",
+      "JavaScript",
+      "CSS3",
+      "Firebase",
+      "Web App"
+    ],
+    "link": "https://github.com/vivekpawar3010/genzday",
+    "github": "https://github.com/vivekpawar3010/genzday",
+    "featured": true,
+    "order": 2,
+    "createdAt": "2026-10-16T17:16:45.253Z",
+    "updatedAt": "2026-10-16T17:16:45.253Z"
+  },
+  {
+    "id": "portfolio-analytics",
+    "name": "Developer Portfolio & Analytics Hub",
+    "subtitle": "Interactive Portfolio with Live LeetCode & GitHub Sync",
+    "description": "High-performance Next.js 16 portfolio with live server-cached GraphQL integrations for GitHub activity and LeetCode problem-solving progress. Includes dark glassmorphic UI, responsive layouts, and SEO optimization.",
+    "category": "Full Stack",
+    "tags": [
+      "Next.js 16",
+      "Turbopack",
+      "GraphQL",
+      "REST APIs",
+      "In-Memory Cache"
+    ],
+    "link": "https://github.com/vivekpawar3010/vivekpawar3010",
+    "github": "https://github.com/vivekpawar3010/vivekpawar3010",
+    "featured": true,
+    "order": 3,
+    "createdAt": "2026-10-16T17:16:45.546Z",
+    "updatedAt": "2026-10-16T17:16:45.546Z"
+  }
+]
