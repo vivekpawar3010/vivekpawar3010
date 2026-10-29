@@ -3,6 +3,7 @@ import defaultProfile from '@/data/profile';
 import defaultProjects from '@/data/projects';
 import defaultSkills from '@/data/skills';
 import defaultTasks from '@/data/tasks.json';
+import defaultVaultNotes from '@/data/vault.json';
 import fs from 'fs';
 import path from 'path';
 
@@ -33,6 +34,24 @@ function writeFile(filePath, data) {
   }
 }
 
+// ── Profile Normalizer ───────────────────────────────────────────────────────
+export function normalizeProfile(raw) {
+  if (!raw) return defaultProfile;
+  return {
+    ...defaultProfile,
+    ...raw,
+    avatarUrl: raw.avatarUrl || defaultProfile.avatarUrl || '/images/avatar.png',
+    education: {
+      degree: raw.education?.degree || raw.degree || defaultProfile.education.degree,
+      institution: raw.education?.institution || raw.institution || defaultProfile.education.institution,
+      period: raw.education?.period || raw.period || defaultProfile.education.period,
+      location: raw.education?.location || defaultProfile.education.location,
+      status: raw.education?.status || defaultProfile.education.status,
+    },
+    interests: Array.isArray(raw.interests) && raw.interests.length > 0 ? raw.interests : defaultProfile.interests,
+  };
+}
+
 // ── Profile ─────────────────────────────────────────────────────────────────
 export async function getProfile() {
   if (prisma) {
@@ -56,70 +75,67 @@ export async function getProfile() {
             github: defaultProfile.github || '',
             linkedin: defaultProfile.linkedin || '',
             leetcode: defaultProfile.leetcode || '',
+            avatarUrl: defaultProfile.avatarUrl || '/images/avatar.png',
           },
         });
       }
-      return {
-        ...defaultProfile,
-        ...p,
-        education: {
-          degree: p.degree || defaultProfile.education?.degree,
-          institution: p.institution || defaultProfile.education?.institution,
-          period: p.period || defaultProfile.education?.period,
-        },
-      };
+      return normalizeProfile(p);
     } catch (e) {
       console.warn('Prisma getProfile fallback to local file:', e.message);
     }
   }
-  return readFile(PROFILE_FILE, defaultProfile);
+  return normalizeProfile(readFile(PROFILE_FILE, defaultProfile));
 }
 
 export async function updateProfile(data) {
+  const normalizedInput = normalizeProfile(data);
   if (prisma) {
     try {
       const updated = await prisma.profile.upsert({
         where: { id: 'profile-1' },
         create: {
           id: 'profile-1',
-          name: data.name || defaultProfile.name,
-          role: data.role || defaultProfile.role,
-          tagline: data.tagline || defaultProfile.tagline,
-          about: data.about || defaultProfile.about,
-          degree: data.education?.degree || data.degree || '',
-          institution: data.education?.institution || data.institution || '',
-          period: data.education?.period || data.period || '',
-          location: data.location || defaultProfile.location,
-          status: data.status || defaultProfile.status,
-          email: data.email || defaultProfile.email,
-          github: data.github || defaultProfile.github,
-          linkedin: data.linkedin || defaultProfile.linkedin,
-          leetcode: data.leetcode || defaultProfile.leetcode,
+          name: normalizedInput.name,
+          role: normalizedInput.role,
+          tagline: normalizedInput.tagline,
+          about: normalizedInput.about,
+          degree: normalizedInput.education.degree,
+          institution: normalizedInput.education.institution,
+          period: normalizedInput.education.period,
+          location: normalizedInput.location,
+          status: normalizedInput.status,
+          email: normalizedInput.email,
+          github: normalizedInput.github,
+          linkedin: normalizedInput.linkedin,
+          leetcode: normalizedInput.leetcode,
+          avatarUrl: normalizedInput.avatarUrl,
         },
         update: {
-          name: data.name,
-          role: data.role,
-          tagline: data.tagline,
-          about: data.about,
-          degree: data.education?.degree || data.degree,
-          institution: data.education?.institution || data.institution,
-          period: data.education?.period || data.period,
-          location: data.location,
-          status: data.status,
-          email: data.email,
-          github: data.github,
-          linkedin: data.linkedin,
-          leetcode: data.leetcode,
+          name: normalizedInput.name,
+          role: normalizedInput.role,
+          tagline: normalizedInput.tagline,
+          about: normalizedInput.about,
+          degree: normalizedInput.education.degree,
+          institution: normalizedInput.education.institution,
+          period: normalizedInput.education.period,
+          location: normalizedInput.location,
+          status: normalizedInput.status,
+          email: normalizedInput.email,
+          github: normalizedInput.github,
+          linkedin: normalizedInput.linkedin,
+          leetcode: normalizedInput.leetcode,
+          avatarUrl: normalizedInput.avatarUrl,
         },
       });
-      writeFile(PROFILE_FILE, updated);
-      return updated;
+      const formatted = normalizeProfile(updated);
+      writeFile(PROFILE_FILE, formatted);
+      return formatted;
     } catch (e) {
       console.warn('Prisma updateProfile fallback:', e.message);
     }
   }
   const current = await getProfile();
-  const updated = { ...current, ...data };
+  const updated = normalizeProfile({ ...current, ...data });
   writeFile(PROFILE_FILE, updated);
   return updated;
 }
@@ -528,38 +544,162 @@ export async function deleteMessage(id) {
   return updated;
 }
 
-// ── Vault Notes ─────────────────────────────────────────────────────────────
-export async function getVaultNote() {
+// ── Vault Notes System ──────────────────────────────────────────────────────
+export async function getVaultNotes() {
   if (prisma) {
     try {
-      let note = await prisma.vaultNote.findFirst();
-      if (!note) {
-        note = await prisma.vaultNote.create({
-          data: { id: 'main-notes', content: '' },
+      let record = await prisma.vaultNote.findUnique({
+        where: { id: 'vault-notes-list' },
+      });
+      if (record && record.content) {
+        try {
+          const parsed = JSON.parse(record.content);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed;
+          }
+        } catch (e) {
+          console.warn('Failed parsing JSON from vaultNote content', e);
+        }
+      } else {
+        // Seed default notes into database
+        await prisma.vaultNote.upsert({
+          where: { id: 'vault-notes-list' },
+          create: { id: 'vault-notes-list', content: JSON.stringify(defaultVaultNotes, null, 2) },
+          update: { content: JSON.stringify(defaultVaultNotes, null, 2) },
         });
+        return defaultVaultNotes;
       }
-      return note;
     } catch (e) {
-      console.warn('Prisma getVaultNote fallback:', e.message);
+      console.warn('Prisma getVaultNotes fallback:', e.message);
     }
   }
-  return readFile(VAULT_FILE, { content: '' });
+  return readFile(VAULT_FILE, defaultVaultNotes);
+}
+
+export async function saveVaultNote(noteData) {
+  const current = await getVaultNotes();
+  const existingIdx = current.findIndex((n) => n.id === noteData.id);
+
+  let updatedList;
+  if (existingIdx >= 0) {
+    const updatedNote = {
+      ...current[existingIdx],
+      ...noteData,
+      updatedAt: new Date().toISOString(),
+    };
+    updatedList = [...current];
+    updatedList[existingIdx] = updatedNote;
+  } else {
+    const newNote = {
+      id: noteData.id || `note-${Date.now()}`,
+      title: noteData.title?.trim() || 'Untitled Note',
+      category: noteData.category || 'General',
+      content: noteData.content || '',
+      pinned: Boolean(noteData.pinned),
+      color: noteData.color || 'cyan',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    updatedList = [newNote, ...current];
+  }
+
+  // Sort notes: pinned first, then by updatedAt descending
+  updatedList.sort((a, b) => {
+    if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+    return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
+  });
+
+  if (prisma) {
+    try {
+      await prisma.vaultNote.upsert({
+        where: { id: 'vault-notes-list' },
+        create: { id: 'vault-notes-list', content: JSON.stringify(updatedList, null, 2) },
+        update: { content: JSON.stringify(updatedList, null, 2) },
+      });
+    } catch (e) {
+      console.warn('Prisma saveVaultNote error:', e.message);
+    }
+  }
+
+  writeFile(VAULT_FILE, updatedList);
+  return updatedList;
+}
+
+export async function deleteVaultNote(id) {
+  const current = await getVaultNotes();
+  const updatedList = current.filter((n) => n.id !== id);
+
+  if (prisma) {
+    try {
+      await prisma.vaultNote.upsert({
+        where: { id: 'vault-notes-list' },
+        create: { id: 'vault-notes-list', content: JSON.stringify(updatedList, null, 2) },
+        update: { content: JSON.stringify(updatedList, null, 2) },
+      });
+    } catch (e) {
+      console.warn('Prisma deleteVaultNote error:', e.message);
+    }
+  }
+
+  writeFile(VAULT_FILE, updatedList);
+  return updatedList;
+}
+
+export async function togglePinVaultNote(id) {
+  const current = await getVaultNotes();
+  const updatedList = current.map((n) =>
+    n.id === id ? { ...n, pinned: !n.pinned, updatedAt: new Date().toISOString() } : n
+  );
+
+  updatedList.sort((a, b) => {
+    if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+    return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
+  });
+
+  if (prisma) {
+    try {
+      await prisma.vaultNote.upsert({
+        where: { id: 'vault-notes-list' },
+        create: { id: 'vault-notes-list', content: JSON.stringify(updatedList, null, 2) },
+        update: { content: JSON.stringify(updatedList, null, 2) },
+      });
+    } catch (e) {
+      console.warn('Prisma togglePinVaultNote error:', e.message);
+    }
+  }
+
+  writeFile(VAULT_FILE, updatedList);
+  return updatedList;
+}
+
+// Backward compatibility single note access
+export async function getVaultNote() {
+  const notes = await getVaultNotes();
+  return { id: 'main-notes', content: JSON.stringify(notes) };
 }
 
 export async function updateVaultNote(content) {
-  if (prisma) {
+  if (typeof content === 'string') {
     try {
-      const updated = await prisma.vaultNote.upsert({
-        where: { id: 'main-notes' },
-        create: { id: 'main-notes', content },
-        update: { content },
-      });
-      return updated;
+      const parsed = JSON.parse(content);
+      if (Array.isArray(parsed)) {
+        if (prisma) {
+          try {
+            await prisma.vaultNote.upsert({
+              where: { id: 'vault-notes-list' },
+              create: { id: 'vault-notes-list', content },
+              update: { content },
+            });
+          } catch (e) {
+            console.warn('Prisma updateVaultNote error:', e.message);
+          }
+        }
+        writeFile(VAULT_FILE, parsed);
+        return { content };
+      }
     } catch (e) {
-      console.warn('Prisma updateVaultNote fallback:', e.message);
+      // not JSON array
     }
   }
-  const updated = { content, updatedAt: new Date().toISOString() };
-  writeFile(VAULT_FILE, updated);
-  return updated;
+  return { content };
 }

@@ -16,30 +16,54 @@ export default function Skills() {
       })
       .catch((err) => console.error("Error loading dynamic skills", err));
   }, []);
+
+  const proficiencyLevels = {
+    "React.js": 92,
+    "Next.js": 90,
+    "Tailwind CSS": 95,
+    "REST APIs": 88,
+    "Java": 88,
+    "Python": 84,
+    "JavaScript": 92,
+    "C / C++": 78,
+    "SQL": 85,
+    "PostgreSQL": 86,
+    "Firebase": 90,
+    "MongoDB": 82,
+    "Android Studio": 80,
+    "React Native": 78,
+    "Gemini API": 88,
+    "Git / GitHub": 90,
+    "VS Code": 95,
+    "Sanity CMS": 84,
+  };
+
   return (
-    <section style={{ padding: "3rem 0" }}>
+    <section style={{ padding: "2.5rem 0 4rem" }}>
       <div className="container">
-        <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
-          <span
+        <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+          <div className="section-tag" style={{ justifyContent: "center" }}>
+            Technical Arsenal
+          </div>
+          <h2
             style={{
-              display: "inline-block",
-              fontSize: 13,
-              fontWeight: 600,
-              color: "var(--accent-cyan)",
-              background: "rgba(56, 189, 248, 0.1)",
-              padding: "4px 14px",
-              borderRadius: 20,
-              border: "1px solid rgba(56, 189, 248, 0.25)",
-              marginBottom: 12,
+              fontSize: "clamp(2rem, 4vw, 2.8rem)",
+              marginBottom: "0.75rem",
+              fontWeight: 900,
+              color: "#F5F7FA",
             }}
           >
-            Technical Arsenal
-          </span>
-          <h2 style={{ fontSize: "2.2rem", marginBottom: "0.75rem" }}>
-            Skills & <span className="gradient-text">Technologies</span>
+            Skills &amp; <span className="lime-underline">Technologies</span>
           </h2>
-          <p style={{ color: "var(--text-secondary)", maxWidth: 600, margin: "0 auto", fontSize: "1rem" }}>
-            The languages, frameworks, developer tools, and technologies I work with daily.
+          <p
+            style={{
+              color: "var(--text-secondary)",
+              maxWidth: 640,
+              margin: "0 auto",
+              fontSize: "1rem",
+            }}
+          >
+            Technologies, frameworks, and developer tools I work with daily and am continuously mastering.
           </p>
         </div>
 
@@ -47,7 +71,7 @@ export default function Skills() {
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-            gap: "1.5rem",
+            gap: "1.8rem",
           }}
         >
           {skillsList.map((group, idx) => (
@@ -55,70 +79,100 @@ export default function Skills() {
               key={idx}
               className="glass-card"
               style={{
-                padding: "1.5rem",
+                padding: "1.8rem",
                 display: "flex",
                 flexDirection: "column",
+                borderRadius: 14,
+                border: "1px solid var(--border-subtle)",
+                background: "rgba(11, 18, 28, 0.85)",
               }}
             >
               <div
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 10,
+                  justifyContent: "space-between",
                   marginBottom: "1.2rem",
                   paddingBottom: "0.8rem",
                   borderBottom: "1px solid var(--border-subtle)",
                 }}
               >
-                <span style={{ fontSize: 24 }}>{group.icon}</span>
-                <h3 style={{ fontSize: "1.15rem", margin: 0, fontWeight: 700 }}>{group.category}</h3>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{ fontSize: 24 }}>{group.icon}</span>
+                  <h3 style={{ fontSize: "1.2rem", margin: 0, fontWeight: 700, color: "#F5F7FA" }}>
+                    {group.category}
+                  </h3>
+                </div>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "var(--accent-lime)" }}>
+                  {Array.isArray(group.items) ? group.items.length : 0} Skills
+                </span>
               </div>
 
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                {group.items.map((item, itemIdx) => (
-                  <div
-                    key={itemIdx}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 6,
-                      background: "var(--badge-bg)",
-                      border: "1px solid var(--border-subtle)",
-                      borderRadius: 10,
-                      padding: "6px 12px",
-                      fontSize: "0.88rem",
-                      fontWeight: 500,
-                      color: "var(--text-primary)",
-                      transition: "all var(--transition-fast)",
-                    }}
-                  >
-                    <span>{item.name}</span>
-                    {item.badge && (
-                      <span
-                        style={{
-                          fontSize: 10,
-                          fontWeight: 700,
-                          padding: "1px 6px",
-                          borderRadius: 6,
-                          background:
-                            item.badge === "Primary"
-                              ? "rgba(56, 189, 248, 0.2)"
-                              : item.badge === "LeetCode"
-                              ? "rgba(245, 158, 11, 0.2)"
-                              : "rgba(16, 185, 129, 0.2)",
-                          color:
-                            item.badge === "Primary"
-                              ? "#38bdf8"
-                              : item.badge === "LeetCode"
-                              ? "#fbbf24"
-                              : "#34d399",
-                        }}
-                      >
-                        {item.badge}
-                      </span>
-                    )}
-                  </div>
-                ))}
+              {/* Items with visual progress bars */}
+              <div style={{ display: "grid", gap: "1rem" }}>
+                {Array.isArray(group.items) &&
+                  group.items.map((item, itemIdx) => {
+                    const levelPercent = proficiencyLevels[item.name] || 82;
+                    return (
+                      <div key={itemIdx}>
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            marginBottom: 6,
+                          }}
+                        >
+                          <span style={{ fontSize: "0.92rem", fontWeight: 600, color: "#F5F7FA" }}>
+                            {item.name}
+                          </span>
+                          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                            {item.badge && (
+                              <span
+                                style={{
+                                  fontSize: 10,
+                                  fontWeight: 700,
+                                  padding: "1px 6px",
+                                  borderRadius: 4,
+                                  background: "rgba(200, 255, 69, 0.15)",
+                                  color: "var(--accent-lime)",
+                                }}
+                              >
+                                {item.badge}
+                              </span>
+                            )}
+                            <span style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600 }}>
+                              {levelPercent}%
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Progress Meter Bar */}
+                        <div
+                          style={{
+                            width: "100%",
+                            height: 6,
+                            borderRadius: 10,
+                            background: "rgba(255, 255, 255, 0.06)",
+                            overflow: "hidden",
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: `${levelPercent}%`,
+                              height: "100%",
+                              borderRadius: 10,
+                              background:
+                                levelPercent >= 90
+                                  ? "linear-gradient(90deg, #22D3EE 0%, var(--accent-lime) 100%)"
+                                  : "linear-gradient(90deg, #818cf8 0%, #22D3EE 100%)",
+                              boxShadow: "0 0 10px rgba(200, 255, 69, 0.3)",
+                            }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
               </div>
             </div>
           ))}

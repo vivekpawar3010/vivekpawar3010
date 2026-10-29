@@ -22,6 +22,7 @@ model Profile {
   github      String   @default("https://github.com/vivekpawar3010")
   linkedin    String   @default("https://linkedin.com/in/vivek-pawar-16548a275")
   leetcode    String   @default("https://leetcode.com/u/vivek_pawar-3010/")
+  avatarUrl   String?  @default("/images/avatar.png")
   updatedAt   DateTime @updatedAt
 }
 

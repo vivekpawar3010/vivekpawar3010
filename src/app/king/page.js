@@ -9,6 +9,7 @@ import TaskManager from "../../components/king/TaskManager";
 import LeetCodeFriends from "../../components/king/LeetCodeFriends";
 import MessagesInbox from "../../components/king/MessagesInbox";
 import PersonalVault from "../../components/king/PersonalVault";
+import DatabaseInspector from "../../components/king/DatabaseInspector";
 
 export default function KingPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -16,20 +17,40 @@ export default function KingPage() {
   const [error, setError] = useState("");
   const [loadingAuth, setLoadingAuth] = useState(false);
   const [activeSection, setActiveSection] = useState("profile");
-  const [sessionInput, setSessionInput] = useState("");
-  const [sessionSaved, setSessionSaved] = useState("");
+  const [stats, setStats] = useState({
+    projects: 6,
+    tasks: 0,
+    messages: 0,
+    unreadMessages: 0,
+    vaultNotes: 0,
+    dbStatus: "Online",
+  });
 
-  // Check persistent session on mount
+  // Check persistent session on mount & load quick stats
   useEffect(() => {
     const auth = localStorage.getItem("king_authenticated");
     if (auth === "true") {
       setIsAuthenticated(true);
     }
-    const savedSession = localStorage.getItem("king_leetcode_session");
-    if (savedSession) {
-      setSessionInput(savedSession);
-    }
-  }, []);
+
+    // Quick stats fetch
+    Promise.allSettled([
+      fetch("/api/king/projects").then((r) => r.json()),
+      fetch("/api/king/tasks").then((r) => r.json()),
+      fetch("/api/king/messages").then((r) => r.json()),
+      fetch("/api/king/vault").then((r) => r.json()),
+    ]).then(([proj, task, msg, vault]) => {
+      const msgs = msg.status === "fulfilled" && Array.isArray(msg.value?.messages) ? msg.value.messages : [];
+      setStats({
+        projects: proj.status === "fulfilled" && Array.isArray(proj.value?.projects) ? proj.value.projects.length : 6,
+        tasks: task.status === "fulfilled" && Array.isArray(task.value?.tasks) ? task.value.tasks.length : 0,
+        messages: msgs.length,
+        unreadMessages: msgs.filter((m) => !m.read).length,
+        vaultNotes: vault.status === "fulfilled" && Array.isArray(vault.value?.notes) ? vault.value.notes.length : 0,
+        dbStatus: "Online",
+      });
+    });
+  }, [isAuthenticated]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -50,7 +71,7 @@ export default function KingPage() {
       } else {
         setError(data.error || "Access denied. Invalid passcode. Please try again.");
       }
-    } catch (err) {
+    } catch {
       setError("Unable to authenticate. Please check network connection and try again.");
     } finally {
       setLoadingAuth(false);
@@ -62,14 +83,7 @@ export default function KingPage() {
     localStorage.removeItem("king_authenticated");
   };
 
-  const handleSaveSessionCookie = (e) => {
-    e.preventDefault();
-    localStorage.setItem("king_leetcode_session", sessionInput.trim());
-    setSessionSaved("LeetCode session token saved to secure browser storage.");
-    setTimeout(() => setSessionSaved(""), 3500);
-  };
-
-  // ─── Login Screen (If not authenticated) ──────────────────────────────────
+  // ─── 1. Login Screen (Dark Futuristic Terminal Passcode) ─────────────────────
   if (!isAuthenticated) {
     return (
       <main
@@ -79,6 +93,7 @@ export default function KingPage() {
           alignItems: "center",
           justifyContent: "center",
           padding: "2rem 1.25rem",
+          background: "radial-gradient(circle at 50% 30%, rgba(200, 255, 69, 0.04) 0%, #05080D 70%)",
         }}
       >
         <div
@@ -86,38 +101,53 @@ export default function KingPage() {
           style={{
             maxWidth: 440,
             width: "100%",
-            padding: "2.5rem 2rem",
+            padding: "2.8rem 2.2rem",
             textAlign: "center",
-            boxShadow: "0 20px 40px -15px rgba(56, 189, 248, 0.25)",
-            border: "1px solid rgba(56, 189, 248, 0.3)",
+            boxShadow: "0 25px 50px -15px rgba(0, 0, 0, 0.8), 0 0 30px rgba(200, 255, 69, 0.1)",
+            border: "1px solid rgba(200, 255, 69, 0.35)",
+            background: "rgba(11, 18, 28, 0.95)",
+            borderRadius: 18,
           }}
         >
+          {/* Glowing Badge */}
           <div
             style={{
-              width: 56,
-              height: 56,
-              borderRadius: 16,
-              background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+              width: 64,
+              height: 64,
+              borderRadius: 18,
+              background: "linear-gradient(135deg, rgba(200, 255, 69, 0.2) 0%, rgba(34, 211, 238, 0.2) 100%)",
+              border: "1px solid var(--accent-lime)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 28,
-              margin: "0 auto 1.2rem",
-              boxShadow: "0 4px 20px rgba(245, 158, 11, 0.4)",
+              fontSize: 30,
+              margin: "0 auto 1.4rem",
+              boxShadow: "0 0 25px rgba(200, 255, 69, 0.35)",
             }}
           >
             👑
           </div>
 
-          <h1 style={{ fontSize: "1.8rem", marginBottom: 6 }}>
-            King <span className="gradient-text">Sanctuary</span>
+          <div className="section-tag" style={{ justifyContent: "center", marginBottom: 6 }}>
+            Admin Sanctuary
+          </div>
+          <h1
+            style={{
+              fontSize: "1.9rem",
+              fontWeight: 900,
+              color: "#F5F7FA",
+              marginBottom: 8,
+              letterSpacing: "-0.02em",
+            }}
+          >
+            King <span className="lime-underline">Deck</span>
           </h1>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.92rem", marginBottom: "1.8rem" }}>
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.92rem", marginBottom: "2rem" }}>
             Private Control Deck for Vivek Pawar. Authorized access only.
           </p>
 
           <form onSubmit={handleLogin}>
-            <div style={{ marginBottom: "1.2rem" }}>
+            <div style={{ marginBottom: "1.4rem" }}>
               <input
                 type="password"
                 placeholder="Enter secret passcode..."
@@ -127,15 +157,16 @@ export default function KingPage() {
                 required
                 style={{
                   width: "100%",
-                  padding: "12px 14px",
-                  background: "var(--input-bg)",
-                  border: error ? "1px solid #f43f5e" : "1px solid var(--border-light)",
+                  padding: "13px 16px",
+                  background: "rgba(5, 8, 13, 0.9)",
+                  border: error ? "1px solid #f43f5e" : "1px solid rgba(255, 255, 255, 0.15)",
                   borderRadius: 10,
-                  color: "var(--text-primary)",
-                  fontSize: "1rem",
+                  color: "#F5F7FA",
+                  fontSize: "1.05rem",
                   textAlign: "center",
-                  letterSpacing: "0.15em",
+                  letterSpacing: "0.2em",
                   outline: "none",
+                  fontFamily: "var(--font-mono)",
                 }}
               />
               {error && (
@@ -148,16 +179,28 @@ export default function KingPage() {
             <button
               type="submit"
               disabled={loadingAuth}
-              className="btn-primary"
-              style={{ width: "100%", justifyContent: "center", padding: "12px" }}
+              className="btn-lime"
+              style={{ width: "100%", justifyContent: "center", padding: "13px", fontSize: "0.95rem" }}
             >
-              {loadingAuth ? "Validating..." : "Unlock King Deck 👑"}
+              {loadingAuth ? "Validating Key..." : "Unlock King Deck 👑"}
             </button>
           </form>
 
-          <div style={{ marginTop: "1.5rem" }}>
-            <Link href="/" style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>
-              ← Return to Public Portfolio
+          <div style={{ marginTop: "1.8rem" }}>
+            <Link
+              href="/"
+              style={{
+                fontSize: "0.85rem",
+                color: "var(--text-muted)",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                transition: "color 0.2s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent-lime)")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
+            >
+              <span>←</span> Return to Public Portfolio
             </Link>
           </div>
         </div>
@@ -165,238 +208,246 @@ export default function KingPage() {
     );
   }
 
-  // ─── Authenticated King Dashboard (Vertical Navbar Layout) ───────────────
+  // ─── 2. Authenticated King Dashboard ─────────────────────────────────────────
   const navItems = [
-    { id: "profile", label: "Profile & Hero Editor", icon: "👤" },
-    { id: "projects", label: "Projects Manager", icon: "💼" },
-    { id: "skills", label: "Skills Manager", icon: "⚡" },
-    { id: "tasks", label: "Task Manager", icon: "📋" },
-    { id: "friends", label: "LeetCode Friends & Rivalry", icon: "🏆" },
-    { id: "messages", label: "Contact Inquiries Inbox", icon: "📬" },
-    { id: "vault", label: "Personal Vault & Notes", icon: "🔐" },
-    { id: "session", label: "Database & Session Config", icon: "⚙️" },
+    { id: "profile", label: "Profile & Hero Editor", icon: "👤", badge: null },
+    { id: "projects", label: "Projects Manager", icon: "💼", badge: stats.projects },
+    { id: "skills", label: "Skills Manager", icon: "⚡", badge: null },
+    { id: "tasks", label: "Task Tracker", icon: "📋", badge: stats.tasks },
+    { id: "friends", label: "LeetCode Rivalry", icon: "🏆", badge: null },
+    { id: "messages", label: "Inquiries Inbox", icon: "📬", badge: stats.unreadMessages > 0 ? `${stats.unreadMessages} new` : null },
+    { id: "vault", label: "Personal Vault & Notes", icon: "🔐", badge: stats.vaultNotes > 0 ? stats.vaultNotes : null },
+    { id: "inspector", label: "Database & Architecture", icon: "🗄️", badge: "Live" },
   ];
 
   return (
-    <div
-      style={{
-        display: "flex",
-        minHeight: "calc(100vh - 68px)",
-        background: "var(--bg-primary)",
-      }}
-    >
-      {/* ── Vertical Navbar / Sidebar ── */}
-      <aside
+    <div style={{ minHeight: "calc(100vh - 68px)", background: "#05080D", display: "flex", flexDirection: "column" }}>
+      {/* ── Top KPI & Live DB Strip ── */}
+      <header
         style={{
-          width: 280,
-          background: "rgba(10, 15, 29, 0.95)",
-          borderRight: "1px solid var(--border-subtle)",
-          padding: "1.5rem 1rem",
+          background: "rgba(11, 18, 28, 0.95)",
+          borderBottom: "1px solid var(--border-subtle)",
+          padding: "0.8rem 1.8rem",
           display: "flex",
-          flexDirection: "column",
           justifyContent: "space-between",
-          flexShrink: 0,
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: "1rem",
         }}
       >
-        <div>
-          {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <div
+            style={{
+              width: 38,
+              height: 38,
+              borderRadius: 10,
+              background: "linear-gradient(135deg, rgba(200, 255, 69, 0.2) 0%, rgba(34, 211, 238, 0.2) 100%)",
+              border: "1px solid var(--accent-lime)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 18,
+            }}
+          >
+            👑
+          </div>
+          <div>
+            <div style={{ fontSize: "1rem", fontWeight: 800, color: "#F5F7FA" }}>
+              King Sanctuary <span style={{ color: "var(--accent-lime)", fontSize: "12px" }}>v2.5</span>
+            </div>
+            <div style={{ fontSize: "11px", color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#C8FF45", boxShadow: "0 0 6px #C8FF45" }} />
+              PostgreSQL Connected &amp; Synced via Prisma
+            </div>
+          </div>
+        </div>
+
+        {/* Quick KPI Badges */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 10,
-              paddingBottom: "1.2rem",
-              borderBottom: "1px solid var(--border-subtle)",
-              marginBottom: "1.5rem",
+              gap: 8,
+              padding: "5px 12px",
+              borderRadius: 8,
+              background: "rgba(255, 255, 255, 0.03)",
+              border: "1px solid var(--border-subtle)",
+              fontSize: "12px",
             }}
           >
-            <div
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 10,
-                background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 18,
-                color: "#ffffff",
-                boxShadow: "0 2px 10px rgba(245, 158, 11, 0.35)",
-              }}
-            >
-              👑
-            </div>
-            <div>
-              <div style={{ fontWeight: 800, fontSize: "1rem", color: "var(--text-primary)" }}>
-                King Sanctuary
-              </div>
-              <div style={{ fontSize: 11, color: "#fbbf24", fontWeight: 600 }}>
-                Vivek&apos;s Control Deck
-              </div>
-            </div>
+            <span style={{ color: "var(--text-secondary)" }}>Projects:</span>
+            <span style={{ color: "var(--accent-lime)", fontWeight: 700 }}>{stats.projects}</span>
           </div>
 
-          {/* Vertical Navigation Links */}
-          <nav style={{ display: "grid", gap: 6 }}>
-            {navItems.map((item) => {
-              const active = activeSection === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveSection(item.id)}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                    width: "100%",
-                    padding: "9px 12px",
-                    borderRadius: 10,
-                    fontSize: "0.88rem",
-                    fontWeight: active ? 700 : 500,
-                    color: active ? "#38bdf8" : "#cbd5e1",
-                    background: active ? "rgba(56, 189, 248, 0.12)" : "transparent",
-                    border: active ? "1px solid rgba(56, 189, 248, 0.3)" : "1px solid transparent",
-                    cursor: "pointer",
-                    textAlign: "left",
-                    transition: "all 0.15s ease",
-                  }}
-                >
-                  <span style={{ fontSize: 16 }}>{item.icon}</span>
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
-          </nav>
-        </div>
-
-        {/* Sidebar Footer */}
-        <div style={{ paddingTop: "1.2rem", borderTop: "1px solid var(--border-subtle)", display: "grid", gap: 10 }}>
-          <Link
-            href="/"
+          <div
             style={{
               display: "flex",
               alignItems: "center",
               gap: 8,
-              fontSize: "0.85rem",
-              color: "var(--text-secondary)",
-              padding: "6px 10px",
-              borderRadius: 6,
+              padding: "5px 12px",
+              borderRadius: 8,
+              background: "rgba(255, 255, 255, 0.03)",
+              border: "1px solid var(--border-subtle)",
+              fontSize: "12px",
             }}
           >
-            <span>🌐</span> Public Portfolio
+            <span style={{ color: "var(--text-secondary)" }}>Tasks:</span>
+            <span style={{ color: "#22D3EE", fontWeight: 700 }}>{stats.tasks}</span>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "5px 12px",
+              borderRadius: 8,
+              background: stats.unreadMessages > 0 ? "rgba(244, 63, 94, 0.12)" : "rgba(255, 255, 255, 0.03)",
+              border: stats.unreadMessages > 0 ? "1px solid rgba(244, 63, 94, 0.3)" : "1px solid var(--border-subtle)",
+              fontSize: "12px",
+            }}
+          >
+            <span style={{ color: "var(--text-secondary)" }}>Inbox:</span>
+            <span style={{ color: stats.unreadMessages > 0 ? "#f43f5e" : "#F5F7FA", fontWeight: 700 }}>
+              {stats.unreadMessages > 0 ? `${stats.unreadMessages} unread` : stats.messages}
+            </span>
+          </div>
+
+          <Link
+            href="/"
+            className="btn-dark-pill"
+            style={{ padding: "6px 14px", fontSize: "12px" }}
+          >
+            <span>🌐</span> View Portfolio
           </Link>
+
           <button
             onClick={handleLogout}
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              fontSize: "0.85rem",
-              color: "#fb7185",
               background: "rgba(244, 63, 94, 0.1)",
-              border: "1px solid rgba(244, 63, 94, 0.25)",
-              padding: "8px 12px",
-              borderRadius: 8,
+              border: "1px solid rgba(244, 63, 94, 0.3)",
+              color: "#fb7185",
+              padding: "6px 12px",
+              borderRadius: "9999px",
+              fontSize: "12px",
+              fontWeight: 700,
               cursor: "pointer",
             }}
           >
-            <span>🚪</span> Lock & Logout
+            Lock 🔒
           </button>
         </div>
-      </aside>
+      </header>
 
-      {/* ── Main Content Area ── */}
-      <main style={{ flex: 1, padding: "2rem 2.5rem", overflowY: "auto" }}>
-        {activeSection === "profile" && <ProfileEditor />}
-
-        {activeSection === "projects" && <ProjectsManager />}
-
-        {activeSection === "skills" && <SkillsManager />}
-
-        {activeSection === "tasks" && <TaskManager />}
-
-        {activeSection === "friends" && <LeetCodeFriends />}
-
-        {activeSection === "messages" && <MessagesInbox />}
-
-        {activeSection === "vault" && <PersonalVault />}
-
-        {activeSection === "session" && (
+      {/* ── Main Layout (Sidebar + Content) ── */}
+      <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
+        {/* Sidebar */}
+        <aside
+          style={{
+            width: 280,
+            background: "rgba(10, 16, 24, 0.98)",
+            borderRight: "1px solid var(--border-subtle)",
+            padding: "1.5rem 1rem",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            flexShrink: 0,
+          }}
+        >
           <div>
-            <div style={{ marginBottom: "1.5rem" }}>
-              <h2 style={{ fontSize: "1.6rem", margin: "0 0 6px" }}>
-                ⚙️ Database & <span className="gradient-text">Configuration</span>
-              </h2>
-              <p style={{ color: "var(--text-secondary)", margin: 0, fontSize: "0.95rem" }}>
-                Prisma Postgres connection, admin password management, and LeetCode session settings.
-              </p>
+            <div
+              style={{
+                fontSize: "10px",
+                fontWeight: 800,
+                color: "var(--text-muted)",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                padding: "0 10px 10px",
+              }}
+            >
+              Control Navigation
             </div>
 
-            <div style={{ display: "grid", gap: "1.5rem", maxWidth: 750 }}>
-              {/* Database Status Card */}
-              <div className="glass-card" style={{ padding: "1.6rem" }}>
-                <h3 style={{ fontSize: "1.15rem", marginBottom: 10, display: "flex", alignItems: "center", gap: 8 }}>
-                  <span>🗄️</span> Prisma Database Status
-                </h3>
-                <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.6, marginBottom: 12 }}>
-                  Your database is actively connected and synchronized using Prisma Postgres.
-                </p>
-                <div style={{ padding: "10px 14px", background: "rgba(16, 185, 129, 0.12)", border: "1px solid rgba(16, 185, 129, 0.3)", borderRadius: 8, color: "#34d399", fontSize: 13, fontWeight: 600 }}>
-                  ✓ Live Database Connected & Synchronized
-                </div>
-              </div>
+            <nav style={{ display: "grid", gap: 6 }}>
+              {navItems.map((item) => {
+                const active = activeSection === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveSection(item.id)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      width: "100%",
+                      padding: "10px 12px",
+                      borderRadius: 10,
+                      fontSize: "0.88rem",
+                      fontWeight: active ? 700 : 500,
+                      color: active ? "#05080D" : "#cbd5e1",
+                      background: active ? "var(--accent-lime)" : "transparent",
+                      border: active ? "1px solid var(--accent-lime)" : "1px solid transparent",
+                      cursor: "pointer",
+                      textAlign: "left",
+                      transition: "all 0.18s ease",
+                      boxShadow: active ? "0 4px 14px rgba(200, 255, 69, 0.3)" : "none",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <span style={{ fontSize: 16 }}>{item.icon}</span>
+                      <span>{item.label}</span>
+                    </div>
 
-              {/* Password info Card */}
-              <div className="glass-card" style={{ padding: "1.6rem" }}>
-                <h3 style={{ fontSize: "1.15rem", marginBottom: 10, display: "flex", alignItems: "center", gap: 8 }}>
-                  <span>🔑</span> King Access Passcode
-                </h3>
-                <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.6 }}>
-                  Your administrative passcode is securely managed on the server. To update your secret key, modify your deployment environment variables.
-                </p>
-              </div>
-
-              {/* LeetCode Session Cookie Card */}
-              <div className="glass-card" style={{ padding: "1.6rem" }}>
-                <h3 style={{ fontSize: "1.15rem", marginBottom: 10 }}>Optional LEETCODE_SESSION Cookie</h3>
-                <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.6, marginBottom: 14 }}>
-                  If you want to inject your personal LeetCode browser session token for authenticated user queries, save it here.
-                </p>
-
-                <form onSubmit={handleSaveSessionCookie}>
-                  <div style={{ marginBottom: "1rem" }}>
-                    <textarea
-                      rows={3}
-                      value={sessionInput}
-                      onChange={(e) => setSessionInput(e.target.value)}
-                      placeholder="eyJhbGciOi..."
-                      style={{
-                        width: "100%",
-                        padding: "10px",
-                        background: "var(--input-bg)",
-                        border: "1px solid var(--border-light)",
-                        borderRadius: 8,
-                        color: "var(--text-primary)",
-                        fontSize: "0.85rem",
-                        fontFamily: "var(--font-mono)",
-                      }}
-                    />
-                  </div>
-
-                  <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                    <button type="submit" className="btn-primary" style={{ fontSize: "0.88rem" }}>
-                      Save Session Cookie
-                    </button>
-                    {sessionSaved && (
-                      <span style={{ color: "#34d399", fontSize: "0.85rem" }}>✓ {sessionSaved}</span>
+                    {item.badge && (
+                      <span
+                        style={{
+                          fontSize: "10px",
+                          fontWeight: 800,
+                          padding: "2px 6px",
+                          borderRadius: 6,
+                          background: active ? "rgba(5, 8, 13, 0.2)" : "rgba(255, 255, 255, 0.08)",
+                          color: active ? "#05080D" : "var(--accent-lime)",
+                        }}
+                      >
+                        {item.badge}
+                      </span>
                     )}
-                  </div>
-                </form>
-              </div>
-            </div>
+                  </button>
+                );
+              })}
+            </nav>
           </div>
-        )}
-      </main>
+
+          <div
+            style={{
+              padding: "12px",
+              borderRadius: 10,
+              background: "rgba(255, 255, 255, 0.02)",
+              border: "1px solid var(--border-subtle)",
+              fontSize: "11px",
+              color: "var(--text-muted)",
+              lineHeight: 1.5,
+            }}
+          >
+            Logged in as <strong style={{ color: "#F5F7FA" }}>Administrator</strong>
+            <br />
+            Database: <span style={{ color: "var(--accent-lime)" }}>Prisma PostgreSQL</span>
+          </div>
+        </aside>
+
+        {/* Content View */}
+        <main style={{ flex: 1, padding: "2.5rem 3rem", overflowY: "auto", background: "#05080D" }}>
+          {activeSection === "profile" && <ProfileEditor />}
+          {activeSection === "projects" && <ProjectsManager />}
+          {activeSection === "skills" && <SkillsManager />}
+          {activeSection === "tasks" && <TaskManager />}
+          {activeSection === "friends" && <LeetCodeFriends />}
+          {activeSection === "messages" && <MessagesInbox />}
+          {activeSection === "vault" && <PersonalVault />}
+          {activeSection === "inspector" && <DatabaseInspector />}
+        </main>
+      </div>
     </div>
   );
 }

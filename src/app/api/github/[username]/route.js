@@ -126,7 +126,7 @@ export async function GET(request, { params }) {
   // Guard: GraphQL always needs a PAT
   if (!pat) {
     return NextResponse.json(
-      { error: 'GitHub PAT is not configured. Add GITHUB_PAT to your .env.local file.' },
+      { error: 'GitHub integration token is not configured on the server.' },
       { status: 503 }
     );
   }

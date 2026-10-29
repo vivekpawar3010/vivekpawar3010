@@ -1,0 +1,62 @@
+[
+  {
+    "id": "note-1",
+    "title": "LeetCode Patterns & Templates (Sliding Window & Monotonic Stack)",
+    "category": "DSA / LeetCode",
+    "content": "### 1. Sliding Window (Variable Size)\n```java\nint left = 0;\nfor (int right = 0; right < n; right++) {\n    // Add nums[right] to window state\n    while (windowConditionViolated) {\n        // Remove nums[left] from window\n        left++;\n    }\n    maxLen = Math.max(maxLen, right - left + 1);\n}\n```\n\n### 2. Monotonic Stack (Next Greater Element)\nUse a decreasing stack to find the next greater element in O(N) time.\n```java\nDeque<Integer> stack = new ArrayDeque<>();\nfor (int i = 0; i < nums.length; i++) {\n    while (!stack.isEmpty() && nums[stack.peek()] < nums[i]) {\n        res[stack.pop()] = nums[i];\n    }\n    stack.push(i);\n}\n```",
+    "pinned": true,
+    "color": "cyan",
+    "createdAt": "2026-10-16T12:00:00.000Z",
+    "updatedAt": "2026-10-26T08:30:00.000Z"
+  },
+  {
+    "id": "note-2",
+    "title": "System Design Principles for Modern Web & Microservices",
+    "category": "System Design",
+    "content": "### Core Fundamentals\n1. **Horizontal vs Vertical Scaling**: Prefer stateless services horizontally scaled with NGINX / Cloudflare edge.\n2. **Caching (Cache-Aside Pattern)**: Read from Redis first; if miss, query PostgreSQL and write back to Redis with TTL.\n3. **Database Sharding & Read Replicas**: Separate heavy read analytics from primary transactional writes.\n4. **Idempotency Keys**: Use UUID headers for payment/booking mutations to prevent double submission.\n5. **Rate Limiting**: Token Bucket / Leaky Bucket algorithm at API gateway level.",
+    "pinned": true,
+    "color": "purple",
+    "createdAt": "2026-10-18T10:15:00.000Z",
+    "updatedAt": "2026-10-25T14:20:00.000Z"
+  },
+  {
+    "id": "note-1793028613384",
+    "title": "Kubernetes & Container Orchestration",
+    "category": "Cloud Architecture",
+    "content": "Mastering Pods, ReplicaSets, Ingress, and Helm charts.",
+    "pinned": false,
+    "color": "cyan",
+    "createdAt": "2026-10-26T15:30:13.384Z",
+    "updatedAt": "2026-10-26T15:30:13.384Z"
+  },
+  {
+    "id": "note-1793026600763",
+    "title": "Dynamic Programming Patterns 2026",
+    "category": "DSA / LeetCode",
+    "content": "### Knapsac### Dynamic Programming 2026 - Knapsack and LCS patterns memoization and tabulation.",
+    "pinned": false,
+    "color": "cyan",
+    "createdAt": "2026-10-26T14:56:40.763Z",
+    "updatedAt": "2026-10-26T14:56:40.763Z"
+  },
+  {
+    "id": "note-4",
+    "title": "Full-Stack Project Ideas & Next Steps",
+    "category": "Project Ideas",
+    "content": "1. **Distributed Task Scheduler**: Go + Redis distributed lock worker pool with UI dashboard.\n2. **Native Android Algorithmic Flashcards**: Kotlin + Jetpack Compose app syncing with LeetCode submissions.\n3. **AI Code Reviewer GitHub Action**: Automated PR analysis checking algorithmic complexity and edge cases.",
+    "pinned": false,
+    "color": "amber",
+    "createdAt": "2026-10-22T09:00:00.000Z",
+    "updatedAt": "2026-10-25T16:00:00.000Z"
+  },
+  {
+    "id": "note-3",
+    "title": "STAR Behavioral Interview Stories (Projects at SVERI COE)",
+    "category": "Interview Prep",
+    "content": "### Story 1: Pandharpur Darshan Real-Time Architecture\n- **Situation**: Pilgrims facing long queues and lack of live temple crowd visibility.\n- **Task**: Build an accessible, low-latency live crowd tracking and queue estimation platform.\n- **Action**: Developed responsive Next.js frontend with Firebase real-time listeners and offline caching.\n- **Result**: Reduced crowd query latency to under 200ms and served over 1,000+ local visitors.\n\n### Story 2: StudyBuddy AI Integration Challenge\n- **Situation**: Needed multi-turn conversational AI without ballooning API costs or latency.\n- **Task**: Optimize LLM prompt token usage and stream responses efficiently.\n- **Action**: Implemented Server-Sent Events (SSE) streaming and contextual sliding memory buffers.\n- **Result**: Achieved 60% faster initial token rendering and fluid user feedback.",
+    "pinned": false,
+    "color": "emerald",
+    "createdAt": "2026-10-20T16:40:00.000Z",
+    "updatedAt": "2026-10-24T11:00:00.000Z"
+  }
+]

@@ -93,7 +93,141 @@ export default function ProfileEditor() {
         </div>
       )}
 
-      <form onSubmit={handleSave} className="glass-card" style={{ padding: "2rem", display: "grid", gap: "1.2rem" }}>
+      <form onSubmit={handleSave} className="glass-card" style={{ padding: "2rem", display: "grid", gap: "1.4rem" }}>
+        {/* Avatar / Photo Section */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "1.5rem",
+            padding: "1.2rem",
+            background: "rgba(255, 255, 255, 0.03)",
+            border: "1px solid var(--border-subtle)",
+            borderRadius: 12,
+            flexWrap: "wrap",
+          }}
+        >
+          {/* Circular Photo Preview */}
+          <div style={{ position: "relative" }}>
+            <div
+              style={{
+                width: 76,
+                height: 76,
+                borderRadius: "50%",
+                overflow: "hidden",
+                border: "3px solid var(--accent-cyan)",
+                boxShadow: "0 0 20px rgba(56, 189, 248, 0.35)",
+                background: "rgba(15, 23, 42, 0.8)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {profile.avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={profile.avatarUrl}
+                  alt={profile.name || "Avatar"}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  onError={(e) => {
+                    e.currentTarget.src = "/images/avatar.png";
+                  }}
+                />
+              ) : (
+                <span style={{ fontSize: 32 }}>🍃</span>
+              )}
+            </div>
+          </div>
+
+          {/* Avatar Inputs & Presets */}
+          <div style={{ flex: 1, minWidth: 260 }}>
+            <label style={{ display: "block", fontSize: 13, fontWeight: 700, marginBottom: 6 }}>
+              Profile Photo / Rock Lee Avatar URL
+            </label>
+            <div style={{ display: "flex", gap: 10, marginBottom: 8 }}>
+              <input
+                type="text"
+                name="avatarUrl"
+                value={profile.avatarUrl || ""}
+                onChange={handleChange}
+                placeholder="/images/avatar.png or image URL"
+                style={{
+                  flex: 1,
+                  padding: "9px 12px",
+                  background: "var(--input-bg)",
+                  border: "1px solid var(--border-light)",
+                  borderRadius: 8,
+                  color: "var(--text-primary)",
+                  fontSize: "0.88rem",
+                  fontFamily: "var(--font-mono)",
+                }}
+              />
+            </div>
+
+            {/* Quick Presets */}
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <button
+                type="button"
+                onClick={() =>
+                  setProfile((prev) => ({ ...prev, avatarUrl: "/images/vivek-profile-photo.png" }))
+                }
+                style={{
+                  fontSize: "0.8rem",
+                  padding: "4px 10px",
+                  borderRadius: 6,
+                  border: "1px solid rgba(132, 204, 22, 0.35)",
+                  background: "rgba(132, 204, 22, 0.12)",
+                  color: "#84cc16",
+                  cursor: "pointer",
+                  fontWeight: 600,
+                }}
+              >
+                👤 Vivek Real Photo (Local)
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setProfile((prev) => ({ ...prev, avatarUrl: "/images/avatar.png" }))
+                }
+                style={{
+                  fontSize: "0.8rem",
+                  padding: "4px 10px",
+                  borderRadius: 6,
+                  border: "1px solid rgba(56, 189, 248, 0.3)",
+                  background: "rgba(56, 189, 248, 0.12)",
+                  color: "var(--accent-cyan)",
+                  cursor: "pointer",
+                  fontWeight: 600,
+                }}
+              >
+                🍃 Rock Lee Avatar (Local)
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setProfile((prev) => ({
+                    ...prev,
+                    avatarUrl:
+                      "https://assets.leetcode.com/users/vivek_pawar-3010/avatar_1739633328.png",
+                  }))
+                }
+                style={{
+                  fontSize: "0.8rem",
+                  padding: "4px 10px",
+                  borderRadius: 6,
+                  border: "1px solid rgba(245, 158, 11, 0.3)",
+                  background: "rgba(245, 158, 11, 0.12)",
+                  color: "#fbbf24",
+                  cursor: "pointer",
+                  fontWeight: 600,
+                }}
+              >
+                ⚡ LeetCode Rock Lee URL
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* Name and Role */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14 }}>
           <div>
@@ -108,10 +242,10 @@ export default function ProfileEditor() {
               style={{
                 width: "100%",
                 padding: "10px 14px",
-                background: "rgba(255, 255, 255, 0.05)",
-                border: "1px solid var(--border-subtle)",
+                background: "var(--input-bg)",
+                border: "1px solid var(--border-light)",
                 borderRadius: 8,
-                color: "#f8fafc",
+                color: "var(--text-primary)",
                 fontSize: "0.95rem",
               }}
             />

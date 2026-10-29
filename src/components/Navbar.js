@@ -2,32 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useAvatarMode } from "../lib/useAvatarMode";
 
 export default function Navbar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [theme, setTheme] = useState("dark");
-
-  useEffect(() => {
-    const saved = localStorage.getItem("portfolio_theme") || "dark";
-    setTheme(saved);
-    document.documentElement.setAttribute("data-theme", saved);
-  }, []);
-
-  const toggleTheme = () => {
-    const nextTheme = theme === "dark" ? "light" : "dark";
-    setTheme(nextTheme);
-    localStorage.setItem("portfolio_theme", nextTheme);
-    document.documentElement.setAttribute("data-theme", nextTheme);
-  };
+  const { currentSrc, toggleAvatarMode, isRockLee } = useAvatarMode();
 
   const navLinks = [
-    { label: "Home", href: "/" },
     { label: "About", href: "/about" },
     { label: "Projects", href: "/projects" },
-    { label: "LeetCode", href: "/leetcode", isSpecial: "leetcode" },
-    { label: "GitHub", href: "/github", isSpecial: "github" },
+    { label: "Experience", href: "/experience" },
     { label: "Contact", href: "/contact" },
   ];
 
@@ -43,8 +29,8 @@ export default function Navbar() {
         top: 0,
         zIndex: 100,
         background: "var(--nav-bg)",
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
+        backdropFilter: "blur(18px)",
+        WebkitBackdropFilter: "blur(18px)",
         borderBottom: "1px solid var(--border-subtle)",
         transition: "background-color 0.3s ease, border-color 0.3s ease",
       }}
@@ -55,211 +41,268 @@ export default function Navbar() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          height: 68,
+          height: 72,
         }}
       >
-        {/* Brand */}
-        <Link
-          href="/"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            textDecoration: "none",
-            color: "var(--text-primary)",
-          }}
-        >
-          <div
+        {/* Brand / Logo merged with Home Button + Dual Profile Switcher */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          {/* VP Logo with Dual Avatar Switcher */}
+          <button
+            onClick={toggleAvatarMode}
+            type="button"
+            title={`Active: ${isRockLee ? "Rock Lee Avatar" : "Vivek Real Portrait"}. Click to toggle avatar!`}
             style={{
-              width: 36,
-              height: 36,
-              borderRadius: 10,
-              background: "linear-gradient(135deg, #38bdf8 0%, #3b82f6 100%)",
+              position: "relative",
+              width: 40,
+              height: 40,
+              borderRadius: "10px",
+              background: "linear-gradient(135deg, rgba(34, 211, 238, 0.15) 0%, rgba(200, 255, 69, 0.15) 100%)",
+              border: "1px solid rgba(200, 255, 69, 0.4)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontWeight: 800,
-              fontSize: 16,
-              color: "#ffffff",
-              boxShadow: "0 2px 10px rgba(56, 189, 248, 0.35)",
+              cursor: "pointer",
+              boxShadow: "0 0 15px rgba(200, 255, 69, 0.2)",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              padding: 0,
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
           >
-            VP
-          </div>
-          <div>
-            <span style={{ fontWeight: 700, fontSize: "1.05rem", letterSpacing: "-0.01em" }}>
-              Vivek Pawar
-            </span>
+            {/* VP Modern Monogram SVG */}
+            <svg width="26" height="26" viewBox="0 0 40 40" fill="none">
+              <path
+                d="M8 12L18 30L23 20L15 12H8Z"
+                fill="url(#paint0_linear)"
+              />
+              <path
+                d="M22 12H30C32.7614 12 35 14.2386 35 17C35 19.7614 32.7614 22 30 22H24L21 28H18L24 16H30C30.5523 16 31 16.4477 31 17C31 17.5523 30.5523 18 30 18H25L22 12Z"
+                fill="url(#paint1_linear)"
+              />
+              <defs>
+                <linearGradient id="paint0_linear" x1="8" y1="12" x2="23" y2="30" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#22D3EE" />
+                  <stop offset="1" stopColor="#38BDF8" />
+                </linearGradient>
+                <linearGradient id="paint1_linear" x1="18" y1="12" x2="35" y2="28" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#C8FF45" />
+                  <stop offset="1" stopColor="#A3E635" />
+                </linearGradient>
+              </defs>
+            </svg>
+
+            {/* Ninja/Real Avatar Toggle Indicator */}
             <span
               style={{
-                display: "block",
-                fontSize: 10,
-                color: "var(--accent-cyan)",
-                fontWeight: 600,
-                letterSpacing: "0.04em",
-                textTransform: "uppercase",
+                position: "absolute",
+                bottom: -4,
+                right: -4,
+                width: 16,
+                height: 16,
+                borderRadius: "50%",
+                background: "#05080D",
+                border: "1px solid var(--border-subtle)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 9,
               }}
             >
-              Portfolio & Analytics
+              {isRockLee ? "🍃" : "👤"}
             </span>
-          </div>
-        </Link>
+          </button>
 
-        {/* Desktop Links + Theme Toggle */}
+          {/* Merged Home Link with active indicator */}
+          <Link
+            href="/"
+            title="Home • Vivek Pawar"
+            style={{
+              textDecoration: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "4px 10px 4px 6px",
+              borderRadius: "9999px",
+              background: pathname === "/" ? "rgba(200, 255, 69, 0.08)" : "transparent",
+              border: pathname === "/" ? "1px solid rgba(200, 255, 69, 0.35)" : "1px solid transparent",
+              transition: "all var(--transition-fast)",
+            }}
+          >
+            <span
+              style={{
+                fontSize: "1.15rem",
+                fontWeight: 800,
+                color: pathname === "/" ? "var(--accent-lime)" : "#F5F7FA",
+                letterSpacing: "-0.01em",
+              }}
+            >
+              Vivek Pawar<span style={{ color: "var(--accent-lime)" }}>.</span>
+            </span>
+            {pathname === "/" && (
+              <span
+                style={{
+                  fontSize: "10px",
+                  fontWeight: 800,
+                  color: "var(--accent-lime)",
+                  background: "rgba(200, 255, 69, 0.15)",
+                  padding: "1px 6px",
+                  borderRadius: 6,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.06em",
+                }}
+              >
+                Home
+              </span>
+            )}
+          </Link>
+        </div>
+
+        {/* Center Desktop Navigation Links */}
         <nav
           style={{
             display: "none",
             alignItems: "center",
-            gap: 8,
+            gap: 6,
           }}
           className="desktop-nav"
         >
           {navLinks.map((link) => {
             const active = isActive(link.href);
-
-            if (link.isSpecial === "leetcode") {
-              return (
-                <Link key={link.href} href={link.href} style={{ textDecoration: "none" }}>
-                  <button
-                    style={{
-                      border: active ? "1px solid #60a5fa" : "1px solid rgba(59, 130, 246, 0.4)",
-                      borderRadius: "8px",
-                      padding: "7px 14px",
-                      background: active
-                        ? "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)"
-                        : "rgba(37, 99, 235, 0.15)",
-                      color: active ? "#ffffff" : "var(--accent-blue)",
-                      cursor: "pointer",
-                      fontSize: "0.88rem",
-                      fontWeight: 600,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 6,
-                      transition: "all 0.18s ease",
-                    }}
-                  >
-                    <span>⚡</span> LeetCode
-                  </button>
-                </Link>
-              );
-            }
-
-            if (link.isSpecial === "github") {
-              return (
-                <Link key={link.href} href={link.href} style={{ textDecoration: "none" }}>
-                  <button
-                    style={{
-                      border: active ? "1px solid #4ade80" : "1px solid rgba(22, 163, 74, 0.4)",
-                      borderRadius: "8px",
-                      padding: "7px 14px",
-                      background: active
-                        ? "linear-gradient(135deg, #16a34a 0%, #15803d 100%)"
-                        : "rgba(22, 163, 74, 0.15)",
-                      color: active ? "#ffffff" : "var(--accent-emerald)",
-                      cursor: "pointer",
-                      fontSize: "0.88rem",
-                      fontWeight: 600,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 6,
-                      transition: "all 0.18s ease",
-                    }}
-                  >
-                    <span>🐙</span> GitHub
-                  </button>
-                </Link>
-              );
-            }
-
             return (
               <Link
                 key={link.href}
                 href={link.href}
                 style={{
-                  padding: "6px 14px",
-                  borderRadius: 8,
-                  fontSize: "0.92rem",
-                  fontWeight: active ? 600 : 500,
-                  color: active ? "var(--accent-cyan)" : "var(--text-secondary)",
-                  background: active ? "rgba(56, 189, 248, 0.1)" : "transparent",
-                  transition: "all 0.18s ease",
+                  padding: "6px 15px",
+                  borderRadius: "9999px",
+                  fontSize: "0.88rem",
+                  fontWeight: active ? 700 : 500,
+                  color: active ? "var(--accent-lime)" : "var(--text-secondary)",
+                  background: active ? "rgba(200, 255, 69, 0.08)" : "transparent",
+                  border: active ? "1px solid rgba(200, 255, 69, 0.4)" : "1px solid transparent",
+                  boxShadow: active ? "0 0 12px rgba(200, 255, 69, 0.15)" : "none",
+                  transition: "all var(--transition-fast)",
+                  textDecoration: "none",
                 }}
               >
                 {link.label}
               </Link>
             );
           })}
+        </nav>
 
-          {/* Theme Toggle Button (Desktop) */}
-          <button
-            onClick={toggleTheme}
-            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
-            title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+        {/* Right Actions: Custom Profiles (LeetCode & GitHub) + Let's Talk CTA */}
+        <div
+          style={{
+            display: "none",
+            alignItems: "center",
+            gap: 10,
+          }}
+          className="desktop-nav"
+        >
+          {/* Custom Profile Icon 1: LeetCode */}
+          <Link
+            href="/leetcode"
+            title="Check Vivek's Custom LeetCode Profile (500+ Solved, Rating ~1718)"
             style={{
-              marginLeft: 6,
-              background: "var(--badge-bg)",
-              border: "1px solid var(--border-light)",
-              borderRadius: "10px",
-              padding: "7px 12px",
-              cursor: "pointer",
-              fontSize: "0.88rem",
-              fontWeight: 600,
-              color: "var(--text-primary)",
               display: "flex",
               alignItems: "center",
               gap: 6,
-              transition: "all var(--transition-fast)",
+              padding: "6px 12px",
+              borderRadius: "9999px",
+              background: isActive("/leetcode")
+                ? "rgba(245, 158, 11, 0.2)"
+                : "rgba(245, 158, 11, 0.1)",
+              border: "1px solid rgba(245, 158, 11, 0.35)",
+              color: "#fbbf24",
+              fontSize: "0.82rem",
+              fontWeight: 700,
+              textDecoration: "none",
+              transition: "all 0.2s ease",
+              boxShadow: "0 0 10px rgba(245, 158, 11, 0.15)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "rgba(245, 158, 11, 0.22)";
+              e.currentTarget.style.transform = "translateY(-1px)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = isActive("/leetcode")
+                ? "rgba(245, 158, 11, 0.2)"
+                : "rgba(245, 158, 11, 0.1)";
+              e.currentTarget.style.transform = "translateY(0)";
             }}
           >
-            <span>{theme === "dark" ? "☀️" : "🌙"}</span>
-            <span>{theme === "dark" ? "Light" : "Dark"}</span>
-          </button>
-        </nav>
+            <span>⚡</span>
+            <span>LeetCode</span>
+          </Link>
 
-        {/* Mobile menu + Theme button */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <button
-            onClick={toggleTheme}
-            aria-label="Toggle theme"
+          {/* Custom Profile Icon 2: GitHub */}
+          <Link
+            href="/github"
+            title="Check Vivek's Custom GitHub Profile & Live Dashboard"
             style={{
-              display: "none",
-              background: "var(--badge-bg)",
-              border: "1px solid var(--border-subtle)",
-              borderRadius: 8,
-              padding: "8px 10px",
-              color: "var(--text-primary)",
-              cursor: "pointer",
-              fontSize: 14,
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "6px 12px",
+              borderRadius: "9999px",
+              background: isActive("/github")
+                ? "rgba(34, 211, 238, 0.2)"
+                : "rgba(34, 211, 238, 0.1)",
+              border: "1px solid rgba(34, 211, 238, 0.35)",
+              color: "#22D3EE",
+              fontSize: "0.82rem",
+              fontWeight: 700,
+              textDecoration: "none",
+              transition: "all 0.2s ease",
+              boxShadow: "0 0 10px rgba(34, 211, 238, 0.15)",
             }}
-            className="mobile-btn"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "rgba(34, 211, 238, 0.22)";
+              e.currentTarget.style.transform = "translateY(-1px)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = isActive("/github")
+                ? "rgba(34, 211, 238, 0.2)"
+                : "rgba(34, 211, 238, 0.1)";
+              e.currentTarget.style.transform = "translateY(0)";
+            }}
           >
-            {theme === "dark" ? "☀️" : "🌙"}
-          </button>
+            <span>🐙</span>
+            <span>GitHub</span>
+          </Link>
 
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Toggle menu"
-            style={{
-              display: "none",
-              background: "transparent",
-              border: "1px solid var(--border-subtle)",
-              borderRadius: 8,
-              padding: "8px 10px",
-              color: "var(--text-primary)",
-              cursor: "pointer",
-            }}
-            className="mobile-btn"
-          >
-            {mobileOpen ? "✕" : "☰"}
-          </button>
+          {/* Let's Talk Button */}
+          <Link href="/contact" className="btn-lime" style={{ padding: "8px 18px", fontSize: "0.88rem" }}>
+            Let&apos;s Talk <span>→</span>
+          </Link>
         </div>
+
+        {/* Mobile Menu Hamburger */}
+        <button
+          onClick={() => setMobileOpen(!mobileOpen)}
+          aria-label="Toggle menu"
+          style={{
+            display: "none",
+            background: "transparent",
+            border: "1px solid var(--border-subtle)",
+            borderRadius: 8,
+            padding: "8px 12px",
+            color: "var(--text-primary)",
+            cursor: "pointer",
+            fontSize: "1.1rem",
+          }}
+          className="mobile-btn"
+        >
+          {mobileOpen ? "✕" : "☰"}
+        </button>
       </div>
 
       {/* Mobile Drawer */}
       {mobileOpen && (
         <div
           style={{
-            background: "var(--bg-glass)",
+            background: "rgba(5, 8, 13, 0.98)",
             borderBottom: "1px solid var(--border-subtle)",
             padding: "1rem 1.25rem 1.5rem",
             display: "flex",
@@ -268,6 +311,66 @@ export default function Navbar() {
           }}
           className="mobile-drawer"
         >
+          {/* Custom Profile Links in Mobile */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 4 }}>
+            <Link
+              href="/leetcode"
+              onClick={() => setMobileOpen(false)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 6,
+                padding: "8px",
+                borderRadius: 8,
+                background: "rgba(245, 158, 11, 0.12)",
+                border: "1px solid rgba(245, 158, 11, 0.35)",
+                color: "#fbbf24",
+                fontSize: "0.85rem",
+                fontWeight: 700,
+                textDecoration: "none",
+              }}
+            >
+              <span>⚡</span> LeetCode Profile
+            </Link>
+            <Link
+              href="/github"
+              onClick={() => setMobileOpen(false)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 6,
+                padding: "8px",
+                borderRadius: 8,
+                background: "rgba(34, 211, 238, 0.12)",
+                border: "1px solid rgba(34, 211, 238, 0.35)",
+                color: "#22D3EE",
+                fontSize: "0.85rem",
+                fontWeight: 700,
+                textDecoration: "none",
+              }}
+            >
+              <span>🐙</span> GitHub Profile
+            </Link>
+          </div>
+
+          <Link
+            href="/"
+            onClick={() => setMobileOpen(false)}
+            style={{
+              padding: "10px 14px",
+              borderRadius: 8,
+              fontSize: "0.95rem",
+              fontWeight: pathname === "/" ? 700 : 500,
+              color: pathname === "/" ? "var(--accent-lime)" : "var(--text-primary)",
+              background: pathname === "/" ? "rgba(200, 255, 69, 0.1)" : "var(--badge-bg)",
+              textDecoration: "none",
+            }}
+          >
+            🏠 Home
+          </Link>
+
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -276,22 +379,30 @@ export default function Navbar() {
               style={{
                 padding: "10px 14px",
                 borderRadius: 8,
-                fontSize: "1rem",
-                fontWeight: isActive(link.href) ? 600 : 500,
-                color: isActive(link.href) ? "var(--accent-cyan)" : "var(--text-primary)",
-                background: isActive(link.href) ? "rgba(56, 189, 248, 0.1)" : "var(--badge-bg)",
+                fontSize: "0.95rem",
+                fontWeight: isActive(link.href) ? 700 : 500,
+                color: isActive(link.href) ? "var(--accent-lime)" : "var(--text-primary)",
+                background: isActive(link.href) ? "rgba(200, 255, 69, 0.1)" : "var(--badge-bg)",
                 textDecoration: "none",
               }}
             >
               {link.label}
             </Link>
           ))}
+
+          <Link
+            href="/contact"
+            onClick={() => setMobileOpen(false)}
+            className="btn-lime"
+            style={{ width: "100%", marginTop: 8 }}
+          >
+            Let&apos;s Talk <span>→</span>
+          </Link>
         </div>
       )}
 
-      {/* Responsive media styles */}
       <style jsx>{`
-        @media (min-width: 768px) {
+        @media (min-width: 900px) {
           .desktop-nav {
             display: flex !important;
           }
@@ -302,7 +413,7 @@ export default function Navbar() {
             display: none !important;
           }
         }
-        @media (max-width: 767px) {
+        @media (max-width: 899px) {
           .desktop-nav {
             display: none !important;
           }

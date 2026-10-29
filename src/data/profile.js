@@ -26,6 +26,7 @@ const profile = {
   leetcode: "https://leetcode.com/u/vivek_pawar-3010/",
   leetcodeUsername: "vivek_pawar-3010",
   email: "vivekpawar.dev@gmail.com",
+  avatarUrl: "/images/avatar.png",
 };
 
 export default profile;

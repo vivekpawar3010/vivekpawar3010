@@ -178,11 +178,11 @@ export default function SkillsManager() {
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: "1rem", borderBottom: "1px solid var(--border-subtle)", paddingBottom: 8 }}>
                 <span style={{ fontSize: 22 }}>{group.icon || "💡"}</span>
                 <h3 style={{ fontSize: "1.15rem", margin: 0, fontWeight: 700 }}>{group.category}</h3>
-                <span style={{ fontSize: 12, color: "var(--text-muted)" }}>({group.items.length})</span>
+                <span style={{ fontSize: 12, color: "var(--text-muted)" }}>({Array.isArray(group.items) ? group.items.length : 0})</span>
               </div>
 
               <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                {group.items.map((item, itemIdx) => (
+                {Array.isArray(group.items) && group.items.map((item, itemIdx) => (
                   <div
                     key={itemIdx}
                     style={{
