@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect, useMemo } from "react";
 import defaultPosts from "../data/blog";
 
@@ -331,6 +332,47 @@ export default function BlogNotes() {
           </div>
         </div>
       )}
+
+      {/* ── Bottom Next Actions Section ── */}
+      <div
+        className="glass-card"
+        style={{
+          marginTop: "2.5rem",
+          padding: "2rem",
+          borderRadius: 16,
+          textAlign: "center",
+          border: "1px solid rgba(200, 255, 69, 0.3)",
+          background: "radial-gradient(circle at 50% 120%, rgba(200, 255, 69, 0.1) 0%, rgba(11, 18, 28, 0.95) 70%)",
+        }}
+      >
+        <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--accent-lime)", marginBottom: 6 }}>
+          Next Step
+        </div>
+        <h3 style={{ fontSize: "1.4rem", fontWeight: 800, margin: "0 0 8px", color: "#F5F7FA" }}>
+          Explore Full Portfolio &amp; Projects
+        </h3>
+        <p style={{ color: "var(--text-secondary)", maxWidth: 520, margin: "0 auto 1.5rem", fontSize: "0.92rem" }}>
+          See the code behind these writeups, explore live full-stack projects, or reach out.
+        </p>
+
+        <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
+          <Link href="/projects" className="btn-lime">
+            <span>💼</span> Explore Projects <span>→</span>
+          </Link>
+          <Link href="/experience" className="btn-dark-pill">
+            <span>🚀</span> Work Experience
+          </Link>
+          <Link href="/leetcode" className="btn-dark-pill" style={{ color: "#fbbf24", borderColor: "rgba(245, 158, 11, 0.4)" }}>
+            <span>⚡</span> LeetCode Profile
+          </Link>
+          <Link href="/github" className="btn-dark-pill" style={{ color: "#22D3EE", borderColor: "rgba(34, 211, 238, 0.4)" }}>
+            <span>🐙</span> GitHub Stats
+          </Link>
+          <Link href="/contact" className="btn-lime">
+            <span>✉️</span> Get in Touch <span>→</span>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

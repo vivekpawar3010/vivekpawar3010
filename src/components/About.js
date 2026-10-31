@@ -137,6 +137,21 @@ export default function About() {
             I&apos;m Vivek Pawar, a Software Developer and Computer Science graduate who loves building real-world products, solving problems, and exploring new technologies. I enjoy turning ideas into useful, impactful applications whether it&apos;s for travel, education, agriculture or beyond.
           </p>
 
+          {/* Quick Action Buttons */}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center", marginBottom: "1.8rem" }}>
+            <Link href="/projects" className="btn-lime">
+              Explore My Work <span>→</span>
+            </Link>
+            <a
+              href="https://drive.google.com/file/d/1X5X9kC5d7eL3yZk_example/view?usp=sharing"
+              target="_blank"
+              rel="noreferrer"
+              className="btn-dark-pill"
+            >
+              <span>📥</span> Download Resume
+            </a>
+          </div>
+
           {/* Social Links Row */}
           <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -853,6 +868,47 @@ export default function About() {
               </span>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* ── Bottom Next Actions Section ── */}
+      <div
+        className="glass-card"
+        style={{
+          marginTop: "3rem",
+          padding: "2.5rem 2rem",
+          borderRadius: 20,
+          textAlign: "center",
+          border: "1px solid rgba(200, 255, 69, 0.3)",
+          background: "radial-gradient(circle at 50% 120%, rgba(200, 255, 69, 0.12) 0%, rgba(34, 211, 238, 0.08) 50%, rgba(11, 18, 28, 0.95) 80%)",
+        }}
+      >
+        <div className="section-tag" style={{ justifyContent: "center", marginBottom: 8 }}>
+          Next Steps
+        </div>
+        <h2 style={{ fontSize: "clamp(1.6rem, 3.5vw, 2.3rem)", fontWeight: 800, margin: "0 0 10px", color: "#F5F7FA" }}>
+          Ready to explore <span className="lime-underline">my work &amp; impact?</span>
+        </h2>
+        <p style={{ color: "var(--text-secondary)", maxWidth: 540, margin: "0 auto 1.8rem", fontSize: "0.95rem" }}>
+          Check out my featured production apps, track record of achievements, or get directly in touch for opportunities.
+        </p>
+
+        <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
+          <Link href="/projects" className="btn-lime">
+            <span>💼</span> Explore Projects <span>→</span>
+          </Link>
+          <Link href="/experience" className="btn-dark-pill">
+            <span>🚀</span> Work Experience &amp; Skills
+          </Link>
+          <Link href="/leetcode" className="btn-dark-pill" style={{ color: "#fbbf24", borderColor: "rgba(245, 158, 11, 0.4)" }}>
+            <span>⚡</span> LeetCode Profile
+          </Link>
+          <Link href="/github" className="btn-dark-pill" style={{ color: "#22D3EE", borderColor: "rgba(34, 211, 238, 0.4)" }}>
+            <span>🐙</span> GitHub Stats
+          </Link>
+          <Link href="/contact" className="btn-lime">
+            <span>✉️</span> Let&apos;s Connect <span>→</span>
+          </Link>
         </div>
       </div>
     </div>

@@ -1,0 +1,45 @@
+[
+  {
+    "id": "folder-1",
+    "name": "DSA / LeetCode",
+    "color": "cyan",
+    "description": "LeetCode patterns, templates, dynamic programming and algorithms."
+  },
+  {
+    "id": "folder-2",
+    "name": "System Design",
+    "color": "purple",
+    "description": "Microservices, caching architectures, and distributed systems."
+  },
+  {
+    "id": "folder-3",
+    "name": "Interview Prep",
+    "color": "emerald",
+    "description": "STAR behavioral stories, HR answers, and mock technical questions."
+  },
+  {
+    "id": "folder-4",
+    "name": "Project Ideas",
+    "color": "amber",
+    "description": "Full-stack project blueprints and next architecture steps."
+  },
+  {
+    "id": "folder-5",
+    "name": "Cloud Architecture",
+    "color": "cyan",
+    "description": "Docker, Kubernetes, AWS & Google Cloud infrastructure notes."
+  },
+  {
+    "id": "folder-6",
+    "name": "Credentials & Setup",
+    "color": "rose",
+    "description": "Environment variables, deployment keys, and private configurations."
+  },
+  {
+    "id": "folder-7",
+    "name": "General",
+    "color": "cyan",
+    "description": "General thoughts, bookmarks, and quick scratchpad notes."
+  }
+]
+

@@ -1,0 +1,54 @@
+[
+  {
+    "id": "eval-1793460533241",
+    "date": "2026-10-31T15:28:53.241Z",
+    "totalWeeklyPoints": 45,
+    "grade": "C",
+    "summaryReview": "Outstanding technical consistency across your active streak habits! You maintained focused problem-solving checkpoints and documented meaningful technical breakthroughs throughout the week. Keep driving this forward!",
+    "perTaskBreakdown": [
+      {
+        "taskTitle": "Read/Practice the DSA Topics Everyday (Enter the list of topics you done)",
+        "points": 12,
+        "verdict": "Strong discipline: 1 consecutive days logged toward 30-day goal."
+      }
+    ],
+    "keyWins": [
+      "Maintained active check-in consistency across 1 streak goals",
+      "Documented daily technical logs and problem-solving reflections in real-time",
+      "Advanced closer to target day milestones with zero regressions"
+    ],
+    "isSunday": false,
+    "source": "local-ai-heuristic"
+  },
+  {
+    "id": "eval-prev-sunday",
+    "date": "2026-10-25T18:00:00.000Z",
+    "totalWeeklyPoints": 88,
+    "grade": "A+",
+    "summaryReview": "Exceptional weekly commitment. Vivek maintained 100% daily check-ins across LeetCode DSA and System Design, solving complex DP and graph problems with detailed technical notes.",
+    "perTaskBreakdown": [
+      {
+        "taskTitle": "Daily LeetCode Challenge & 2 Mediums",
+        "points": 20,
+        "verdict": "Flawless consistency and strong algorithmic depth."
+      },
+      {
+        "taskTitle": "System Design & DDIA Architecture Reading",
+        "points": 18,
+        "verdict": "Great insights on database replication and conflict resolution."
+      },
+      {
+        "taskTitle": "Full-Stack Portfolio & Native Android Coding",
+        "points": 20,
+        "verdict": "High-impact execution on Next.js 16 performance and Canvas graphics."
+      }
+    ],
+    "keyWins": [
+      "Unbroken 14-day streak on algorithmic problem-solving",
+      "Completed in-depth replication logs from DDIA",
+      "Production-ready Next.js 16 deployment with 0 build errors"
+    ],
+    "isSunday": true,
+    "source": "gemini-1.5-flash"
+  }
+]

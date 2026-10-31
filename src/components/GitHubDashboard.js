@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState, useCallback } from "react";
 
 const DEFAULT_USERNAME = "vivekpawar3010";
@@ -481,6 +482,53 @@ export default function GitHubDashboard() {
           )}
         </>
       )}
+
+      {/* ── Bottom Next Actions Section ── */}
+      <div
+        className="glass-card"
+        style={{
+          marginTop: "2.5rem",
+          padding: "2rem",
+          borderRadius: 16,
+          textAlign: "center",
+          border: "1px solid rgba(34, 211, 238, 0.3)",
+          background: "radial-gradient(circle at 50% 120%, rgba(34, 211, 238, 0.1) 0%, rgba(11, 18, 28, 0.95) 70%)",
+        }}
+      >
+        <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "#22D3EE", marginBottom: 6 }}>
+          Next Actions
+        </div>
+        <h3 style={{ fontSize: "1.4rem", fontWeight: 800, margin: "0 0 8px", color: "#F5F7FA" }}>
+          Explore Full Portfolio &amp; Profiles
+        </h3>
+        <p style={{ color: "var(--text-secondary)", maxWidth: 520, margin: "0 auto 1.5rem", fontSize: "0.92rem" }}>
+          Compare problem-solving metrics on LeetCode, inspect deployed apps, or reach out.
+        </p>
+
+        <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
+          <Link href="/leetcode" className="btn-dark-pill" style={{ color: "#fbbf24", borderColor: "rgba(245, 158, 11, 0.4)" }}>
+            <span>⚡</span> LeetCode Profile
+          </Link>
+          <Link href="/projects" className="btn-lime">
+            <span>💼</span> View Projects <span>→</span>
+          </Link>
+          <Link href="/experience" className="btn-dark-pill">
+            <span>🚀</span> Work Experience
+          </Link>
+          <Link href="/contact" className="btn-dark-pill">
+            <span>✉️</span> Get in Touch
+          </Link>
+          <a
+            href="https://github.com/vivekpawar3010"
+            target="_blank"
+            rel="noreferrer"
+            className="btn-dark-pill"
+            style={{ color: "#22D3EE", borderColor: "rgba(34, 211, 238, 0.4)" }}
+          >
+            <span>↗</span> Open on GitHub.com
+          </a>
+        </div>
+      </div>
     </section>
   );
 }
