@@ -1,68 +1,26 @@
 [
   {
-    "id": "proj-1792172228564",
-    "name": "AI Portfolio Engine",
-    "subtitle": "Real-time database-backed developer deck",
-    "description": "Built with Next.js 16, Prisma ORM, and PostgreSQL. Features dynamic admin control.",
-    "category": "Full Stack",
-    "tags": [
-      "Next.js",
-      "Prisma",
-      "PostgreSQL"
-    ],
-    "link": "",
-    "github": "",
-    "featured": false
-  },
-  {
-    "id": "proj-1792171849228",
-    "name": "AI Portfolio Engine",
-    "subtitle": "Real-time database-backed developer deck",
-    "description": "Built with Next.js 16, Prisma ORM, and PostgreSQL. Features dynamic admin control.",
-    "category": "Full Stack",
-    "tags": [
-      "Next.js",
-      "Prisma",
-      "PostgreSQL"
-    ],
-    "link": "",
-    "github": "",
-    "featured": false
-  },
-  {
-    "id": "proj-1792171502416",
-    "name": "AI Portfolio Engine",
-    "subtitle": "Real-time database-backed developer deck",
-    "description": "Built with Next.js 16, Prisma ORM, and PostgreSQL. Features dynamic admin control.",
-    "category": "Full Stack",
-    "tags": [
-      "Next.js",
-      "Prisma",
-      "PostgreSQL"
-    ],
-    "link": "",
-    "github": "",
-    "featured": true
-  },
-  {
     "id": "pandharpurdarshan",
     "name": "Pandharpur Darshan",
     "subtitle": "Cultural & Tourism Information Portal",
     "description": "A comprehensive digital guide and exploration platform for devotees and tourists visiting the holy city of Pandharpur. Features temple schedules, accommodation guides, interactive maps, and travel planning.",
     "category": "Full Stack",
-    "tags": [
-      "React",
-      "Next.js",
-      "JavaScript",
-      "Responsive Design",
-      "Tourism"
-    ],
-    "link": "https://github.com/vivekpawar3010/pandharpurdarshan",
+    "tags": ["Next.js", "React", "JavaScript", "Tailwind CSS", "Tourism"],
+    "icon": "Landmark",
+    "link": "https://pandharpurdarshan.com",
+    "liveUrl": "https://pandharpurdarshan.com",
     "github": "https://github.com/vivekpawar3010/pandharpurdarshan",
+    "githubUrl": "https://github.com/vivekpawar3010/pandharpurdarshan",
     "featured": true,
-    "order": 0,
-    "createdAt": "2026-10-16T17:16:44.069Z",
-    "updatedAt": "2026-10-16T17:16:44.069Z"
+    "problem": "Pilgrims and tourists visiting Pandharpur lacked a centralized real-time information system for temple darshan queues, accommodation booking, and local transport.",
+    "solution": "Built a lightning-fast responsive portal providing real-time temple updates, downloadable itineraries, interactive routes, and multilingual verified emergency contacts.",
+    "keyFeatures": [
+      "Real-time Temple Schedule & Festival Alerts",
+      "Interactive Pandharpur Pilgrimage Map & Geo-Routing",
+      "Verified Ashram & Hotel Directory with One-Click Dial",
+      "Offline-capable PWA support for low-bandwidth zones"
+    ],
+    "architecture": "Next.js 16 App Router, Tailwind CSS, Leaflet Maps, Edge Caching"
   },
   {
     "id": "studybuddy-ai",
@@ -70,19 +28,68 @@
     "subtitle": "AI-Powered Learning & Doubt Resolution Assistant",
     "description": "An intelligent educational assistant designed to help students study smarter. Integrates AI reasoning to break down complex concepts, summarize notes, generate practice quizzes, and explain solutions step-by-step.",
     "category": "AI & Web",
-    "tags": [
-      "Next.js",
-      "AI Integration",
-      "React",
-      "Node.js",
-      "OpenAI / Gemini"
-    ],
-    "link": "https://github.com/vivekpawar3010/atudybudd-ai",
-    "github": "https://github.com/vivekpawar3010/atudybudd-ai",
+    "tags": ["Next.js", "AI Integration", "React", "Node.js", "Gemini API"],
+    "icon": "Bot",
+    "link": "https://github.com/vivekpawar3010/studybuddy-ai",
+    "liveUrl": "",
+    "github": "https://github.com/vivekpawar3010/studybuddy-ai",
+    "githubUrl": "https://github.com/vivekpawar3010/studybuddy-ai",
     "featured": true,
-    "order": 1,
-    "createdAt": "2026-10-16T17:16:44.919Z",
-    "updatedAt": "2026-10-16T17:16:44.919Z"
+    "problem": "Engineering students struggle with fragmented self-study resources and delayed doubt-resolution during late-night exam prep.",
+    "solution": "Created an AI conversational tutor that parses uploaded syllabus notes, generates active-recall quizzes, and provides step-by-step algorithm breakdowns.",
+    "keyFeatures": [
+      "Dynamic Question Generation from uploaded lecture PDF notes",
+      "Step-by-step DSA & Code logic explanation with time complexity analysis",
+      "Interactive Flashcard deck generation for revision",
+      "Multi-turn streaming chat with memory using Google Gemini API"
+    ],
+    "architecture": "Next.js App Router, Gemini 1.5 Flash API, Tailwind CSS, Vercel Serverless"
+  },
+  {
+    "id": "agromitra-ai",
+    "name": "AgroMitra",
+    "subtitle": "AI Crop Diagnostic & Smart Advisory Platform",
+    "description": "An AgriTech advisory system empowering Indian farmers with real-time leaf disease detection, weather-based irrigation alerts, and local mandi price forecasts.",
+    "category": "AI & Web",
+    "tags": ["React", "Python", "Computer Vision", "Node.js", "AgriTech"],
+    "icon": "Sprout",
+    "link": "https://github.com/vivekpawar3010/agromitra",
+    "liveUrl": "",
+    "github": "https://github.com/vivekpawar3010/agromitra",
+    "githubUrl": "https://github.com/vivekpawar3010/agromitra",
+    "featured": true,
+    "problem": "Crop yield losses due to untimely detection of crop pathogens and lack of localized vernacular advisory.",
+    "solution": "Engineered a vision-based mobile-friendly diagnostic tool where farmers take a photo of an infected leaf to receive instant diagnosis, pesticide recommendations, and dosage in Marathi and Hindi.",
+    "keyFeatures": [
+      "Image-based plant disease classification with 94%+ accuracy",
+      "Localized multilingual audio advisory in Marathi, Hindi, and English",
+      "Live APMC Mandi crop price trends and fair-value indicator",
+      "Smart irrigation alerts based on 7-day hyper-local rainfall forecast"
+    ],
+    "architecture": "React.js frontend, Flask/FastAPI ML microservice, PyTorch, Node.js gateway"
+  },
+  {
+    "id": "krishi-connect",
+    "name": "Krishi Connect",
+    "subtitle": "Direct Farmer-to-Consumer Agricultural Marketplace",
+    "description": "A decentralized agricultural marketplace connecting rural producers directly with retail buyers and bulk restaurants, cutting out predatory middlemen.",
+    "category": "Full Stack",
+    "tags": ["Next.js", "PostgreSQL", "Prisma", "Express", "Stripe / Razorpay"],
+    "icon": "ShoppingBag",
+    "link": "https://github.com/vivekpawar3010/krishi-connect",
+    "liveUrl": "",
+    "github": "https://github.com/vivekpawar3010/krishi-connect",
+    "githubUrl": "https://github.com/vivekpawar3010/krishi-connect",
+    "featured": true,
+    "problem": "Smallholder farmers capture less than 30% of the final consumer price due to multi-layered distributor cartels.",
+    "solution": "Built a transparent supply-chain order tracking platform where farmers list harvest quantities and negotiate bulk pricing with verified buyers directly.",
+    "keyFeatures": [
+      "Real-time harvest listing and bidding system",
+      "Escrow payments and digital invoice generation",
+      "Integrated logistics booking and pickup status tracking",
+      "Quality grading certificates and verified farmer profiles"
+    ],
+    "architecture": "Next.js 16, Prisma ORM, PostgreSQL, Tailwind CSS, Razorpay API"
   },
   {
     "id": "genzday",
@@ -90,38 +97,44 @@
     "subtitle": "Modern Lifestyle & Trend Curation App",
     "description": "A trendy, engaging platform tailored for Gen-Z audiences featuring curated viral topics, dynamic mood trackers, daily inspirations, and interactive community polls.",
     "category": "Frontend",
-    "tags": [
-      "React",
-      "JavaScript",
-      "CSS3",
-      "Firebase",
-      "Web App"
-    ],
+    "tags": ["React", "JavaScript", "CSS3", "Firebase", "Web App"],
+    "icon": "Sparkles",
     "link": "https://github.com/vivekpawar3010/genzday",
+    "liveUrl": "",
     "github": "https://github.com/vivekpawar3010/genzday",
+    "githubUrl": "https://github.com/vivekpawar3010/genzday",
     "featured": true,
-    "order": 2,
-    "createdAt": "2026-10-16T17:16:45.253Z",
-    "updatedAt": "2026-10-16T17:16:45.253Z"
+    "problem": "Cluttered social feeds causing cognitive fatigue and lack of positive mood-aligned content discovery.",
+    "solution": "Crafted a vibrant, glassmorphic daily digital companion that matches daily quotes, playlists, and productivity micro-goals to user mood state.",
+    "keyFeatures": [
+      "Mood-driven dynamic themes with responsive ambient glows",
+      "Interactive community polls with real-time voting charts",
+      "Curated daily tech and culture trend highlights",
+      "Personal habit streak badges with local storage persistence"
+    ],
+    "architecture": "React 18, CSS Glassmorphism, Firebase Firestore, Web Audio API"
   },
   {
-    "id": "portfolio-analytics",
-    "name": "Developer Portfolio & Analytics Hub",
-    "subtitle": "Interactive Portfolio with Live LeetCode & GitHub Sync",
-    "description": "High-performance Next.js 16 portfolio with live server-cached GraphQL integrations for GitHub activity and LeetCode problem-solving progress. Includes dark glassmorphic UI, responsive layouts, and SEO optimization.",
+    "id": "dharacode-cms",
+    "name": "DharaCode (Kings Deck CMS)",
+    "subtitle": "Real-time Database-Backed Developer Portfolio Engine",
+    "description": "High-performance developer sanctuary with live Prisma PostgreSQL sync, custom personal vault, habit streak tracking, and interactive theme orchestration.",
     "category": "Full Stack",
-    "tags": [
-      "Next.js 16",
-      "Turbopack",
-      "GraphQL",
-      "REST APIs",
-      "In-Memory Cache"
-    ],
+    "tags": ["Next.js 16", "Prisma", "PostgreSQL", "Tailwind CSS", "Security"],
+    "icon": "Crown",
     "link": "https://github.com/vivekpawar3010/vivekpawar3010",
+    "liveUrl": "/king",
     "github": "https://github.com/vivekpawar3010/vivekpawar3010",
+    "githubUrl": "https://github.com/vivekpawar3010/vivekpawar3010",
     "featured": true,
-    "order": 3,
-    "createdAt": "2026-10-16T17:16:45.546Z",
-    "updatedAt": "2026-10-16T17:16:45.546Z"
+    "problem": "Static portfolio templates quickly become outdated and require developer commits to update every single project, skill, or streak.",
+    "solution": "Built a private, passcode-secured administrative OS ('Kings Deck') that orchestrates all portfolio data, custom markdown vault notes, weekly habit streaks, and live theme states in real time.",
+    "keyFeatures": [
+      "Full dual-navbar standalone administrative dashboard",
+      "Dynamic project and category CRUD with live front-end reflection",
+      "Personal Vault with persistent folder management and note encryption",
+      "Habit streak engine with automated weekly Sunday score evaluation"
+    ],
+    "architecture": "Next.js 16, Prisma ORM, PostgreSQL (Neon / Supabase), Next API Routes"
   }
 ]

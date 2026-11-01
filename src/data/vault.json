@@ -1,13 +1,13 @@
 [
   {
-    "id": "note-1793026600763",
-    "title": "Dynamic Programming Patterns 2026",
-    "category": "General",
-    "content": "### Knapsac### Dynamic Programming 2026 - Knapsack and LCS patterns memoization and tabulation.",
+    "id": "note-1793534693896",
+    "title": "Dipak Pawar",
+    "category": "Send Sms On 5 Nov",
+    "content": "i will write it after some time\n",
     "pinned": true,
     "color": "cyan",
-    "createdAt": "2026-10-26T14:56:40.763Z",
-    "updatedAt": "2026-11-01T05:13:05.654Z"
+    "createdAt": "2026-11-01T12:04:53.896Z",
+    "updatedAt": "2026-11-01T12:05:02.143Z"
   },
   {
     "id": "note-2",
@@ -18,6 +18,16 @@
     "color": "purple",
     "createdAt": "2026-10-18T10:15:00.000Z",
     "updatedAt": "2026-11-01T05:13:08.758Z"
+  },
+  {
+    "id": "note-1793026600763",
+    "title": "Dynamic Programming Patterns 2026",
+    "category": "General",
+    "content": "### Knapsac### Dynamic Programming 2026 - Knapsack and LCS patterns memoization and tabulation.",
+    "pinned": true,
+    "color": "cyan",
+    "createdAt": "2026-10-26T14:56:40.763Z",
+    "updatedAt": "2026-11-01T05:13:05.654Z"
   },
   {
     "id": "note-1",

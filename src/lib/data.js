@@ -321,48 +321,37 @@ export async function getSkills() {
 }
 
 export async function addSkill(categoryName, skillItem) {
-  if (prisma) {
-    try {
-      await prisma.skill.create({
-        data: {
-          category: categoryName,
-          name: skillItem.name,
-          level: skillItem.level || 'Intermediate',
-          badge: skillItem.badge || null,
-        },
-      });
-      return await getSkills();
-    } catch (e) {
-      console.warn('Prisma addSkill fallback:', e.message);
-    }
-  }
-
   const current = await getSkills();
+  let found = false;
   const updated = current.map((cat) => {
     if (cat.category.toLowerCase() === categoryName.toLowerCase()) {
-      return { ...cat, items: [...cat.items, skillItem] };
+      found = true;
+      const existingIdx = cat.items.findIndex(
+        (i) => i.name.toLowerCase() === skillItem.name.toLowerCase()
+      );
+      if (existingIdx >= 0) {
+        cat.items[existingIdx] = { ...cat.items[existingIdx], ...skillItem };
+      } else {
+        cat.items.push(skillItem);
+      }
+      return { ...cat, items: [...cat.items] };
     }
     return cat;
   });
+
+  if (!found) {
+    updated.push({
+      category: categoryName,
+      icon: skillItem.categoryIcon || "Code2",
+      items: [skillItem],
+    });
+  }
+
   writeFile(SKILLS_FILE, updated);
   return updated;
 }
 
 export async function deleteSkill(categoryName, skillName) {
-  if (prisma) {
-    try {
-      await prisma.skill.deleteMany({
-        where: {
-          category: categoryName,
-          name: skillName,
-        },
-      });
-      return await getSkills();
-    } catch (e) {
-      console.warn('Prisma deleteSkill fallback:', e.message);
-    }
-  }
-
   const current = await getSkills();
   const updated = current.map((cat) => {
     if (cat.category.toLowerCase() === categoryName.toLowerCase()) {
@@ -373,6 +362,23 @@ export async function deleteSkill(categoryName, skillName) {
     }
     return cat;
   });
+  writeFile(SKILLS_FILE, updated);
+  return updated;
+}
+
+export async function addSkillCategory(categoryName, icon = "Code2") {
+  const current = await getSkills();
+  const exists = current.some((c) => c.category.toLowerCase() === categoryName.toLowerCase());
+  if (!exists) {
+    current.push({ category: categoryName, icon, items: [] });
+    writeFile(SKILLS_FILE, current);
+  }
+  return current;
+}
+
+export async function deleteSkillCategory(categoryName) {
+  const current = await getSkills();
+  const updated = current.filter((c) => c.category.toLowerCase() !== categoryName.toLowerCase());
   writeFile(SKILLS_FILE, updated);
   return updated;
 }

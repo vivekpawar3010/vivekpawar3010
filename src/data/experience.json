@@ -1,0 +1,149 @@
+{
+  "internships": [
+    {
+      "id": "webvarad-fourise",
+      "role": "Software Development Intern",
+      "company": "Webvarad / Fourise Software Solutions",
+      "period": "Dec 2025 – Apr 2026",
+      "location": "Pune / Hybrid",
+      "description": "Engineered full-stack features, optimized database schemas, and implemented RESTful microservices.",
+      "highlights": [
+        "Architected scalable backend services using Next.js, Node.js, and relational database systems.",
+        "Collaborated on production-grade application modules, performance tuning, and comprehensive API testing.",
+        "Integrated modern CI/CD deployment pipelines and automated verification tests."
+      ],
+      "tech": ["Next.js", "Node.js", "PostgreSQL", "Prisma", "REST APIs", "Docker"],
+      "icon": "Briefcase",
+      "certificateUrl": ""
+    },
+    {
+      "id": "qspiders-pune",
+      "role": "Software Testing & QA Trainee",
+      "company": "QSpiders Pune",
+      "period": "2025 – 2026",
+      "location": "Pune, India",
+      "description": "Hands-on training in manual testing, automated test suites, Selenium, and API validation.",
+      "highlights": [
+        "Mastered test-case authoring, bug lifecycle management, edge-case analysis, and regression testing.",
+        "Created automated testing suites with industry-standard frameworks and verified integration reliability."
+      ],
+      "tech": ["Manual Testing", "Automation Testing", "Selenium", "API Testing", "Postman", "Jira"],
+      "icon": "CheckCircle2",
+      "certificateUrl": ""
+    },
+    {
+      "id": "micro-it",
+      "role": "Front-End Development Intern",
+      "company": "Micro IT",
+      "period": "Mar 2024 (1 month)",
+      "location": "Remote / Hybrid",
+      "description": "Built responsive, interactive user interfaces for client-facing web products.",
+      "highlights": [
+        "Worked on real-world web development projects using React.js and modern component architecture.",
+        "Guided by Vijay Kumar (Senior Technical Lead) on frontend performance, state management, and code reviews.",
+        "Learned modern React hooks, modular CSS, component lifecycle, and production deployment practices."
+      ],
+      "tech": ["React.js", "JavaScript (ES6+)", "CSS3 / Modules", "Git", "REST APIs"],
+      "icon": "Code2",
+      "certificateUrl": ""
+    }
+  ],
+  "achievements": [
+    {
+      "id": "tcs-digital",
+      "title": "Selected for TCS Digital",
+      "subtitle": "7 LPA Premium Package",
+      "description": "Cleared the highly competitive TCS National Qualifier Test (NQT) and advanced coding rounds for the premier TCS Digital developer role.",
+      "category": "Career Selection",
+      "badge": "7 LPA Offer",
+      "icon": "Rocket",
+      "color": "#34d399",
+      "credentialUrl": ""
+    },
+    {
+      "id": "google-cloud-genai",
+      "title": "Google Cloud Certification",
+      "subtitle": "Responsible AI & Large Language Models (LLMs)",
+      "description": "Earned official Google Cloud credentials verifying expertise in generative AI principles, ethical AI frameworks, prompt engineering, and LLM orchestration.",
+      "category": "Cloud & AI",
+      "badge": "Google Certified",
+      "icon": "Cloud",
+      "color": "#38bdf8",
+      "credentialUrl": ""
+    },
+    {
+      "id": "leetcode-500",
+      "title": "500+ LeetCode Problems Solved",
+      "subtitle": "Rating ~1718 | Top Competitive Coder",
+      "description": "Achieved consistent problem-solving milestones across Algorithms & Data Structures, including dynamic programming, graphs, trees, monotonic stacks, and sliding window.",
+      "category": "Competitive Programming",
+      "badge": "500+ Solved",
+      "icon": "Zap",
+      "color": "#fbbf24",
+      "credentialUrl": "https://leetcode.com/u/vivek_pawar-3010/"
+    },
+    {
+      "id": "cloud-desk-spirit",
+      "title": "Shortlisted & Finalist at SPIRIT 2K25",
+      "subtitle": "Cloud-desk Ventures & State Level Hackathons",
+      "description": "Demonstrated innovative full-stack system architecture at regional tech symposiums, winning accolades for real-time applications and system efficiency.",
+      "category": "Hackathons & Events",
+      "badge": "Finalist",
+      "icon": "Trophy",
+      "color": "#a855f7",
+      "credentialUrl": ""
+    }
+  ],
+  "careerTimeline": [
+    {
+      "step": "01",
+      "phase": "Education",
+      "title": "B.Tech in Computer Science & Engineering",
+      "institution": "SVERI's College of Engineering, Pandharpur",
+      "period": "2022 – 2026",
+      "status": "Final Year Student · CGPA: 9.21 · Final Sem SGPA: 10.00",
+      "details": "Strong fundamentals in Object-Oriented Programming, Operating Systems, Database Management, Algorithm Design, and GATE 2026 Qualified.",
+      "icon": "GraduationCap"
+    },
+    {
+      "step": "02",
+      "phase": "Leadership",
+      "title": "Event Manager - Mirror Code @ Olympus 2K24",
+      "institution": "National Level Technical Symposium",
+      "period": "2024",
+      "status": "Coordinated & Hosted",
+      "details": "Organized and managed competitive programming tracks and problem setting for collegiate coders.",
+      "icon": "Users"
+    },
+    {
+      "step": "03",
+      "phase": "Internship",
+      "title": "Front-End Developer Intern",
+      "institution": "Micro IT",
+      "period": "Mar 2024",
+      "status": "Successfully Completed",
+      "details": "Built interactive web features in React, guided by Vijay Kumar, mastering modern frontend practices.",
+      "icon": "Code2"
+    },
+    {
+      "step": "04",
+      "phase": "Internship",
+      "title": "Software Development Intern",
+      "institution": "Webvarad / Fourise Software Solutions",
+      "period": "Dec 2025 – Apr 2026",
+      "status": "Production Engineering",
+      "details": "Engineered enterprise microservices, API integrations, and database schemas.",
+      "icon": "Briefcase"
+    },
+    {
+      "step": "05",
+      "phase": "Career Milestone",
+      "title": "Selected for TCS Digital",
+      "institution": "Tata Consultancy Services (TCS)",
+      "period": "2025 – 2026",
+      "status": "7 LPA Package Selection",
+      "details": "Advanced engineering role focusing on cloud systems, enterprise architecture, and scalable software solutions.",
+      "icon": "Rocket"
+    }
+  ]
+}

@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import defaultProfile from "../data/profile";
 
 export default function Footer() {
+  const pathname = usePathname();
   const [profile, setProfile] = useState(defaultProfile);
 
   useEffect(() => {
@@ -21,6 +23,10 @@ export default function Footer() {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
+
+  if (pathname?.startsWith("/king")) {
+    return null;
+  }
 
   return (
     <footer

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import defaultProfile from "../data/profile";
 import GreenJupiterPlanet from "./GreenJupiterPlanet";
+import { Mail, Zap, Download, ArrowRight } from "lucide-react";
+import { GithubIcon as Github, LinkedinIcon as Linkedin, TwitterIcon as Twitter, InstagramIcon as Instagram } from "./BrandIcons";
 
 export default function Hero() {
   const [profile, setProfile] = useState(defaultProfile);
@@ -86,16 +88,16 @@ export default function Hero() {
               }}
             >
               <Link href="/projects" className="btn-lime">
-                Explore My Work <span>→</span>
+                Explore My Work <ArrowRight size={16} />
               </Link>
 
               <a
-                href="https://drive.google.com/file/d/1X5X9kC5d7eL3yZk_example/view?usp=sharing"
+                href={profile.resumeUrl || "https://drive.google.com/file/d/1X5X9kC5d7eL3yZk_example/view?usp=sharing"}
                 target="_blank"
                 rel="noreferrer"
                 className="btn-dark-pill"
               >
-                <span>📥</span> Download Resume
+                <Download size={15} /> Download Resume
               </a>
             </div>
 
@@ -117,7 +119,6 @@ export default function Hero() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: 16,
                     color: "var(--text-secondary)",
                     transition: "all 0.2s ease",
                   }}
@@ -130,7 +131,7 @@ export default function Hero() {
                     e.currentTarget.style.borderColor = "var(--border-subtle)";
                   }}
                 >
-                  🐙
+                  <Github size={17} />
                 </a>
 
                 {/* LinkedIn */}
@@ -148,9 +149,7 @@ export default function Hero() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: 14,
                     color: "var(--text-secondary)",
-                    fontWeight: 700,
                     transition: "all 0.2s ease",
                   }}
                   onMouseEnter={(e) => {
@@ -162,7 +161,7 @@ export default function Hero() {
                     e.currentTarget.style.borderColor = "var(--border-subtle)";
                   }}
                 >
-                  in
+                  <Linkedin size={17} />
                 </a>
 
                 {/* Twitter / X */}
@@ -180,9 +179,7 @@ export default function Hero() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: 13,
                     color: "var(--text-secondary)",
-                    fontWeight: 700,
                     transition: "all 0.2s ease",
                   }}
                   onMouseEnter={(e) => {
@@ -194,7 +191,7 @@ export default function Hero() {
                     e.currentTarget.style.borderColor = "var(--border-subtle)";
                   }}
                 >
-                  𝕏
+                  <Twitter size={16} />
                 </a>
 
                 {/* Email */}
@@ -210,7 +207,6 @@ export default function Hero() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: 15,
                     color: "var(--text-secondary)",
                     transition: "all 0.2s ease",
                   }}
@@ -223,7 +219,7 @@ export default function Hero() {
                     e.currentTarget.style.borderColor = "var(--border-subtle)";
                   }}
                 >
-                  ✉️
+                  <Mail size={17} />
                 </a>
 
                 {/* Instagram */}
@@ -241,7 +237,6 @@ export default function Hero() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: 14,
                     color: "var(--text-secondary)",
                     transition: "all 0.2s ease",
                   }}
@@ -254,7 +249,7 @@ export default function Hero() {
                     e.currentTarget.style.borderColor = "var(--border-subtle)";
                   }}
                 >
-                  📸
+                  <Instagram size={17} />
                 </a>
 
                 {/* LeetCode */}
@@ -270,7 +265,6 @@ export default function Hero() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: 15,
                     color: "var(--text-secondary)",
                     transition: "all 0.2s ease",
                   }}
@@ -283,7 +277,7 @@ export default function Hero() {
                     e.currentTarget.style.borderColor = "var(--border-subtle)";
                   }}
                 >
-                  ⚡
+                  <Zap size={17} />
                 </Link>
               </div>
 

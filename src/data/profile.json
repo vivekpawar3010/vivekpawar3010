@@ -25,12 +25,21 @@
   "leetcode": "https://leetcode.com/u/vivek_pawar-3010/",
   "leetcodeUsername": "vivek_pawar-3010",
   "email": "vivekpawar.dev@gmail.com",
-  "avatarUrl": "/images/vivek-portrait-cutout.png",
+  "avatarUrl": "/images/vivek-hologram-portrait.jpg",
   "id": "profile-1",
   "degree": "B.Tech in Computer Science and Engineering",
   "institution": "SVERI's College of Engineering, Pandharpur",
   "period": "2022 – 2026",
   "updatedAt": "2026-10-27T18:24:19.848Z",
   "photos": [],
-  "activePhoto": "/images/vivek-portrait-cutout.png"
+  "activePhoto": "/images/vivek-hologram-portrait.jpg",
+  "resumeUrl": "https://drive.google.com/file/d/1X5X9kC5d7eL3yZk_example/view?usp=sharing",
+  "cgpa": "9.21 / 10",
+  "finalSemSgpa": "10.00 / 10",
+  "gateStatus": "GATE 2026 Qualified",
+  "themeBackgrounds": {
+    "dark": "/images/bg-theme-1.jpg",
+    "warmAmber": "/images/bg-theme-2.jpg",
+    "electricCyan": "/images/bg-theme-3.jpg"
+  }
 }

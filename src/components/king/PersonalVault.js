@@ -40,7 +40,7 @@ export default function PersonalVault() {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingNote, setEditingNote] = useState(null);
   const [formTitle, setFormTitle] = useState("");
-  const [formCategory, setFormCategory] = useState("DSA / LeetCode");
+  const [formCategory, setFormCategory] = useState("");
   const [formContent, setFormContent] = useState("");
   const [formPinned, setFormPinned] = useState(false);
   const [formColor, setFormColor] = useState("cyan");
@@ -79,17 +79,10 @@ export default function PersonalVault() {
     fetchVaultData();
   }, [fetchVaultData]);
 
-  // Compute all available categories from folders & notes
+  // Compute all available categories strictly from existing user folders (never synthesize demo/phantom folders)
   const allCategoryNames = useMemo(() => {
-    const set = new Set();
-    folders.forEach((f) => {
-      if (f.name) set.add(f.name.trim());
-    });
-    notes.forEach((n) => {
-      if (n.category) set.add(n.category.trim());
-    });
-    return Array.from(set);
-  }, [folders, notes]);
+    return folders.map((f) => (f.name || "").trim()).filter(Boolean);
+  }, [folders]);
 
   // Filter notes by search and active category / folder
   const displayedNotes = useMemo(() => {
@@ -281,7 +274,7 @@ export default function PersonalVault() {
   const handleOpenCreate = (prefilledCategory = null) => {
     setEditingNote(null);
     setFormTitle("");
-    setFormCategory(prefilledCategory || activeFolder || "DSA / LeetCode");
+    setFormCategory(prefilledCategory || activeFolder || (folders[0]?.name || ""));
     setFormContent("");
     setFormPinned(false);
     setFormColor("cyan");
@@ -291,7 +284,7 @@ export default function PersonalVault() {
   const handleOpenEdit = (note) => {
     setEditingNote(note);
     setFormTitle(note.title || "");
-    setFormCategory(note.category || "DSA / LeetCode");
+    setFormCategory(note.category || (folders[0]?.name || ""));
     setFormContent(note.content || "");
     setFormPinned(Boolean(note.pinned));
     setFormColor(note.color || "cyan");
@@ -587,7 +580,7 @@ export default function PersonalVault() {
               📁 Category Folders ({computedFolderCards.length})
             </h3>
             <span style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>
-              Click any folder to view and add notes within that category.
+              {computedFolderCards.length === 0 ? "No active folders. Click create to add one." : "Click any folder to view and add notes within that category."}
             </span>
           </div>
 

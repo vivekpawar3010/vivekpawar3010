@@ -1,0 +1,67 @@
+[
+  {
+    "category": "Programming Languages",
+    "icon": "Code2",
+    "items": [
+      { "name": "Java", "level": "Advanced", "badge": "Primary", "percentage": 90 },
+      { "name": "JavaScript (ES6+)", "level": "Advanced", "badge": "Primary", "percentage": 92 },
+      { "name": "C++", "level": "Intermediate", "badge": "DSA", "percentage": 82 },
+      { "name": "Python", "level": "Intermediate", "percentage": 84 },
+      { "name": "SQL", "level": "Intermediate", "percentage": 86 }
+    ]
+  },
+  {
+    "category": "Frontend Development",
+    "icon": "Palette",
+    "items": [
+      { "name": "React.js", "level": "Advanced", "badge": "Primary", "percentage": 93 },
+      { "name": "Next.js (App Router)", "level": "Advanced", "badge": "Primary", "percentage": 91 },
+      { "name": "HTML5 & CSS3", "level": "Advanced", "percentage": 95 },
+      { "name": "Responsive UI/UX", "level": "Advanced", "percentage": 89 },
+      { "name": "Tailwind CSS & Vanilla CSS", "level": "Intermediate", "percentage": 94 }
+    ]
+  },
+  {
+    "category": "Backend & APIs",
+    "icon": "Cpu",
+    "items": [
+      { "name": "Node.js", "level": "Advanced", "percentage": 88 },
+      { "name": "Express.js", "level": "Advanced", "percentage": 87 },
+      { "name": "RESTful APIs", "level": "Advanced", "percentage": 92 },
+      { "name": "GraphQL APIs", "level": "Intermediate", "percentage": 78 },
+      { "name": "Next.js API Routes", "level": "Advanced", "percentage": 90 }
+    ]
+  },
+  {
+    "category": "Mobile & Android",
+    "icon": "Smartphone",
+    "items": [
+      { "name": "Android App Development", "level": "Intermediate", "badge": "Active", "percentage": 85 },
+      { "name": "Java for Android", "level": "Intermediate", "percentage": 86 },
+      { "name": "Firebase (Auth, DB)", "level": "Intermediate", "percentage": 88 },
+      { "name": "XML UI Layouts", "level": "Intermediate", "percentage": 82 }
+    ]
+  },
+  {
+    "category": "Databases & Tools",
+    "icon": "Database",
+    "items": [
+      { "name": "MongoDB", "level": "Intermediate", "percentage": 84 },
+      { "name": "MySQL", "level": "Intermediate", "percentage": 86 },
+      { "name": "Git & GitHub", "level": "Advanced", "percentage": 91 },
+      { "name": "Postman", "level": "Intermediate", "percentage": 89 },
+      { "name": "Vercel & Turbopack", "level": "Intermediate", "percentage": 87 }
+    ]
+  },
+  {
+    "category": "DSA & Core CS",
+    "icon": "Binary",
+    "items": [
+      { "name": "Data Structures & Algorithms", "level": "Strong", "badge": "LeetCode", "percentage": 92 },
+      { "name": "Problem Solving", "level": "Strong", "percentage": 90 },
+      { "name": "Object-Oriented Programming (OOP)", "level": "Strong", "percentage": 91 },
+      { "name": "System Design Basics", "level": "Learning", "percentage": 79 }
+    ]
+  }
+]
+

@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useAvatarMode } from "../lib/useAvatarMode";
-import HolographicPortrait from "./HolographicPortrait";
 
 export default function GreenJupiterPlanet() {
   const canvasRef = useRef(null);
@@ -22,7 +21,7 @@ export default function GreenJupiterPlanet() {
 
     let animationFrameId;
     const dpr = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 2) : 1;
-    const baseDim = 540;
+    const baseDim = 600;
     canvas.width = baseDim * dpr;
     canvas.height = baseDim * dpr;
     ctx.scale(dpr, dpr);
@@ -32,7 +31,7 @@ export default function GreenJupiterPlanet() {
     const centerX = width / 2;
     const centerY = height / 2;
     // Significantly increased radius (almost 400px diameter sphere!)
-    const radius = 195;
+    const radius = 220;
 
     let time = 0;
     let tiltX = 0;
@@ -448,10 +447,18 @@ export default function GreenJupiterPlanet() {
     <div
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
+      onMouseEnter={() => {
+        setIsHovered(true);
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("jupiter_hover", { detail: { hovering: true } }));
+        }
+      }}
       onMouseLeave={() => {
         setIsHovered(false);
         setMousePos({ x: 0, y: 0 });
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("jupiter_hover", { detail: { hovering: false } }));
+        }
       }}
       style={{
         position: "relative",
@@ -464,78 +471,12 @@ export default function GreenJupiterPlanet() {
         margin: "0 auto",
       }}
     >
-      {/* ── Top Hero Mode Switcher: 🪐 Jupiter 3D | 👤 Vivek Hologram ── */}
-      <div
+      {/* Canvas rendering the enlarged Green Jupiter gas giant with rotating rings */}
+      <canvas
+        ref={canvasRef}
         style={{
-          position: "absolute",
-          top: -14,
-          zIndex: 10,
-          display: "flex",
-          alignItems: "center",
-          gap: 6,
-          padding: "4px 8px",
-          borderRadius: "9999px",
-          background: "var(--bg-glass)",
-          border: "1px solid var(--border-lime)",
-          backdropFilter: "blur(14px)",
-          boxShadow: "0 8px 24px rgba(0, 0, 0, 0.8), 0 0 15px rgba(200, 255, 69, 0.2)",
-        }}
-      >
-        <button
-          type="button"
-          onClick={() => setViewMode("jupiter")}
-          style={{
-            padding: "5px 14px",
-            borderRadius: "9999px",
-            border: "none",
-            background: viewMode === "jupiter" ? "var(--accent-lime)" : "transparent",
-            color: viewMode === "jupiter" ? "var(--text-on-accent)" : "var(--text-secondary)",
-            fontSize: "11px",
-            fontWeight: 800,
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            transition: "all 0.2s ease",
-          }}
-        >
-          <span>🪐</span> 3D Jupiter
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setViewMode("hologram")}
-          style={{
-            padding: "5px 14px",
-            borderRadius: "9999px",
-            border: "none",
-            background: viewMode === "hologram" ? "var(--accent-lime)" : "transparent",
-            color: viewMode === "hologram" ? "var(--text-on-accent)" : "var(--text-secondary)",
-            fontSize: "11px",
-            fontWeight: 800,
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            transition: "all 0.2s ease",
-          }}
-        >
-          <span>👤</span> Vivek Hologram
-        </button>
-      </div>
-
-      {viewMode === "hologram" ? (
-        <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <HolographicPortrait />
-        </div>
-      ) : (
-        <>
-          {/* Canvas rendering the enlarged Green Jupiter gas giant with rotating rings */}
-          <canvas
-            ref={canvasRef}
-            style={{
-              width: "min(520px, 94vw)",
-              height: "min(520px, 94vw)",
+          width: "min(580px, 94vw)",
+          height: "min(580px, 94vw)",
               display: "block",
               filter: isHovered
                 ? "drop-shadow(0 0 45px rgba(200, 255, 69, 0.5))"
@@ -836,8 +777,6 @@ export default function GreenJupiterPlanet() {
         </div>
         <span style={{ color: "var(--accent-lime)", fontSize: "13px" }}>→</span>
       </Link>
-        </>
-      )}
     </div>
   );
 }

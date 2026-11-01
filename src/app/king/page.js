@@ -5,11 +5,35 @@ import Link from "next/link";
 import ProfileEditor from "../../components/king/ProfileEditor";
 import ProjectsManager from "../../components/king/ProjectsManager";
 import SkillsManager from "../../components/king/SkillsManager";
+import ExperienceManager from "../../components/king/ExperienceManager";
 import TaskManager from "../../components/king/TaskManager";
 import LeetCodeFriends from "../../components/king/LeetCodeFriends";
 import MessagesInbox from "../../components/king/MessagesInbox";
 import PersonalVault from "../../components/king/PersonalVault";
 import DatabaseInspector from "../../components/king/DatabaseInspector";
+import { WebsiteLogoIcon } from "../../components/BrandIcons";
+import {
+  Crown,
+  User,
+  FolderGit2,
+  Zap,
+  Briefcase,
+  Flame,
+  Trophy,
+  Mail,
+  Lock,
+  Database,
+  ExternalLink,
+  Menu,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Sun,
+  Moon,
+  Sparkles,
+  ShieldAlert,
+  Layers,
+} from "lucide-react";
 
 export default function KingPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -111,30 +135,30 @@ export default function KingPage() {
 
   // Navigation Items
   const navItems = [
-    { id: "profile", label: "Profile & Hero Content", icon: "👤", badge: null, desc: "Personal bio, contact, and headline" },
-    { id: "projects", label: "Projects Manager", icon: "💼", badge: stats.projects, desc: "Live production portfolio projects" },
-    { id: "skills", label: "Skills & Tech Stack", icon: "⚡", badge: null, desc: "Languages, frameworks, and proficiencies" },
-    { id: "tasks", label: "Daily Streaks & Tasks", icon: "🔥", badge: stats.tasks, desc: "Habit streaks, AI scores & general tasks" },
-    { id: "friends", label: "LeetCode Rivalry Hub", icon: "🏆", badge: null, desc: "Friend rankings & DSA battle stats" },
-    { id: "messages", label: "Inquiries & Inbox", icon: "📬", badge: stats.unreadMessages > 0 ? `${stats.unreadMessages} new` : null, desc: "Messages received from contact form" },
-    { id: "vault", label: "Personal Vault & Notes", icon: "🔐", badge: stats.vaultNotes > 0 ? stats.vaultNotes : null, desc: "Private categorized folder notes" },
-    { id: "inspector", label: "Database & Architecture", icon: "🗄️", badge: "Live", desc: "Prisma PostgreSQL sync & latency" },
+    { id: "profile", label: "Profile & Hero Content", icon: User, badge: null, desc: "Portraits, bio & theme backgrounds" },
+    { id: "projects", label: "Projects Manager", icon: FolderGit2, badge: stats.projects, desc: "Production projects & categories" },
+    { id: "skills", label: "Skills & Tech Stack", icon: Zap, badge: null, desc: "Proficiency gauges & categories" },
+    { id: "experience", label: "Experience & Roles", icon: Briefcase, badge: null, desc: "Internships & verified achievements" },
+    { id: "tasks", label: "Streak Engine & Tasks", icon: Flame, badge: stats.tasks, desc: "Habits, Sunday points & task tracker" },
+    { id: "friends", label: "LeetCode Rivalry Hub", icon: Trophy, badge: null, desc: "DSA battle rankings & stats" },
+    { id: "messages", label: "Inquiries & Inbox", icon: Mail, badge: stats.unreadMessages > 0 ? `${stats.unreadMessages} new` : null, desc: "Encrypted messages received" },
+    { id: "vault", label: "Personal Vault & Notes", icon: Lock, badge: stats.vaultNotes > 0 ? stats.vaultNotes : null, desc: "Private folder notes & scratchpad" },
+    { id: "inspector", label: "Database Inspector", icon: Database, badge: "Live", desc: "Prisma PostgreSQL sync & schema" },
   ];
 
-  const currentNav = navItems.find((n) => n.id === activeSection) || navItems[0];
-
-  // ─── 1. Login Screen (User-side Glassmorphism + Orbiting Rings + Theme Toggle) ───
+  // ─── 1. Login Screen ────────────────────────────────────────────────────────
   if (!isAuthenticated) {
     return (
       <main
         style={{
-          minHeight: "calc(100vh - 72px)",
+          minHeight: "100vh",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           padding: "2rem 1.25rem",
           position: "relative",
           overflow: "hidden",
+          background: "var(--bg-primary)",
         }}
       >
         {/* Top-Right Theme Toggle Pill */}
@@ -152,20 +176,21 @@ export default function KingPage() {
               cursor: "pointer",
             }}
           >
-            <span>{theme === "electric-cyan" ? "🌊 Electric Cyan" : theme === "light" ? "☀️ Warm Amber & Slate" : "🌙 Cyber Dark"}</span>
-            <span style={{ fontSize: "10px", color: "var(--accent-brand)" }}>[Switch Theme]</span>
+            {theme === "dark" ? <Moon size={13} /> : <Sun size={13} />}
+            <span>{theme === "electric-cyan" ? "Electric Cyan" : theme === "light" ? "Warm Amber" : "Cyber Dark"}</span>
           </button>
         </div>
 
-        {/* Orbiting Cyber Ring 1 (Background visual) */}
+        {/* Orbiting Cyber Ring 1 */}
         <div
           style={{
             position: "absolute",
             width: 520,
             height: 520,
             borderRadius: "50%",
-            border: isLight ? "2px dashed rgba(255, 107, 0, 0.25)" : "2px dashed rgba(200, 255, 69, 0.25)",
-            boxShadow: isLight ? "0 0 40px rgba(255, 107, 0, 0.12)" : "0 0 40px rgba(200, 255, 69, 0.15)",
+            border: "2px dashed var(--accent-brand)",
+            opacity: 0.35,
+            boxShadow: "0 0 40px var(--accent-glow)",
             transform: "rotateX(68deg) rotateY(-18deg)",
             pointerEvents: "none",
             animation: "orbitSpin 22s linear infinite",
@@ -179,7 +204,8 @@ export default function KingPage() {
             width: 580,
             height: 580,
             borderRadius: "50%",
-            border: "1.5px solid rgba(2, 132, 199, 0.22)",
+            border: "1.5px solid var(--accent-secondary)",
+            opacity: 0.3,
             transform: "rotateX(72deg) rotateY(24deg)",
             pointerEvents: "none",
             animation: "orbitSpinRev 18s linear infinite",
@@ -197,34 +223,30 @@ export default function KingPage() {
             position: "relative",
             zIndex: 2,
             borderRadius: 20,
+            border: "1px solid var(--border-subtle)",
           }}
         >
-          {/* Glowing Crown Emblem with Pulse */}
+          {/* Glowing Website Brand Logo Emblem */}
           <div
             style={{
-              width: 70,
-              height: 70,
+              width: 68,
+              height: 68,
               borderRadius: 20,
-              background: isLight
-                ? "linear-gradient(135deg, rgba(255, 107, 0, 0.2) 0%, rgba(251, 146, 60, 0.15) 100%)"
-                : "linear-gradient(135deg, rgba(200, 255, 69, 0.2) 0%, rgba(34, 211, 238, 0.2) 100%)",
-              border: `1.5px solid ${isLight ? "var(--accent-orange)" : "var(--accent-lime)"}`,
+              background: "linear-gradient(135deg, rgba(34, 211, 238, 0.15) 0%, rgba(200, 255, 69, 0.15) 100%)",
+              border: "1.5px solid var(--border-subtle)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 32,
               margin: "0 auto 1.4rem",
-              boxShadow: isLight
-                ? "0 0 30px rgba(255, 107, 0, 0.35)"
-                : "0 0 30px rgba(200, 255, 69, 0.35)",
+              boxShadow: "0 0 30px rgba(200, 255, 69, 0.25)",
               animation: "floatCrown 4s ease-in-out infinite",
             }}
           >
-            👑
+            <WebsiteLogoIcon size={42} />
           </div>
 
           <div className="section-tag" style={{ justifyContent: "center", marginBottom: 6 }}>
-            Admin Sanctuary
+            Sanctuary Control
           </div>
           <h1
             style={{
@@ -235,7 +257,7 @@ export default function KingPage() {
               letterSpacing: "-0.02em",
             }}
           >
-            King <span className="lime-underline">Deck</span>
+            Kings <span className="lime-underline">Deck</span>
           </h1>
           <p
             style={{
@@ -245,7 +267,7 @@ export default function KingPage() {
               lineHeight: 1.5,
             }}
           >
-            Private Command Hub for Vivek Pawar. Full encrypted control of projects, daily habit streaks, and personal vault.
+            Encrypted Admin Sanctuary for Vivek Pawar. Full control over portraits, projects, habit streaks, and database vault.
           </p>
 
           <form onSubmit={handleLogin}>
@@ -260,20 +282,15 @@ export default function KingPage() {
                 style={{
                   width: "100%",
                   padding: "13px 16px",
-                  background: isLight ? "#FFFFFF" : "rgba(5, 8, 13, 0.9)",
-                  border: error
-                    ? "1px solid #f43f5e"
-                    : isLight
-                    ? "1px solid rgba(249, 115, 22, 0.3)"
-                    : "1px solid rgba(255, 255, 255, 0.15)",
+                  background: "var(--input-bg)",
+                  border: error ? "1px solid #f43f5e" : "1px solid var(--border-subtle)",
                   borderRadius: 12,
                   color: "var(--text-primary)",
                   fontSize: "1.05rem",
                   textAlign: "center",
                   letterSpacing: "0.2em",
                   outline: "none",
-                  fontFamily: "var(--font-mono)",
-                  boxShadow: isLight ? "0 2px 8px rgba(255, 107, 0, 0.08)" : "none",
+                  fontFamily: "monospace",
                 }}
               />
               {error && (
@@ -293,9 +310,13 @@ export default function KingPage() {
                 padding: "13px",
                 fontSize: "0.95rem",
                 fontWeight: 800,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
               }}
             >
-              {loadingAuth ? "Validating Authorization..." : "Unlock King Deck 👑"}
+              <Crown size={16} />
+              {loadingAuth ? "Validating Authorization..." : "Unlock Kings Deck"}
             </button>
           </form>
 
@@ -304,17 +325,15 @@ export default function KingPage() {
               href="/"
               style={{
                 fontSize: "0.88rem",
-                color: "var(--text-muted)",
+                color: "var(--text-secondary)",
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 6,
                 fontWeight: 600,
-                transition: "color 0.2s ease",
+                textDecoration: "none",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent-lime)")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
             >
-              <span>←</span> Return to Public Portfolio
+              <span>←</span> Return to Public Website
             </Link>
           </div>
         </div>
@@ -337,22 +356,21 @@ export default function KingPage() {
     );
   }
 
-  // ─── 2. Authenticated King Dashboard (Ultra-Crisp User-Side UI + Light/Dark Mode) ───
+  // ─── 2. Authenticated Kings Deck (Dual-Navbar: Top Telemetry + Left Navigation) ─
   return (
     <div
       style={{
-        minHeight: "calc(100vh - 68px)",
+        minHeight: "100vh",
         background: "var(--bg-primary)",
         color: "var(--text-primary)",
         display: "flex",
         flexDirection: "column",
-        transition: "background-color 0.3s ease, color 0.3s ease",
       }}
     >
-      {/* ── Top Executive KPI & Database Strip ── */}
+      {/* ── Top Horizontal Telemetry & Status Bar ── */}
       <header
         style={{
-          background: isLight ? "rgba(255, 255, 255, 0.95)" : "rgba(11, 18, 28, 0.95)",
+          background: "var(--bg-card)",
           borderBottom: "1px solid var(--border-subtle)",
           backdropFilter: "blur(18px)",
           WebkitBackdropFilter: "blur(18px)",
@@ -362,7 +380,6 @@ export default function KingPage() {
           alignItems: "center",
           flexWrap: "wrap",
           gap: "1rem",
-          boxShadow: isLight ? "0 4px 20px rgba(249, 115, 22, 0.05)" : "none",
           position: "sticky",
           top: 0,
           zIndex: 40,
@@ -380,37 +397,41 @@ export default function KingPage() {
               display: "none",
               padding: "6px 10px",
               borderRadius: 8,
-              background: "var(--bg-card)",
+              background: "var(--bg-surface)",
               border: "1px solid var(--border-subtle)",
               color: "var(--text-primary)",
               cursor: "pointer",
             }}
           >
-            {mobileMenuOpen ? "✕" : "☰"}
+            {mobileMenuOpen ? <X size={16} /> : <Menu size={16} />}
           </button>
 
-          <div
+          <Link
+            href="/"
+            title="Return to Public Website"
             style={{
+              position: "relative",
               width: 40,
               height: 40,
-              borderRadius: 12,
-              background: isLight
-                ? "linear-gradient(135deg, rgba(255, 107, 0, 0.2) 0%, rgba(251, 146, 60, 0.15) 100%)"
-                : "linear-gradient(135deg, rgba(200, 255, 69, 0.2) 0%, rgba(34, 211, 238, 0.2) 100%)",
-              border: `1px solid ${isLight ? "var(--accent-orange)" : "var(--accent-lime)"}`,
+              borderRadius: "10px",
+              background: "linear-gradient(135deg, rgba(34, 211, 238, 0.15) 0%, rgba(200, 255, 69, 0.15) 100%)",
+              border: "1px solid var(--border-subtle)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 20,
-              boxShadow: isLight ? "0 0 15px rgba(255, 107, 0, 0.25)" : "0 0 15px rgba(200, 255, 69, 0.25)",
+              boxShadow: "0 0 15px rgba(200, 255, 69, 0.15)",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              padding: 0,
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
           >
-            👑
-          </div>
+            <WebsiteLogoIcon size={26} />
+          </Link>
 
           <div>
             <div style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--text-primary)" }}>
-              King Sanctuary
+              Kings Deck
             </div>
             <div style={{ fontSize: "11px", color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: 6 }}>
               <span
@@ -418,60 +439,18 @@ export default function KingPage() {
                   width: 7,
                   height: 7,
                   borderRadius: "50%",
-                  background: isLight ? "#16A34A" : "#C8FF45",
-                  boxShadow: isLight ? "0 0 6px #16A34A" : "0 0 6px #C8FF45",
+                  background: "#22c55e",
+                  boxShadow: "0 0 6px #22c55e",
                   display: "inline-block",
                 }}
               />
-              Prisma PostgreSQL Synced &bull; Latency {stats.latency}
+              Prisma PostgreSQL Online &bull; Latency {stats.latency}
             </div>
           </div>
         </div>
 
-        {/* Right Actions: KPI Badges + Admin Avatar Control + Theme Switcher + Lock */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-          {/* Admin Exclusive Avatar Control */}
-          <div
-            className="kpi-chip"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              padding: "5px 12px",
-              borderRadius: 9999,
-              background: "var(--bg-card)",
-              border: "1px solid var(--border-subtle)",
-              fontSize: "12px",
-              fontWeight: 600,
-            }}
-          >
-            <span style={{ color: "var(--text-muted)" }}>Active Avatar:</span>
-            <button
-              type="button"
-              onClick={() => {
-                const next = avatarMode === "real" ? "rocklee" : "real";
-                setAvatarMode(next);
-                localStorage.setItem("portfolio_avatar_mode", next);
-                window.dispatchEvent(new CustomEvent("portfolio_avatar_changed", { detail: { mode: next } }));
-              }}
-              style={{
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                fontWeight: 800,
-                color: "var(--accent-brand)",
-                fontSize: "12px",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 4,
-                padding: 0,
-              }}
-              title="Only Admin controls the active public avatar"
-            >
-              <span>{avatarMode === "real" ? "👤 Vivek Real Cutout" : "🍃 Rock Lee"}</span>
-              <span style={{ fontSize: "10px", color: "var(--text-muted)" }}>[Swap]</span>
-            </button>
-          </div>
+        {/* Right Actions: KPI Badges + Theme Switcher + View Site + Lock */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           {/* KPI Badge: Projects */}
           <div
             className="kpi-chip"
@@ -481,18 +460,18 @@ export default function KingPage() {
               gap: 6,
               padding: "5px 12px",
               borderRadius: 9999,
-              background: "var(--bg-card)",
+              background: "var(--bg-surface)",
               border: "1px solid var(--border-subtle)",
               fontSize: "12px",
               fontWeight: 600,
-              boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
             }}
           >
-            <span style={{ color: "var(--text-muted)" }}>💼 Projects:</span>
+            <Briefcase size={13} style={{ color: "var(--accent-brand)" }} />
+            <span style={{ color: "var(--text-secondary)" }}>Projects:</span>
             <span style={{ color: "var(--accent-brand)", fontWeight: 800 }}>{stats.projects}</span>
           </div>
 
-          {/* KPI Badge: Tasks & Streaks */}
+          {/* KPI Badge: Tasks */}
           <div
             className="kpi-chip"
             style={{
@@ -501,15 +480,15 @@ export default function KingPage() {
               gap: 6,
               padding: "5px 12px",
               borderRadius: 9999,
-              background: "var(--bg-card)",
+              background: "var(--bg-surface)",
               border: "1px solid var(--border-subtle)",
               fontSize: "12px",
               fontWeight: 600,
-              boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
             }}
           >
-            <span style={{ color: "var(--text-muted)" }}>🔥 Tasks:</span>
-            <span style={{ color: "var(--accent-cyan)", fontWeight: 800 }}>{stats.tasks}</span>
+            <Flame size={13} style={{ color: "var(--accent-highlight)" }} />
+            <span style={{ color: "var(--text-secondary)" }}>Tasks:</span>
+            <span style={{ color: "var(--text-primary)", fontWeight: 800 }}>{stats.tasks}</span>
           </div>
 
           {/* KPI Badge: Messages Inbox */}
@@ -521,49 +500,49 @@ export default function KingPage() {
               gap: 6,
               padding: "5px 12px",
               borderRadius: 9999,
-              background: stats.unreadMessages > 0 ? "rgba(244, 63, 94, 0.12)" : "var(--bg-card)",
+              background: stats.unreadMessages > 0 ? "rgba(244, 63, 94, 0.12)" : "var(--bg-surface)",
               border: stats.unreadMessages > 0 ? "1px solid rgba(244, 63, 94, 0.4)" : "1px solid var(--border-subtle)",
               fontSize: "12px",
               fontWeight: 600,
-              boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
             }}
           >
-            <span style={{ color: "var(--text-muted)" }}>📬 Inbox:</span>
+            <Mail size={13} style={{ color: stats.unreadMessages > 0 ? "#f43f5e" : "var(--text-secondary)" }} />
+            <span style={{ color: "var(--text-secondary)" }}>Inbox:</span>
             <span style={{ color: stats.unreadMessages > 0 ? "#f43f5e" : "var(--text-primary)", fontWeight: 800 }}>
               {stats.unreadMessages > 0 ? `${stats.unreadMessages} new` : stats.messages}
             </span>
           </div>
 
-          {/* Master Theme Switcher Pill */}
+          {/* Theme Switcher Pill */}
           <button
             onClick={toggleTheme}
             type="button"
-            title="Click to switch theme: Warm Amber -> Electric Cyan -> Cyber Dark"
+            title="Click to toggle theme"
             style={{
               display: "flex",
               alignItems: "center",
               gap: 6,
               padding: "5px 14px",
               borderRadius: 9999,
-              background: "var(--tag-bg)",
+              background: "var(--badge-bg)",
               border: "1px solid var(--border-subtle)",
               color: "var(--accent-brand)",
               fontSize: "12px",
               fontWeight: 800,
               cursor: "pointer",
-              transition: "all 0.2s ease",
             }}
           >
-            <span>{theme === "electric-cyan" ? "🌊 Electric Cyan" : theme === "light" ? "☀️ Warm Amber" : "🌙 Cyber Dark"}</span>
+            {theme === "dark" ? <Moon size={13} /> : <Sun size={13} />}
+            <span>{theme === "electric-cyan" ? "Electric Cyan" : theme === "light" ? "Warm Amber" : "Cyber Dark"}</span>
           </button>
 
           {/* View Public Portfolio CTA */}
           <Link
             href="/"
             className="btn-dark-pill"
-            style={{ padding: "5px 14px", fontSize: "12px", fontWeight: 700 }}
+            style={{ padding: "5px 14px", fontSize: "12px", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 6 }}
           >
-            <span>🌐</span> Portfolio
+            <ExternalLink size={13} /> Public Site
           </Link>
 
           {/* Lock Admin Session */}
@@ -580,36 +559,36 @@ export default function KingPage() {
               fontSize: "12px",
               fontWeight: 700,
               cursor: "pointer",
-              transition: "all 0.2s ease",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 5,
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(244, 63, 94, 0.2)")}
-            onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(244, 63, 94, 0.1)")}
           >
-            Lock 🔒
+            <Lock size={12} /> Lock
           </button>
         </div>
       </header>
 
-      {/* ── Main Layout: Sidebar + Content Area ── */}
+      {/* ── Main Layout: Sidebar Navigation + Workspace Pane ── */}
       <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
-        {/* Sidebar Navigation */}
+        {/* Left Sidebar Navigation */}
         <aside
           style={{
-            width: isSidebarCollapsed ? 80 : 290,
-            background: isLight ? "rgba(255, 255, 255, 0.98)" : "rgba(10, 16, 24, 0.98)",
+            width: isSidebarCollapsed ? 80 : 280,
+            background: "var(--bg-card)",
             borderRight: "1px solid var(--border-subtle)",
-            padding: "1.4rem 0.9rem",
+            padding: "1.2rem 0.8rem",
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
             flexShrink: 0,
-            transition: "width 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
+            transition: "width 0.22s ease",
             position: "relative",
           }}
           className={`king-sidebar ${mobileMenuOpen ? "king-mobile-open" : ""}`}
         >
           <div>
-            {/* Navigation Header with Collapse Toggle */}
+            {/* Collapse Toggle */}
             <div
               style={{
                 display: "flex",
@@ -623,41 +602,41 @@ export default function KingPage() {
               {!isSidebarCollapsed && (
                 <span
                   style={{
-                    fontSize: "10px",
+                    fontSize: "11px",
                     fontWeight: 800,
-                    color: "var(--text-muted)",
-                    letterSpacing: "0.1em",
+                    color: "var(--text-secondary)",
+                    letterSpacing: "0.08em",
                     textTransform: "uppercase",
                   }}
                 >
-                  Workspace Control
+                  DECK MODULES
                 </span>
               )}
 
               <button
                 type="button"
                 onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar to Compact Mode"}
+                title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
                 style={{
                   background: "transparent",
                   border: "none",
-                  color: "var(--text-muted)",
+                  color: "var(--text-secondary)",
                   cursor: "pointer",
-                  fontSize: "12px",
-                  padding: "4px 8px",
+                  padding: "4px 6px",
                   borderRadius: 6,
+                  display: "flex",
+                  alignItems: "center",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent-lime)")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
               >
-                {isSidebarCollapsed ? "⇥" : "⇤ Collapse"}
+                {isSidebarCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
               </button>
             </div>
 
             {/* Navigation Buttons List */}
-            <nav style={{ display: "grid", gap: 6 }}>
+            <nav style={{ display: "grid", gap: 5 }}>
               {navItems.map((item) => {
                 const active = activeSection === item.id;
+                const IconComponent = item.icon;
                 return (
                   <button
                     key={item.id}
@@ -672,34 +651,19 @@ export default function KingPage() {
                       justifyContent: isSidebarCollapsed ? "center" : "space-between",
                       width: "100%",
                       padding: isSidebarCollapsed ? "12px 0" : "10px 14px",
-                      borderRadius: 12,
+                      borderRadius: 10,
                       fontSize: "0.88rem",
-                      fontWeight: active ? 800 : 500,
+                      fontWeight: active ? 800 : 600,
                       color: active ? "var(--text-on-accent)" : "var(--text-secondary)",
                       background: active ? "var(--accent-brand)" : "transparent",
-                      border: active ? "1px solid var(--accent-brand)" : "1px solid transparent",
+                      border: "none",
                       cursor: "pointer",
                       textAlign: "left",
-                      transition: "all 0.18s ease",
-                      boxShadow: active ? "0 4px 16px var(--accent-glow)" : "none",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!active) {
-                        e.currentTarget.style.background = "var(--tag-bg)";
-                        e.currentTarget.style.color = "var(--text-primary)";
-                        e.currentTarget.style.transform = "translateX(2px)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!active) {
-                        e.currentTarget.style.background = "transparent";
-                        e.currentTarget.style.color = "var(--text-secondary)";
-                        e.currentTarget.style.transform = "translateX(0)";
-                      }
+                      transition: "all 0.15s ease",
                     }}
                   >
-                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                      <span style={{ fontSize: 18 }}>{item.icon}</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <IconComponent size={18} />
                       {!isSidebarCollapsed && <span>{item.label}</span>}
                     </div>
 
@@ -710,12 +674,9 @@ export default function KingPage() {
                           fontWeight: 800,
                           padding: "2px 7px",
                           borderRadius: 6,
-                          background: active
-                            ? "rgba(255, 255, 255, 0.25)"
-                            : "var(--tag-bg)",
-                          color: active
-                            ? "var(--text-on-accent)"
-                            : "var(--accent-brand)",
+                          background: active ? "rgba(255, 255, 255, 0.25)" : "var(--bg-surface)",
+                          color: active ? "var(--text-on-accent)" : "var(--accent-brand)",
+                          border: active ? "none" : "1px solid var(--border-subtle)",
                         }}
                       >
                         {item.badge}
@@ -742,122 +703,37 @@ export default function KingPage() {
             >
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
                 <span style={{ fontWeight: 800, color: "var(--text-primary)" }}>Active Session</span>
-                <span style={{ color: isLight ? "#16A34A" : "var(--accent-lime)", fontWeight: 700 }}>● Online</span>
+                <span style={{ color: "#22c55e", fontWeight: 700 }}>● Online</span>
               </div>
               <div>Admin: <strong style={{ color: "var(--text-primary)" }}>Vivek Pawar</strong></div>
-              <div>Database: <span style={{ color: "var(--accent-brand)", fontWeight: 700 }}>Prisma PostgreSQL</span></div>
-              <div style={{ color: "var(--text-muted)", marginTop: 4 }}>Theme: {theme === "electric-cyan" ? "Modern Slate & Electric Cyan" : theme === "light" ? "Warm Amber & Slate" : "Cyber Dark"}</div>
+              <div>Database: <span style={{ color: "var(--accent-brand)", fontWeight: 700 }}>PostgreSQL</span></div>
             </div>
           ) : (
-            <div style={{ textAlign: "center", fontSize: 18, color: "var(--text-muted)", padding: "10px 0" }}>
-              👑
+            <div style={{ textAlign: "center", padding: "10px 0" }}>
+              <WebsiteLogoIcon size={24} />
             </div>
           )}
         </aside>
 
-        {/* ── Main Executive Content Workspace ── */}
+        {/* ── Main Workspace Content Area (Renders Active Module Cleanly) ── */}
         <main
           style={{
             flex: 1,
             padding: "2rem 2.5rem",
             overflowY: "auto",
             background: "var(--bg-primary)",
-            display: "flex",
-            flexDirection: "column",
-            gap: "1.5rem",
             position: "relative",
           }}
         >
-          {/* Section Breadcrumb & Header Hero Banner */}
-          <div
-            className="glass-card"
-            style={{
-              padding: "1.4rem 1.8rem",
-              borderRadius: 16,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: "1rem",
-            }}
-          >
-            <div>
-              <div className="section-tag" style={{ marginBottom: 4 }}>
-                {currentNav.icon} King Deck &bull; {currentNav.label}
-              </div>
-              <h2
-                style={{
-                  fontSize: "1.5rem",
-                  fontWeight: 900,
-                  margin: "0 0 4px",
-                  color: "var(--text-primary)",
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                {currentNav.label}
-              </h2>
-              <p style={{ margin: 0, fontSize: "0.9rem", color: "var(--text-secondary)" }}>
-                {currentNav.desc}
-              </p>
-            </div>
-
-            {/* Quick Action Navigation Buttons */}
-            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-              <button
-                type="button"
-                onClick={() => setActiveSection("tasks")}
-                className="btn-dark-pill"
-                style={{
-                  padding: "6px 14px",
-                  fontSize: "12px",
-                  fontWeight: 700,
-                  borderColor: activeSection === "tasks" ? "var(--accent-lime)" : "var(--border-subtle)",
-                }}
-              >
-                <span>🔥</span> Daily Streaks
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setActiveSection("vault")}
-                className="btn-dark-pill"
-                style={{
-                  padding: "6px 14px",
-                  fontSize: "12px",
-                  fontWeight: 700,
-                  borderColor: activeSection === "vault" ? "var(--accent-lime)" : "var(--border-subtle)",
-                }}
-              >
-                <span>🔐</span> Vault Folders
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setActiveSection("inspector")}
-                className="btn-dark-pill"
-                style={{
-                  padding: "6px 14px",
-                  fontSize: "12px",
-                  fontWeight: 700,
-                  borderColor: activeSection === "inspector" ? "var(--accent-lime)" : "var(--border-subtle)",
-                }}
-              >
-                <span>🗄️</span> DB Status
-              </button>
-            </div>
-          </div>
-
-          {/* Active Section Content Mount */}
-          <div style={{ flex: 1 }}>
-            {activeSection === "profile" && <ProfileEditor />}
-            {activeSection === "projects" && <ProjectsManager />}
-            {activeSection === "skills" && <SkillsManager />}
-            {activeSection === "tasks" && <TaskManager />}
-            {activeSection === "friends" && <LeetCodeFriends />}
-            {activeSection === "messages" && <MessagesInbox />}
-            {activeSection === "vault" && <PersonalVault />}
-            {activeSection === "inspector" && <DatabaseInspector />}
-          </div>
+          {activeSection === "profile" && <ProfileEditor />}
+          {activeSection === "projects" && <ProjectsManager />}
+          {activeSection === "skills" && <SkillsManager />}
+          {activeSection === "experience" && <ExperienceManager />}
+          {activeSection === "tasks" && <TaskManager />}
+          {activeSection === "friends" && <LeetCodeFriends />}
+          {activeSection === "messages" && <MessagesInbox />}
+          {activeSection === "vault" && <PersonalVault />}
+          {activeSection === "inspector" && <DatabaseInspector />}
         </main>
       </div>
 

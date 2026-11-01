@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useAvatarMode } from "../lib/useAvatarMode";
+import { Zap, Briefcase, GraduationCap, Code2, Sparkles } from "lucide-react";
 
 export default function HolographicPortrait({ compact = false }) {
   const containerRef = useRef(null);
@@ -39,7 +40,7 @@ export default function HolographicPortrait({ compact = false }) {
       id: "leetcode",
       title: "500+ LeetCode",
       sub: "Rating ~1718",
-      icon: "⚡",
+      icon: Zap,
       color: "#fbbf24",
       bg: "rgba(245, 158, 11, 0.15)",
       border: "rgba(245, 158, 11, 0.4)",
@@ -51,8 +52,8 @@ export default function HolographicPortrait({ compact = false }) {
       id: "tcs",
       title: "TCS Digital",
       sub: "Selected • 7 LPA",
-      icon: "💼",
-      color: "#C8FF45",
+      icon: Briefcase,
+      color: "var(--accent-lime)",
       bg: "rgba(200, 255, 69, 0.15)",
       border: "rgba(200, 255, 69, 0.4)",
       style: { top: "16%", right: "-8%" },
@@ -63,7 +64,7 @@ export default function HolographicPortrait({ compact = false }) {
       id: "cgpa",
       title: "B.Tech CSE",
       sub: "9.21 CGPA",
-      icon: "🎓",
+      icon: GraduationCap,
       color: "#22D3EE",
       bg: "rgba(34, 211, 238, 0.15)",
       border: "rgba(34, 211, 238, 0.4)",
@@ -75,7 +76,7 @@ export default function HolographicPortrait({ compact = false }) {
       id: "impact",
       title: "Full-Stack Dev",
       sub: "Next.js • AI • Spring",
-      icon: "🚀",
+      icon: Code2,
       color: "#c084fc",
       bg: "rgba(192, 132, 252, 0.15)",
       border: "rgba(192, 132, 252, 0.4)",
@@ -244,7 +245,7 @@ export default function HolographicPortrait({ compact = false }) {
               e.currentTarget.style.borderColor = "var(--border-subtle)";
             }}
           >
-            <span style={{ fontSize: 16 }}>{b.icon}</span>
+            <b.icon size={16} style={{ color: b.color }} />
             <div>
               <div style={{ fontSize: 11, fontWeight: 800, color: "var(--text-primary)", lineHeight: 1.2 }}>
                 {b.title}

@@ -49,6 +49,11 @@ export default function Navbar() {
     return pathname.startsWith(href);
   };
 
+  // Hide Navbar completely on King's Deck Admin panel (/king)
+  if (pathname?.startsWith("/king")) {
+    return null;
+  }
+
   return (
     <header
       style={{
@@ -144,22 +149,6 @@ export default function Navbar() {
             >
               Vivek Pawar<span style={{ color: "var(--accent-lime)" }}>.</span>
             </span>
-            {pathname === "/" && (
-              <span
-                style={{
-                  fontSize: "10px",
-                  fontWeight: 800,
-                  color: "var(--accent-lime)",
-                  background: "rgba(200, 255, 69, 0.15)",
-                  padding: "1px 6px",
-                  borderRadius: 6,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
-                }}
-              >
-                Home
-              </span>
-            )}
           </Link>
         </div>
 

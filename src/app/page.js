@@ -8,6 +8,8 @@ import defaultProjects from "../data/projects";
 
 export default function Home() {
   const [projectsList, setProjectsList] = useState(defaultProjects);
+  const [isJupiterHovered, setIsJupiterHovered] = useState(false);
+  const [theme, setTheme] = useState("dark");
 
   useEffect(() => {
     fetch("/api/king/projects")
@@ -18,9 +20,37 @@ export default function Home() {
         }
       })
       .catch((err) => console.error("Error loading dynamic projects", err));
+
+    const handleJupiterHover = (e) => {
+      setIsJupiterHovered(Boolean(e.detail?.hovering));
+    };
+    const updateTheme = () => {
+      const activeTheme = document.documentElement.getAttribute("data-theme") || "dark";
+      setTheme(activeTheme);
+    };
+    updateTheme();
+
+    window.addEventListener("jupiter_hover", handleJupiterHover);
+    window.addEventListener("themechange", updateTheme);
+    return () => {
+      window.removeEventListener("jupiter_hover", handleJupiterHover);
+      window.removeEventListener("themechange", updateTheme);
+    };
   }, []);
 
-  const featuredProjects = projectsList.slice(0, 4);
+  const themeBgMap = {
+    dark: "/images/bg-theme-1.jpg",
+    light: "/images/bg-theme-2.jpg",
+    "warm-amber": "/images/bg-theme-2.jpg",
+    "electric-cyan": "/images/bg-theme-3.jpg",
+  };
+  const activeBgImage = themeBgMap[theme] || themeBgMap.dark;
+
+  // Deduplicate projects so each project appears only once
+  const uniqueProjects = Array.from(
+    new Map(projectsList.map((p) => [p.name.toLowerCase().trim(), p])).values()
+  );
+  const featuredProjects = uniqueProjects.slice(0, 4);
 
   const technologies = [
     { name: "Java", icon: "☕" },
@@ -88,7 +118,27 @@ export default function Home() {
   ];
 
   return (
-    <main>
+    <main style={{ position: "relative" }}>
+      {/* Dynamic Theme Background Portrait (Revealed on 3D Jupiter Hover with Enhanced Visibility & Downward Positioning) */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          top: "-70px",
+          bottom: "-70px",
+          left: 0,
+          right: 0,
+          pointerEvents: "none",
+          zIndex: 0,
+          opacity: isJupiterHovered ? 0.88 : 0,
+          transform: isJupiterHovered ? "scale(1.03) translateY(55px)" : "scale(1) translateY(0)",
+          transition: "opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+          backgroundImage: `radial-gradient(circle at 50% 40%, rgba(0, 0, 0, 0.04) 0%, rgba(0, 0, 0, 0.28) 60%, rgba(5, 8, 13, 0.88) 100%), url(${activeBgImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center 38%",
+          backgroundRepeat: "no-repeat",
+        }}
+      />
       {/* 1. Hero Section (Image 1) */}
       <Hero />
 
@@ -212,189 +262,166 @@ export default function Home() {
               gap: "1.5rem",
             }}
           >
-            {featuredProjects.map((project) => (
-              <div
-                key={project.id}
-                className="glass-card interactive-card"
-                style={{
-                  padding: "1.4rem",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  borderRadius: 14,
-                  border: "1px solid var(--border-subtle)",
-                  background: "rgba(11, 18, 28, 0.85)",
-                  cursor: "pointer",
-                }}
-              >
-                <div>
-                  {/* Mock Screenshot Banner */}
-                  <div
-                    style={{
-                      width: "100%",
-                      height: 160,
-                      borderRadius: 10,
-                      background: "linear-gradient(135deg, rgba(34, 211, 238, 0.15) 0%, rgba(11, 18, 28, 0.95) 100%)",
-                      border: "1px solid var(--border-subtle)",
-                      marginBottom: "1rem",
-                      overflow: "hidden",
-                      position: "relative",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <span style={{ fontSize: 36, opacity: 0.85 }}>
-                      {project.id === "pandharpurdarshan"
-                        ? "🏛️"
-                        : project.id === "studybuddy-ai"
-                        ? "📚"
-                        : project.id === "nextgenhire"
-                        ? "💼"
-                        : "🚗"}
-                    </span>
-                    <a
-                      href={project.link}
-                      target="_blank"
-                      rel="noreferrer"
+            {featuredProjects.map((project) => {
+              const targetUrl =
+                project.liveUrl || project.link || project.githubUrl || project.github || "/projects";
+              const isExternal = targetUrl.startsWith("http");
+
+              return (
+                <Link
+                  key={project.id}
+                  href={targetUrl}
+                  target={isExternal ? "_blank" : undefined}
+                  rel={isExternal ? "noreferrer" : undefined}
+                  className="glass-card interactive-card"
+                  style={{
+                    padding: "1.5rem",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    borderRadius: 14,
+                    border: "1px solid var(--border-subtle)",
+                    background: "var(--bg-card)",
+                    textDecoration: "none",
+                    transition: "transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease",
+                    minHeight: 200,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-4px)";
+                    e.currentTarget.style.borderColor = "var(--accent-lime)";
+                    e.currentTarget.style.boxShadow = "0 12px 30px rgba(0, 0, 0, 0.25)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.borderColor = "var(--border-subtle)";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                >
+                  <div>
+                    {/* Top row: Project Icon / Logo + Category Badge */}
+                    <div
                       style={{
-                        position: "absolute",
-                        top: 10,
-                        right: 10,
-                        background: "rgba(5, 8, 13, 0.8)",
-                        width: 28,
-                        height: 28,
-                        borderRadius: "50%",
                         display: "flex",
+                        justifyContent: "space-between",
                         alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: 12,
-                        color: "#F5F7FA",
+                        marginBottom: 12,
                       }}
                     >
-                      ↗
-                    </a>
-                    {project.category && (
-                      <span
+                      <div
                         style={{
-                          position: "absolute",
-                          bottom: 10,
-                          left: 10,
-                          fontSize: "10px",
-                          fontWeight: 700,
-                          padding: "2px 8px",
-                          borderRadius: 4,
-                          background: "rgba(5, 8, 13, 0.85)",
-                          border: "1px solid var(--border-subtle)",
+                          width: 44,
+                          height: 44,
+                          borderRadius: 10,
+                          background: "var(--tag-bg)",
+                          border: "1px solid var(--border-light)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: 22,
                           color: "var(--accent-lime)",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.05em",
                         }}
                       >
-                        {project.category}
-                      </span>
-                    )}
-                  </div>
+                        {project.id === "pandharpurdarshan"
+                          ? "🏛️"
+                          : project.id === "studybuddy-ai"
+                          ? "🤖"
+                          : project.id === "agromitra-ai"
+                          ? "🌱"
+                          : project.id === "krishi-connect"
+                          ? "🌾"
+                          : project.id === "genzday"
+                          ? "✨"
+                          : "👑"}
+                      </div>
 
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
+                      {project.category && (
+                        <span
+                          style={{
+                            fontSize: "11px",
+                            fontWeight: 700,
+                            padding: "3px 8px",
+                            borderRadius: 6,
+                            background: "var(--badge-bg)",
+                            color: "var(--accent-lime)",
+                            border: "1px solid var(--border-subtle)",
+                          }}
+                        >
+                          {project.category}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Project Title */}
                     <h3
                       style={{
-                        fontSize: "1.25rem",
+                        fontSize: "1.2rem",
                         fontWeight: 800,
-                        margin: 0,
-                        color: "#F5F7FA",
+                        margin: "0 0 6px",
+                        color: "var(--text-primary)",
                       }}
                     >
                       {project.name}
                     </h3>
-                    <span className="card-hint-badge">
-                      Hover for details <span>↓</span>
-                    </span>
-                  </div>
 
-                  {/* Clean Initial Subtitle */}
-                  <div
-                    style={{
-                      color: "var(--text-secondary)",
-                      fontSize: "0.88rem",
-                      lineHeight: 1.5,
-                      fontWeight: 500,
-                    }}
-                  >
-                    {project.subtitle || project.description.slice(0, 75) + "..."}
-                  </div>
-
-                  {/* Progressive Disclosure: Full details revealed on hover */}
-                  <div className="hover-reveal-content">
+                    {/* Concise 1-2 line description */}
                     <p
                       style={{
-                        color: "#cbd5e1",
-                        fontSize: "0.85rem",
-                        lineHeight: 1.55,
+                        color: "var(--text-secondary)",
+                        fontSize: "0.88rem",
+                        lineHeight: 1.5,
                         margin: 0,
-                        padding: "8px 10px",
-                        background: "rgba(255, 255, 255, 0.02)",
-                        borderLeft: "2px solid var(--accent-lime)",
-                        borderRadius: "0 6px 6px 0",
                       }}
                     >
-                      {project.description}
+                      {project.subtitle || project.description}
                     </p>
-
-                    {/* Tags */}
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: "0.8rem", marginBottom: "0.5rem" }}>
-                      {project.tags.map((tag, tIdx) => (
-                        <span
-                          key={tIdx}
-                          style={{
-                            fontSize: "11px",
-                            fontWeight: 500,
-                            padding: "2px 8px",
-                            borderRadius: 4,
-                            background: "rgba(255, 255, 255, 0.05)",
-                            color: "var(--text-secondary)",
-                            border: "1px solid var(--border-subtle)",
-                          }}
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
                   </div>
-                </div>
 
-                {/* Buttons: Live Demo (Lime) & GitHub (Dark) */}
-                <div style={{ display: "flex", gap: 10, marginTop: "1.2rem" }}>
-                  <a
-                    href={project.link}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn-lime"
+                  {/* Card Footer: Top Tech tags + Single Arrow CTA */}
+                  <div
                     style={{
-                      flex: 1,
-                      padding: "8px 14px",
-                      fontSize: "0.85rem",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginTop: 16,
+                      paddingTop: 12,
+                      borderTop: "1px solid var(--border-subtle)",
                     }}
                   >
-                    Live Demo
-                  </a>
-                  {project.github && (
-                    <a
-                      href={project.github}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="btn-dark-pill"
+                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                      {Array.isArray(project.tags) &&
+                        project.tags.slice(0, 3).map((tag, tIdx) => (
+                          <span
+                            key={tIdx}
+                            style={{
+                              fontSize: "10px",
+                              fontWeight: 600,
+                              padding: "2px 6px",
+                              borderRadius: 4,
+                              background: "var(--tag-bg)",
+                              color: "var(--text-muted)",
+                            }}
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                    </div>
+
+                    <span
                       style={{
-                        padding: "8px 14px",
-                        fontSize: "0.85rem",
+                        fontSize: 13,
+                        fontWeight: 800,
+                        color: "var(--accent-lime)",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 2,
                       }}
                     >
-                      GitHub
-                    </a>
-                  )}
-                </div>
-              </div>
-            ))}
+                      Visit ↗
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>

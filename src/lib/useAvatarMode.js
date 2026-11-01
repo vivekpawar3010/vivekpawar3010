@@ -69,7 +69,7 @@ export function useAvatarMode(dynamicAvatarUrl) {
     }
   }, []);
 
-  let currentSrc = "/images/vivek-portrait-cutout.png";
+  let currentSrc = "/images/vivek-hologram-portrait.jpg";
   if (avatarMode === "rocklee") {
     currentSrc = "/images/rock-lee.png";
   } else if (avatarMode === "custom" && customPhotoUrl) {
