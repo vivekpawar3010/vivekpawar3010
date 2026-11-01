@@ -185,10 +185,10 @@ export default function HolographicPortrait({ compact = false }) {
           }}
         />
 
-        {/* ── 5. Vivek's Transparent Cutout Image (Crystal Clear & Natural) ── */}
+        {/* ── 5. Vivek's Cutout Image / Active Photo (Controlled by Admin) ── */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={isRockLee ? "/images/rock-lee.png" : "/images/vivek-portrait-cutout.png"}
+          src={currentSrc}
           alt="Vivek Pawar - Software Developer"
           style={{
             width: "auto",

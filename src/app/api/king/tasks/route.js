@@ -25,7 +25,7 @@ export async function POST(request) {
   try {
     const body = await request.json();
 
-    // 1. Add Task (General or Streak with max 5 enforcement)
+    // 1. Add Task (General or Streak with max 5 enforcement & custom fields)
     if (body.action === 'add') {
       try {
         const newTask = await addTask({
@@ -35,6 +35,7 @@ export async function POST(request) {
           dueDate: body.dueDate,
           goalDays: body.goalDays,
           dailyLog: body.dailyLog,
+          fields: body.fields,
         });
         const tasks = await getTasks();
         return NextResponse.json({ success: true, tasks, task: newTask });
@@ -43,12 +44,19 @@ export async function POST(request) {
       }
     }
 
-    // 2. Check In Streak with small daily log text & goal progress
+    // 2. Check In Streak with dynamic fields, numbers done, topics list & daily log
     if (body.action === 'check_in') {
       if (!body.id) {
         return NextResponse.json({ error: 'Task ID is required for streak check-in.' }, { status: 400 });
       }
-      const tasks = await checkInStreak(body.id, body.dailyLog, body.date);
+      const tasks = await checkInStreak(
+        body.id,
+        body.dailyLog,
+        body.date,
+        body.fieldValues,
+        body.topics,
+        body.numberDone
+      );
       return NextResponse.json({ success: true, tasks });
     }
 

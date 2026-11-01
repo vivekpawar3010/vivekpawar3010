@@ -211,7 +211,7 @@ export default function ProjectsManager() {
                 <select
                   value={form.category}
                   onChange={(e) => setForm({ ...form, category: e.target.value })}
-                  style={{ width: "100%", padding: "8px 12px", background: "#1e293b", border: "1px solid var(--border-subtle)", borderRadius: 8, color: "#fff" }}
+                  style={{ width: "100%", padding: "8px 12px", background: "var(--input-bg)", border: "1px solid var(--border-light)", borderRadius: 8, color: "var(--text-primary)" }}
                 >
                   <option value="Full Stack">Full Stack</option>
                   <option value="AI & Web">AI & Web</option>

@@ -43,6 +43,8 @@ export function normalizeProfile(raw) {
     ...defaultProfile,
     ...raw,
     avatarUrl: raw.avatarUrl || defaultProfile.avatarUrl || '/images/avatar.png',
+    activePhoto: raw.activePhoto || raw.avatarUrl || defaultProfile.activePhoto || '/images/vivek-portrait-cutout.png',
+    photos: Array.isArray(raw.photos) ? raw.photos : (defaultProfile.photos || []),
     education: {
       degree: raw.education?.degree || raw.degree || defaultProfile.education.degree,
       institution: raw.education?.institution || raw.institution || defaultProfile.education.institution,
@@ -56,6 +58,7 @@ export function normalizeProfile(raw) {
 
 // ── Profile ─────────────────────────────────────────────────────────────────
 export async function getProfile() {
+  const fileData = readFile(PROFILE_FILE, defaultProfile);
   if (prisma) {
     try {
       let p = await prisma.profile.findFirst();
@@ -81,19 +84,26 @@ export async function getProfile() {
           },
         });
       }
-      return normalizeProfile(p);
+      return normalizeProfile({
+        ...p,
+        photos: fileData.photos || [],
+        activePhoto: fileData.activePhoto || p.avatarUrl || '/images/vivek-portrait-cutout.png',
+      });
     } catch (e) {
       console.warn('Prisma getProfile fallback to local file:', e.message);
     }
   }
-  return normalizeProfile(readFile(PROFILE_FILE, defaultProfile));
+  return normalizeProfile(fileData);
 }
 
 export async function updateProfile(data) {
-  const normalizedInput = normalizeProfile(data);
+  const current = await getProfile();
+  const merged = { ...current, ...data };
+  const normalizedInput = normalizeProfile(merged);
+
   if (prisma) {
     try {
-      const updated = await prisma.profile.upsert({
+      await prisma.profile.upsert({
         where: { id: 'profile-1' },
         create: {
           id: 'profile-1',
@@ -129,17 +139,13 @@ export async function updateProfile(data) {
           avatarUrl: normalizedInput.avatarUrl,
         },
       });
-      const formatted = normalizeProfile(updated);
-      writeFile(PROFILE_FILE, formatted);
-      return formatted;
     } catch (e) {
       console.warn('Prisma updateProfile fallback:', e.message);
     }
   }
-  const current = await getProfile();
-  const updated = normalizeProfile({ ...current, ...data });
-  writeFile(PROFILE_FILE, updated);
-  return updated;
+
+  writeFile(PROFILE_FILE, normalizedInput);
+  return normalizedInput;
 }
 
 // ── Projects ────────────────────────────────────────────────────────────────
@@ -381,11 +387,27 @@ export function normalizeTask(t) {
     } catch (e) {}
   }
   const isStreak = t.category === 'Streak';
+
+  const defaultFields = isStreak
+    ? [
+        { id: 'number_done', label: 'Number / Problems Completed', type: 'number', target: '5' },
+        { id: 'topics_read', label: 'Topics & Concepts Read', type: 'topics', target: 'DSA, System Design' },
+        { id: 'daily_notes', label: 'Daily Reflection & Small Text', type: 'text', target: 'Notes' },
+      ]
+    : [];
+
+  const rawFields = Array.isArray(t.fields) && t.fields.length > 0
+    ? t.fields
+    : Array.isArray(extra.fields) && extra.fields.length > 0
+    ? extra.fields
+    : defaultFields;
+
   return {
     ...t,
     category: t.category || 'General',
     priority: t.priority || 'Medium',
     status: t.status || 'todo',
+    fields: rawFields,
     goalDays: Number(t.goalDays !== undefined ? t.goalDays : (extra.goalDays !== undefined ? extra.goalDays : (isStreak ? 30 : 0))),
     currentStreak: Number(t.currentStreak !== undefined ? t.currentStreak : (extra.currentStreak || 0)),
     bestStreak: Number(t.bestStreak !== undefined ? t.bestStreak : (extra.bestStreak || 0)),
@@ -412,6 +434,11 @@ export async function getTasks() {
         for (const t of defaultTasks) {
           const serializedDueDate = t.category === 'Streak'
             ? JSON.stringify({
+                fields: t.fields || [
+                  { id: 'number_done', label: 'Number / Problems Completed', type: 'number', target: '5' },
+                  { id: 'topics_read', label: 'Topics & Concepts Read', type: 'topics', target: 'DSA, System Design' },
+                  { id: 'daily_notes', label: 'Daily Reflection & Small Text', type: 'text', target: 'Notes' },
+                ],
                 goalDays: t.goalDays || 30,
                 currentStreak: t.currentStreak || 0,
                 bestStreak: t.bestStreak || 0,
@@ -459,7 +486,20 @@ export async function addTask(taskData) {
     }
   }
 
+  const defaultFields = isStreak
+    ? [
+        { id: 'number_done', label: 'Number / Problems Completed', type: 'number', target: '5' },
+        { id: 'topics_read', label: 'Topics & Concepts Read', type: 'topics', target: 'DSA, System Design' },
+        { id: 'daily_notes', label: 'Daily Reflection & Small Text', type: 'text', target: 'Notes' },
+      ]
+    : [];
+
+  const configuredFields = Array.isArray(taskData.fields) && taskData.fields.length > 0
+    ? taskData.fields
+    : defaultFields;
+
   const streakExtra = {
+    fields: configuredFields,
     goalDays: Number(taskData.goalDays) || 30,
     currentStreak: Number(taskData.currentStreak) || 0,
     bestStreak: Number(taskData.bestStreak) || 0,
@@ -522,7 +562,14 @@ export async function updateTaskStatus(id, status) {
   return updated;
 }
 
-export async function checkInStreak(id, dailyLog = '', customDate = null) {
+export async function checkInStreak(
+  id,
+  dailyLog = '',
+  customDate = null,
+  fieldValues = {},
+  topics = [],
+  numberDone = null
+) {
   const current = await getTasks();
   const taskIndex = current.findIndex((t) => t.id === id);
   if (taskIndex === -1) {
@@ -533,25 +580,41 @@ export async function checkInStreak(id, dailyLog = '', customDate = null) {
   const todayStr = customDate || new Date().toISOString().split('T')[0];
   const trimmedLog = dailyLog?.trim() || '';
 
+  const topicsArray = Array.isArray(topics)
+    ? topics
+    : typeof topics === 'string' && topics
+    ? topics.split(',').map((s) => s.trim()).filter(Boolean)
+    : [];
+  const parsedNumber =
+    numberDone !== null && numberDone !== undefined && numberDone !== ''
+      ? Number(numberDone)
+      : undefined;
+
   let newStreak = task.currentStreak || 0;
   let newHistory = Array.isArray(task.history) ? [...task.history] : [];
+  const isAlreadyCheckedToday = task.lastCheckedDate === todayStr;
 
-  if (task.lastCheckedDate === todayStr) {
-    // Already checked in today: update today's log without double-counting streak
+  const logEntry = {
+    id: `log-${Date.now()}`,
+    date: todayStr,
+    note: trimmedLog || 'Streak check-in completed.',
+    numberDone: parsedNumber,
+    topics: topicsArray,
+    fieldValues: fieldValues || {},
+    completed: true,
+    updatedAt: new Date().toISOString(),
+  };
+
+  if (isAlreadyCheckedToday) {
+    // Update today's entry without double-counting streak days
     const existingLogIdx = newHistory.findIndex((h) => h.date === todayStr);
     if (existingLogIdx >= 0) {
       newHistory[existingLogIdx] = {
         ...newHistory[existingLogIdx],
-        note: trimmedLog || newHistory[existingLogIdx].note,
-        updatedAt: new Date().toISOString(),
+        ...logEntry,
       };
-    } else if (trimmedLog) {
-      newHistory.push({
-        id: `log-${Date.now()}`,
-        date: todayStr,
-        note: trimmedLog,
-        completed: true,
-      });
+    } else {
+      newHistory.push(logEntry);
     }
   } else {
     // Check if consecutive from yesterday
@@ -573,26 +636,31 @@ export async function checkInStreak(id, dailyLog = '', customDate = null) {
       newStreak = 1;
     }
 
-    newHistory.push({
-      id: `log-${Date.now()}`,
-      date: todayStr,
-      note: trimmedLog || 'Streak check-in completed.',
-      completed: true,
-    });
+    newHistory.push(logEntry);
   }
 
   const bestStreak = Math.max(task.bestStreak || 0, newStreak);
   const goalDays = Number(task.goalDays) || 30;
   const isGoalReached = newStreak >= goalDays;
 
+  // Compile readable daily log string
+  const summaryParts = [];
+  if (parsedNumber !== undefined) summaryParts.push(`Count: ${parsedNumber}`);
+  if (topicsArray.length > 0) summaryParts.push(`Topics: ${topicsArray.join(', ')}`);
+  if (trimmedLog) summaryParts.push(trimmedLog);
+  const combinedLog = summaryParts.join(' | ') || trimmedLog || 'Check-in completed';
+
+  // Rule: 5 tasks everyday, 50 points (10 points each task per day)
+  const awardedPoints = isAlreadyCheckedToday ? 0 : 10;
+
   const updatedTask = {
     ...task,
     currentStreak: newStreak,
     bestStreak,
     lastCheckedDate: todayStr,
-    dailyLog: trimmedLog,
+    dailyLog: combinedLog,
     history: newHistory,
-    weeklyPoints: (task.weeklyPoints || 0) + 15, // Award base daily check-in points
+    weeklyPoints: (task.weeklyPoints || 0) + awardedPoints,
     status: isGoalReached ? 'completed' : 'in_progress',
   };
 
@@ -602,6 +670,7 @@ export async function checkInStreak(id, dailyLog = '', customDate = null) {
   if (prisma) {
     try {
       const streakExtra = {
+        fields: updatedTask.fields,
         goalDays: updatedTask.goalDays,
         currentStreak: updatedTask.currentStreak,
         bestStreak: updatedTask.bestStreak,
@@ -649,6 +718,7 @@ export async function updateStreakGoal(id, newGoalDays) {
       const target = updated.find((t) => t.id === id);
       if (target) {
         const streakExtra = {
+          fields: target.fields,
           goalDays: target.goalDays,
           currentStreak: target.currentStreak,
           bestStreak: target.bestStreak,
@@ -683,7 +753,7 @@ export async function evaluateSundayPoints() {
     throw new Error('No Streak tasks found to evaluate. Add streak tasks first!');
   }
 
-  // Call Gemini AI or intelligent heuristic coach
+  // Call Gemini AI or intelligent heuristic rubric evaluated out of 350
   const evaluation = await evaluateStreaksWithGeminiAI(streakTasks);
 
   // Archive evaluation into streak_evaluations.json
@@ -700,7 +770,7 @@ export async function evaluateSundayPoints() {
       const taskBreakdown = evaluation.perTaskBreakdown?.find(
         (b) => b.taskTitle?.toLowerCase() === t.title?.toLowerCase()
       );
-      const awardedPoints = taskBreakdown?.points || 20;
+      const awardedPoints = taskBreakdown?.points || 55;
 
       return {
         ...t,
@@ -717,6 +787,7 @@ export async function evaluateSundayPoints() {
       for (const t of updatedTasks) {
         if (t.category === 'Streak') {
           const streakExtra = {
+            fields: t.fields,
             goalDays: t.goalDays,
             currentStreak: t.currentStreak,
             bestStreak: t.bestStreak,
@@ -759,6 +830,7 @@ export async function resetWeeklyPoints() {
       for (const t of updatedTasks) {
         if (t.category === 'Streak') {
           const streakExtra = {
+            fields: t.fields,
             goalDays: t.goalDays,
             currentStreak: t.currentStreak,
             bestStreak: t.bestStreak,
@@ -787,7 +859,7 @@ export async function getStreakEvaluations() {
   return readFile(STREAK_EVALUATIONS_FILE, []);
 }
 
-// ── Gemini AI Streak Evaluator ───────────────────────────────────────────────
+// ── Gemini AI Streak Evaluator (350 Points System - Never Full 350) ──────────
 async function evaluateStreaksWithGeminiAI(streakTasks) {
   const apiKey = process.env.GEMINI_API_KEY;
   const now = new Date();
@@ -796,32 +868,65 @@ async function evaluateStreaksWithGeminiAI(streakTasks) {
 
   const taskDigest = streakTasks.map((t) => {
     const recentLogs = (t.history || []).slice(-7);
+    const totalNumbers = recentLogs.reduce((acc, l) => acc + (Number(l.numberDone) || 0), 0);
+    const allTopics = recentLogs.flatMap((l) => (Array.isArray(l.topics) ? l.topics : []));
+    const uniqueTopics = Array.from(new Set(allTopics));
+
     return {
       title: t.title,
       goalDays: t.goalDays || 30,
       currentStreak: t.currentStreak || 0,
       bestStreak: t.bestStreak || 0,
       todayLog: t.dailyLog || '(no log saved today)',
-      recentLogs: recentLogs.map((l) => `${l.date}: ${l.note}`).join(' | '),
+      totalNumbersLogged: totalNumbers,
+      topicsRead: uniqueTopics,
+      recentLogs: recentLogs.map((l) => ({
+        date: l.date,
+        numberDone: l.numberDone,
+        topics: l.topics,
+        note: l.note,
+      })),
     };
   });
 
   const prompt = `You are a world-class AI engineering coach evaluating Vivek Pawar's weekly progress on his habit streaks.
-Today is ${dayName}. Vivek has logged his streak tasks and daily reflections.
+Today is Sunday (or Sunday evening evaluation).
+Vivek tracks up to 5 habit streaks (10 points per task per day = 50 points/day).
+Across a 7-day week, the theoretical ceiling is 350 points (5 tasks × 70 points each).
 
-Streak Data:
+Streak & Habit Data:
 ${JSON.stringify(taskDigest, null, 2)}
 
-Evaluate Vivek's consistency, depth of effort, and honesty in daily logs.
-Calculate his Sunday Weekly Score (0 to 100 scale).
-Provide:
-1. totalWeeklyPoints: Integer between 0 and 100
-2. grade: "S" (90-100), "A+" (80-89), "A" (70-79), "B" (55-69), or "C" (<55)
-3. summaryReview: A motivating, analytical 2-3 sentence review evaluating his achievements this week.
-4. perTaskBreakdown: Array of objects for each task with { "taskTitle": string, "points": number (0-20), "verdict": string }
-5. keyWins: Array of 3 bullet points summarizing notable achievements.
+EVALUATION RUBRIC & STRICT RULES:
+1. MAXIMUM THEORETICAL SCORE: 350 Points (70 points max per task).
+2. STRICT MANDATORY RULE: NEVER GIVE THE FULL 350 POINTS. You MUST cap the maximum achievable score at 335 out of 350 (and individual tasks at max 67 out of 70). Rigorous code craftsmanship always recognizes room for optimization, deeper edge-case coverage, and continuous learning.
+3. Scoring factors:
+   - Volume & number of questions/items completed
+   - Depth and breadth of topics & algorithms read
+   - Unbroken streak consistency across the week
+   - Daily reflections and honest technical notes
 
-Respond ONLY with a valid JSON object matching the requested schema.`;
+Provide a JSON response matching:
+{
+  "totalWeeklyPoints": number (integer between 0 and 335, evaluated out of 350),
+  "maxPossiblePoints": 350,
+  "percentage": number (e.g. 89.4),
+  "grade": "S" (315-335), "A+" (280-314), "A" (245-279), "B" (190-244), or "C" (<190),
+  "summaryReview": "Analytical 2-3 sentence review evaluating his achievements this week in topics read and numbers accomplished.",
+  "perTaskBreakdown": [
+    {
+      "taskTitle": string,
+      "points": number (0 to 67, out of 70),
+      "maxPoints": 70,
+      "numbersLogged": string,
+      "topicsRead": string,
+      "verdict": string
+    }
+  ],
+  "keyWins": [string, string, string]
+}
+
+Respond ONLY with valid JSON.`;
 
   if (apiKey) {
     try {
@@ -845,8 +950,13 @@ Respond ONLY with a valid JSON object matching the requested schema.`;
         const text = json.candidates?.[0]?.content?.parts?.[0]?.text;
         if (text) {
           const parsed = JSON.parse(text);
+          // Safety cap: never allow 350
+          const safeTotal = Math.min(335, Math.max(0, Number(parsed.totalWeeklyPoints) || 0));
           return {
             ...parsed,
+            totalWeeklyPoints: safeTotal,
+            maxPossiblePoints: 350,
+            percentage: Math.round((safeTotal / 350) * 1000) / 10,
             date: new Date().toISOString(),
             isSunday,
             source: 'gemini-1.5-flash',
@@ -858,43 +968,60 @@ Respond ONLY with a valid JSON object matching the requested schema.`;
     }
   }
 
-  // Intelligent Fallback AI Evaluator
+  // Intelligent Fallback AI Evaluator (Rubric out of 350, never full 350)
   let totalPts = 0;
   const perTaskBreakdown = streakTasks.map((t) => {
-    const streakBonus = Math.min((t.currentStreak || 0) * 2, 8);
-    const logBonus = t.dailyLog && t.dailyLog.length > 25 ? 8 : 4;
-    const taskScore = Math.min(20, Math.max(6, 6 + streakBonus + logBonus));
+    const recentLogs = (t.history || []).slice(-7);
+    const daysChecked = recentLogs.length;
+    // Base points for days checked: up to 7 pts per day checked = 49 max
+    const basePts = daysChecked * 7;
+    const streakBonus = Math.min(Math.round((t.currentStreak || 0) * 1.2), 9);
+
+    const totalNumbers = recentLogs.reduce((acc, l) => acc + (Number(l.numberDone) || 0), 0);
+    const allTopics = recentLogs.flatMap((l) => (Array.isArray(l.topics) ? l.topics : []));
+    const uniqueTopics = Array.from(new Set(allTopics));
+    const depthBonus = Math.min(uniqueTopics.length * 2 + (totalNumbers > 0 ? 3 : 0), 9);
+
+    // Strictly cap each task at max 67 out of 70 (NEVER 70)
+    const rawTaskScore = basePts + streakBonus + depthBonus;
+    const taskScore = Math.min(67, Math.max(15, rawTaskScore));
     totalPts += taskScore;
 
     return {
       taskTitle: t.title,
       points: taskScore,
+      maxPoints: 70,
+      numbersLogged: totalNumbers > 0 ? `${totalNumbers} completed` : 'Logged daily',
+      topicsRead: uniqueTopics.length > 0 ? uniqueTopics.join(', ') : 'Technical topics covered',
       verdict:
-        t.currentStreak >= 10
-          ? `Exceptional ${t.currentStreak}-day unbroken consistency! Target milestone is well within reach.`
+        t.currentStreak >= 7
+          ? `Flawless 7-day consistency! ${totalNumbers > 0 ? `${totalNumbers} units completed with ` : ''}${uniqueTopics.length} core topics covered.`
           : t.currentStreak > 0
-          ? `Strong discipline: ${t.currentStreak} consecutive days logged toward ${t.goalDays}-day goal.`
+          ? `Consistent cadence: ${t.currentStreak} day streak maintained. Solid topic coverage.`
           : `Streak primed for the upcoming week. Ready for daily check-ins.`,
     };
   });
 
-  const totalWeeklyPoints = Math.min(100, Math.max(45, totalPts));
+  // Strictly enforce never full 350 (cap at max 330)
+  const totalWeeklyPoints = Math.min(330, Math.max(80, totalPts));
   const grade =
-    totalWeeklyPoints >= 90
+    totalWeeklyPoints >= 315
       ? 'S'
-      : totalWeeklyPoints >= 80
+      : totalWeeklyPoints >= 280
       ? 'A+'
-      : totalWeeklyPoints >= 70
+      : totalWeeklyPoints >= 245
       ? 'A'
-      : totalWeeklyPoints >= 55
+      : totalWeeklyPoints >= 190
       ? 'B'
       : 'C';
 
   return {
     date: new Date().toISOString(),
     totalWeeklyPoints,
+    maxPossiblePoints: 350,
+    percentage: Math.round((totalWeeklyPoints / 350) * 1000) / 10,
     grade,
-    summaryReview: `Outstanding technical consistency across your active streak habits! You maintained focused problem-solving checkpoints and documented meaningful technical breakthroughs throughout the week. Keep driving this forward!`,
+    summaryReview: `Outstanding technical consistency across your active streak habits! You maintained focused problem-solving checkpoints and documented meaningful technical breakthroughs throughout the week (scored out of 350 points). Keep driving this momentum!`,
     perTaskBreakdown,
     keyWins: [
       `Maintained active check-in consistency across ${streakTasks.length} streak goals`,
@@ -1132,20 +1259,11 @@ export async function togglePinVaultNote(id) {
 // ── Vault Folders & Category Directory System ──────────────────────────────
 export async function getVaultFolders() {
   const notes = await getVaultNotes();
-  const storedFolders = readFile(VAULT_FOLDERS_FILE, [
-    { id: 'folder-1', name: 'DSA / LeetCode', color: 'cyan', description: 'LeetCode patterns, templates, dynamic programming and algorithms.' },
-    { id: 'folder-2', name: 'System Design', color: 'purple', description: 'Microservices, caching architectures, and distributed systems.' },
-    { id: 'folder-3', name: 'Interview Prep', color: 'emerald', description: 'STAR behavioral stories, HR answers, and mock technical questions.' },
-    { id: 'folder-4', name: 'Project Ideas', color: 'amber', description: 'Full-stack project blueprints and next architecture steps.' },
-    { id: 'folder-5', name: 'Cloud Architecture', color: 'cyan', description: 'Docker, Kubernetes, AWS & Google Cloud infrastructure notes.' },
-    { id: 'folder-6', name: 'Credentials & Setup', color: 'rose', description: 'Environment variables, deployment keys, and private configurations.' },
-    { id: 'folder-7', name: 'General', color: 'cyan', description: 'General thoughts, bookmarks, and quick scratchpad notes.' },
-  ]);
+  const storedFolders = readFile(VAULT_FOLDERS_FILE, []);
 
-  // Aggregate stats per folder
+  // Aggregate stats strictly for the stored folders (never resurrect demo/ghost folders)
   const folderMap = new Map();
 
-  // Add all predefined/stored folders first
   storedFolders.forEach((f) => {
     folderMap.set(f.name.toLowerCase().trim(), {
       id: f.id,
@@ -1159,31 +1277,19 @@ export async function getVaultFolders() {
     });
   });
 
-  // Calculate notes and discover any extra category folders from notes
+  // Calculate notes strictly for existing stored folders
   notes.forEach((n) => {
-    const catName = (n.category || 'General').trim();
+    const catName = (n.category || '').trim();
+    if (!catName) return;
     const key = catName.toLowerCase();
-
-    if (!folderMap.has(key)) {
-      folderMap.set(key, {
-        id: `folder-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
-        name: catName,
-        color: n.color || 'cyan',
-        description: `Notes categorized under ${catName}`,
-        noteCount: 0,
-        pinnedCount: 0,
-        updatedAt: null,
-        recentTitle: null,
-      });
-    }
-
     const folder = folderMap.get(key);
-    folder.noteCount += 1;
-    if (n.pinned) folder.pinnedCount += 1;
-
-    if (!folder.updatedAt || new Date(n.updatedAt || 0) > new Date(folder.updatedAt || 0)) {
-      folder.updatedAt = n.updatedAt || n.createdAt;
-      folder.recentTitle = n.title;
+    if (folder) {
+      folder.noteCount += 1;
+      if (n.pinned) folder.pinnedCount += 1;
+      if (!folder.updatedAt || new Date(n.updatedAt || 0) > new Date(folder.updatedAt || 0)) {
+        folder.updatedAt = n.updatedAt || n.createdAt;
+        folder.recentTitle = n.title;
+      }
     }
   });
 
@@ -1262,7 +1368,7 @@ export async function renameVaultFolder(oldFolder, newFolder) {
   return await getVaultNotes();
 }
 
-export async function deleteVaultFolder(folderName, moveToFolder = 'General') {
+export async function deleteVaultFolder(folderName, moveToFolder = '') {
   const trimmed = folderName?.trim();
   if (!trimmed) throw new Error('Folder name cannot be empty');
 
@@ -1271,11 +1377,11 @@ export async function deleteVaultFolder(folderName, moveToFolder = 'General') {
   const updatedFolders = folders.filter((f) => f.name.toLowerCase() !== trimmed.toLowerCase());
   writeFile(VAULT_FOLDERS_FILE, updatedFolders);
 
-  // Migrate any notes in this folder to moveToFolder
+  // Unlink category on notes in this deleted folder so no phantom folders appear
   const notes = await getVaultNotes();
   const updatedNotes = notes.map((n) =>
     (n.category || '').toLowerCase() === trimmed.toLowerCase()
-      ? { ...n, category: moveToFolder, updatedAt: new Date().toISOString() }
+      ? { ...n, category: moveToFolder || '', updatedAt: new Date().toISOString() }
       : n
   );
 
@@ -1292,7 +1398,7 @@ export async function deleteVaultFolder(folderName, moveToFolder = 'General') {
   }
 
   writeFile(VAULT_FILE, updatedNotes);
-  return await getVaultNotes();
+  return await getVaultFolders();
 }
 
 // Backward compatibility single note access

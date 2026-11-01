@@ -25,10 +25,12 @@
   "leetcode": "https://leetcode.com/u/vivek_pawar-3010/",
   "leetcodeUsername": "vivek_pawar-3010",
   "email": "vivekpawar.dev@gmail.com",
-  "avatarUrl": "/images/vivek-profile-photo.png",
+  "avatarUrl": "/images/vivek-portrait-cutout.png",
   "id": "profile-1",
   "degree": "B.Tech in Computer Science and Engineering",
   "institution": "SVERI's College of Engineering, Pandharpur",
   "period": "2022 – 2026",
-  "updatedAt": "2026-10-27T18:24:19.848Z"
+  "updatedAt": "2026-10-27T18:24:19.848Z",
+  "photos": [],
+  "activePhoto": "/images/vivek-portrait-cutout.png"
 }

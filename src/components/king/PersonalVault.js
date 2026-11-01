@@ -2,15 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 
-const DEFAULT_CATEGORIES = [
-  "DSA / LeetCode",
-  "System Design",
-  "Interview Prep",
-  "Project Ideas",
-  "Cloud Architecture",
-  "Credentials & Setup",
-  "General",
-];
+const DEFAULT_CATEGORIES = [];
 
 const ACCENT_COLORS = {
   cyan: { border: "rgba(56, 189, 248, 0.4)", text: "#38bdf8", bg: "rgba(56, 189, 248, 0.12)", icon: "📁" },
@@ -89,7 +81,7 @@ export default function PersonalVault() {
 
   // Compute all available categories from folders & notes
   const allCategoryNames = useMemo(() => {
-    const set = new Set(DEFAULT_CATEGORIES);
+    const set = new Set();
     folders.forEach((f) => {
       if (f.name) set.add(f.name.trim());
     });
@@ -124,11 +116,11 @@ export default function PersonalVault() {
     });
   }, [notes, activeFolder, navMode, selectedCategory, searchTerm]);
 
-  // Compute folder cards with accurate real-time stats
+  // Compute folder cards with accurate real-time stats (no phantom/demo folders)
   const computedFolderCards = useMemo(() => {
     const map = new Map();
 
-    // Seed from folders API
+    // Seed strictly from user folders API
     folders.forEach((f) => {
       const key = f.name.toLowerCase().trim();
       map.set(key, {
@@ -142,41 +134,17 @@ export default function PersonalVault() {
       });
     });
 
-    // Ensure defaults exist
-    DEFAULT_CATEGORIES.forEach((catName, idx) => {
-      const key = catName.toLowerCase().trim();
-      if (!map.has(key)) {
-        map.set(key, {
-          id: `default-${idx}`,
-          name: catName,
-          color: idx % 2 === 0 ? "cyan" : idx % 3 === 0 ? "purple" : "emerald",
-          description: `Folder for ${catName} notes`,
-          noteCount: 0,
-          pinnedCount: 0,
-          recentTitle: null,
-        });
-      }
-    });
-
-    // Map notes to folders
+    // Map notes only to existing folders; never synthesize phantom demo folders
     notes.forEach((n) => {
-      const cat = (n.category || "General").trim();
+      const cat = (n.category || "").trim();
+      if (!cat) return;
       const key = cat.toLowerCase();
-      if (!map.has(key)) {
-        map.set(key, {
-          id: `folder-dynamic-${key}`,
-          name: cat,
-          color: n.color || "cyan",
-          description: `Notes categorized under ${cat}`,
-          noteCount: 0,
-          pinnedCount: 0,
-          recentTitle: null,
-        });
+      if (map.has(key)) {
+        const item = map.get(key);
+        item.noteCount += 1;
+        if (n.pinned) item.pinnedCount += 1;
+        if (!item.recentTitle) item.recentTitle = n.title;
       }
-      const item = map.get(key);
-      item.noteCount += 1;
-      if (n.pinned) item.pinnedCount += 1;
-      if (!item.recentTitle) item.recentTitle = n.title;
     });
 
     return Array.from(map.values());
@@ -254,7 +222,7 @@ export default function PersonalVault() {
     if (e) e.stopPropagation();
     if (
       !confirm(
-        `Are you sure you want to delete folder "${folderName}"? Any notes in this folder will be safely moved to "General".`
+        `Are you sure you want to delete folder "${folderName}"?`
       )
     ) {
       return;
@@ -267,7 +235,7 @@ export default function PersonalVault() {
         body: JSON.stringify({
           action: "delete_folder",
           folderName,
-          moveToFolder: "General",
+          moveToFolder: "",
         }),
       });
 
@@ -276,7 +244,7 @@ export default function PersonalVault() {
         if (data.folders) setFolders(data.folders);
         if (data.notes) setNotes(data.notes);
         if (activeFolder === folderName) setActiveFolder(null);
-        setStatusMessage(`Folder "${folderName}" deleted. Notes moved to General.`);
+        setStatusMessage(`Folder "${folderName}" deleted.`);
         setTimeout(() => setStatusMessage(""), 3500);
       }
     } catch (err) {
@@ -521,7 +489,7 @@ export default function PersonalVault() {
             style={{
               background: "transparent",
               border: "none",
-              color: activeFolder ? "var(--accent-cyan)" : "#f8fafc",
+              color: activeFolder ? "var(--accent-cyan)" : "var(--text-primary)",
               fontSize: "0.95rem",
               fontWeight: 700,
               cursor: "pointer",
@@ -542,7 +510,7 @@ export default function PersonalVault() {
                   display: "flex",
                   alignItems: "center",
                   gap: 6,
-                  color: "#f8fafc",
+                  color: "var(--text-primary)",
                   fontWeight: 800,
                   fontSize: "0.95rem",
                 }}
@@ -689,27 +657,25 @@ export default function PersonalVault() {
                           ✏️
                         </button>
 
-                        {folder.name.toLowerCase() !== "general" && (
-                          <button
-                            onClick={(e) => handleDeleteFolder(folder.name, e)}
-                            title="Delete Folder"
-                            style={{
-                              background: "transparent",
-                              border: "none",
-                              color: "#f43f5e",
-                              cursor: "pointer",
-                              fontSize: 13,
-                              padding: "2px 4px",
-                            }}
-                          >
-                            🗑️
-                          </button>
-                        )}
+                        <button
+                          onClick={(e) => handleDeleteFolder(folder.name, e)}
+                          title="Delete Folder"
+                          style={{
+                            background: "transparent",
+                            border: "none",
+                            color: "#f43f5e",
+                            cursor: "pointer",
+                            fontSize: 13,
+                            padding: "2px 4px",
+                          }}
+                        >
+                          🗑️
+                        </button>
                       </div>
                     </div>
 
                     {/* Folder Title */}
-                    <h4 style={{ fontSize: "1.15rem", margin: "0 0 6px", fontWeight: 700, color: "#f8fafc" }}>
+                    <h4 style={{ fontSize: "1.15rem", margin: "0 0 6px", fontWeight: 700, color: "var(--text-primary)" }}>
                       {folder.name}
                     </h4>
 
@@ -805,14 +771,14 @@ export default function PersonalVault() {
                 alignItems: "center",
                 flexWrap: "wrap",
                 gap: 12,
-                background: "linear-gradient(135deg, rgba(56, 189, 248, 0.08) 0%, rgba(15, 23, 42, 0.4) 100%)",
+                background: "var(--bg-surface)",
                 borderLeft: "4px solid var(--accent-cyan)",
               }}
             >
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <span style={{ fontSize: 26 }}>📁</span>
-                  <h3 style={{ fontSize: "1.35rem", margin: 0, fontWeight: 800, color: "#f8fafc" }}>
+                  <h3 style={{ fontSize: "1.35rem", margin: 0, fontWeight: 800, color: "var(--text-primary)" }}>
                     Folder: {activeFolder}
                   </h3>
                   <span
@@ -919,10 +885,10 @@ export default function PersonalVault() {
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 style={{
                   padding: "8px 12px",
-                  background: "#1e293b",
+                  background: "var(--input-bg)",
                   border: "1px solid var(--border-subtle)",
                   borderRadius: 8,
-                  color: "#f8fafc",
+                  color: "var(--text-primary)",
                   fontSize: "0.85rem",
                 }}
               >
@@ -946,7 +912,7 @@ export default function PersonalVault() {
                   cursor: "pointer",
                   fontSize: 13,
                   background: viewMode === "grid" ? "var(--accent-cyan)" : "transparent",
-                  color: viewMode === "grid" ? "#0f172a" : "var(--text-secondary)",
+                  color: viewMode === "grid" ? "var(--text-on-accent)" : "var(--text-secondary)",
                 }}
               >
                 🔲 Grid
@@ -960,7 +926,7 @@ export default function PersonalVault() {
                   cursor: "pointer",
                   fontSize: 13,
                   background: viewMode === "list" ? "var(--accent-cyan)" : "transparent",
-                  color: viewMode === "list" ? "#0f172a" : "var(--text-secondary)",
+                  color: viewMode === "list" ? "var(--text-on-accent)" : "var(--text-secondary)",
                 }}
               >
                 📑 List
@@ -1135,10 +1101,10 @@ export default function PersonalVault() {
                           onChange={(e) => handleMoveNote(note.id, e.target.value)}
                           style={{
                             padding: "3px 6px",
-                            background: "#1e293b",
+                            background: "var(--input-bg)",
                             border: "1px solid var(--border-subtle)",
                             borderRadius: 6,
-                            color: "var(--text-secondary)",
+                            color: "var(--text-primary)",
                             fontSize: 11,
                             cursor: "pointer",
                           }}
@@ -1499,7 +1465,7 @@ export default function PersonalVault() {
                 background: "var(--input-bg)",
                 border: "1px solid var(--accent-cyan)",
                 borderRadius: 8,
-                color: "#fff",
+                color: "var(--text-primary)",
                 fontSize: "0.95rem",
                 marginBottom: 16,
               }}

@@ -2,32 +2,32 @@
   {
     "id": "note-1793026600763",
     "title": "Dynamic Programming Patterns 2026",
-    "category": "DSA / LeetCode",
+    "category": "General",
     "content": "### Knapsac### Dynamic Programming 2026 - Knapsack and LCS patterns memoization and tabulation.",
     "pinned": true,
     "color": "cyan",
     "createdAt": "2026-10-26T14:56:40.763Z",
-    "updatedAt": "2026-11-01T00:32:30.514Z"
+    "updatedAt": "2026-11-01T05:13:05.654Z"
   },
   {
     "id": "note-2",
     "title": "System Design Principles for Modern Web & Microservices",
-    "category": "System Design",
+    "category": "General",
     "content": "### Core Fundamentals\n1. **Horizontal vs Vertical Scaling**: Prefer stateless services horizontally scaled with NGINX / Cloudflare edge.\n2. **Caching (Cache-Aside Pattern)**: Read from Redis first; if miss, query PostgreSQL and write back to Redis with TTL.\n3. **Database Sharding & Read Replicas**: Separate heavy read analytics from primary transactional writes.\n4. **Idempotency Keys**: Use UUID headers for payment/booking mutations to prevent double submission.\n5. **Rate Limiting**: Token Bucket / Leaky Bucket algorithm at API gateway level.",
     "pinned": true,
     "color": "purple",
     "createdAt": "2026-10-18T10:15:00.000Z",
-    "updatedAt": "2026-10-25T14:20:00.000Z"
+    "updatedAt": "2026-11-01T05:13:08.758Z"
   },
   {
     "id": "note-1",
     "title": "LeetCode Patterns & Templates (Sliding Window & Monotonic Stack)",
-    "category": "DSA / LeetCode",
+    "category": "General",
     "content": "### 1. Sliding Window (Variable Size)\n```java\nint left = 0;\nfor (int right = 0; right < n; right++) {\n    // Add nums[right] to window state\n    while (windowConditionViolated) {\n        // Remove nums[left] from window\n        left++;\n    }\n    maxLen = Math.max(maxLen, right - left + 1);\n}\n```\n\n### 2. Monotonic Stack (Next Greater Element)\nUse a decreasing stack to find the next greater element in O(N) time.\n```java\nDeque<Integer> stack = new ArrayDeque<>();\nfor (int i = 0; i < nums.length; i++) {\n    while (!stack.isEmpty() && nums[stack.peek()] < nums[i]) {\n        res[stack.pop()] = nums[i];\n    }\n    stack.push(i);\n}\n```",
     "pinned": false,
     "color": "cyan",
     "createdAt": "2026-10-16T12:00:00.000Z",
-    "updatedAt": "2026-11-01T00:32:28.268Z"
+    "updatedAt": "2026-11-01T05:13:05.654Z"
   },
   {
     "id": "note-4",

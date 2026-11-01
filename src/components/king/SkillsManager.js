@@ -108,7 +108,7 @@ export default function SkillsManager() {
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              style={{ width: "100%", padding: "9px 12px", background: "#1e293b", border: "1px solid var(--border-subtle)", borderRadius: 8, color: "#fff" }}
+              style={{ width: "100%", padding: "9px 12px", background: "var(--input-bg)", border: "1px solid var(--border-light)", borderRadius: 8, color: "var(--text-primary)" }}
             >
               <option value="Programming Languages">Programming Languages</option>
               <option value="Frontend Development">Frontend Development</option>
@@ -129,7 +129,7 @@ export default function SkillsManager() {
               placeholder="e.g. Docker, GraphQL, Redis"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              style={{ width: "100%", padding: "8px 12px", background: "rgba(255,255,255,0.05)", border: "1px solid var(--border-subtle)", borderRadius: 8, color: "#fff" }}
+              style={{ width: "100%", padding: "8px 12px", background: "var(--input-bg)", border: "1px solid var(--border-light)", borderRadius: 8, color: "var(--text-primary)" }}
             />
           </div>
 
@@ -140,7 +140,7 @@ export default function SkillsManager() {
             <select
               value={level}
               onChange={(e) => setLevel(e.target.value)}
-              style={{ width: "100%", padding: "9px 12px", background: "#1e293b", border: "1px solid var(--border-subtle)", borderRadius: 8, color: "#fff" }}
+              style={{ width: "100%", padding: "9px 12px", background: "var(--input-bg)", border: "1px solid var(--border-light)", borderRadius: 8, color: "var(--text-primary)" }}
             >
               <option value="Advanced">Advanced</option>
               <option value="Intermediate">Intermediate</option>
@@ -158,7 +158,7 @@ export default function SkillsManager() {
               placeholder="Primary, LeetCode, Active"
               value={badge}
               onChange={(e) => setBadge(e.target.value)}
-              style={{ width: "100%", padding: "8px 12px", background: "rgba(255,255,255,0.05)", border: "1px solid var(--border-subtle)", borderRadius: 8, color: "#fff" }}
+              style={{ width: "100%", padding: "8px 12px", background: "var(--input-bg)", border: "1px solid var(--border-light)", borderRadius: 8, color: "var(--text-primary)" }}
             />
           </div>
 

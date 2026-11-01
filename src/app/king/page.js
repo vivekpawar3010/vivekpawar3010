@@ -152,8 +152,8 @@ export default function KingPage() {
               cursor: "pointer",
             }}
           >
-            <span>{isLight ? "☀️ Sunfire Light (White & Orange)" : "🌙 Cyber Dark"}</span>
-            <span style={{ fontSize: "10px", color: "var(--accent-lime)" }}>[Switch]</span>
+            <span>{theme === "electric-cyan" ? "🌊 Electric Cyan" : theme === "light" ? "☀️ Warm Amber & Slate" : "🌙 Cyber Dark"}</span>
+            <span style={{ fontSize: "10px", color: "var(--accent-brand)" }}>[Switch Theme]</span>
           </button>
         </div>
 
@@ -459,7 +459,7 @@ export default function KingPage() {
                 border: "none",
                 cursor: "pointer",
                 fontWeight: 800,
-                color: isLight ? "#FF6B00" : "var(--accent-lime)",
+                color: "var(--accent-brand)",
                 fontSize: "12px",
                 display: "inline-flex",
                 alignItems: "center",
@@ -489,7 +489,7 @@ export default function KingPage() {
             }}
           >
             <span style={{ color: "var(--text-muted)" }}>💼 Projects:</span>
-            <span style={{ color: isLight ? "#FF6B00" : "var(--accent-lime)", fontWeight: 800 }}>{stats.projects}</span>
+            <span style={{ color: "var(--accent-brand)", fontWeight: 800 }}>{stats.projects}</span>
           </div>
 
           {/* KPI Badge: Tasks & Streaks */}
@@ -534,27 +534,27 @@ export default function KingPage() {
             </span>
           </div>
 
-          {/* ☀️ / 🌙 Master Theme Switcher Pill */}
+          {/* Master Theme Switcher Pill */}
           <button
             onClick={toggleTheme}
             type="button"
-            title={`Active: ${isLight ? "Sunfire Light (White & Orange)" : "Cyber Dark (Green & Cyan)"}. Click to toggle!`}
+            title="Click to switch theme: Warm Amber -> Electric Cyan -> Cyber Dark"
             style={{
               display: "flex",
               alignItems: "center",
               gap: 6,
               padding: "5px 14px",
               borderRadius: 9999,
-              background: isLight ? "rgba(255, 107, 0, 0.15)" : "rgba(255, 255, 255, 0.06)",
-              border: isLight ? "1px solid rgba(255, 107, 0, 0.4)" : "1px solid var(--border-subtle)",
-              color: isLight ? "#FF6B00" : "var(--accent-lime)",
+              background: "var(--tag-bg)",
+              border: "1px solid var(--border-subtle)",
+              color: "var(--accent-brand)",
               fontSize: "12px",
               fontWeight: 800,
               cursor: "pointer",
               transition: "all 0.2s ease",
             }}
           >
-            <span>{isLight ? "☀️ Sunfire (White & Orange)" : "🌙 Cyber Dark"}</span>
+            <span>{theme === "electric-cyan" ? "🌊 Electric Cyan" : theme === "light" ? "☀️ Warm Amber" : "🌙 Cyber Dark"}</span>
           </button>
 
           {/* View Public Portfolio CTA */}
@@ -675,33 +675,17 @@ export default function KingPage() {
                       borderRadius: 12,
                       fontSize: "0.88rem",
                       fontWeight: active ? 800 : 500,
-                      color: active
-                        ? isLight
-                          ? "#FFFFFF"
-                          : "#05080D"
-                        : "var(--text-secondary)",
-                      background: active
-                        ? isLight
-                          ? "linear-gradient(135deg, #FF6B00 0%, #F97316 100%)"
-                          : "var(--accent-lime)"
-                        : "transparent",
-                      border: active
-                        ? isLight
-                          ? "1px solid #FF6B00"
-                          : "1px solid var(--accent-lime)"
-                        : "1px solid transparent",
+                      color: active ? "var(--text-on-accent)" : "var(--text-secondary)",
+                      background: active ? "var(--accent-brand)" : "transparent",
+                      border: active ? "1px solid var(--accent-brand)" : "1px solid transparent",
                       cursor: "pointer",
                       textAlign: "left",
                       transition: "all 0.18s ease",
-                      boxShadow: active
-                        ? isLight
-                          ? "0 4px 16px rgba(255, 107, 0, 0.35)"
-                          : "0 4px 16px rgba(200, 255, 69, 0.35)"
-                        : "none",
+                      boxShadow: active ? "0 4px 16px var(--accent-glow)" : "none",
                     }}
                     onMouseEnter={(e) => {
                       if (!active) {
-                        e.currentTarget.style.background = isLight ? "rgba(255, 107, 0, 0.08)" : "rgba(255, 255, 255, 0.05)";
+                        e.currentTarget.style.background = "var(--tag-bg)";
                         e.currentTarget.style.color = "var(--text-primary)";
                         e.currentTarget.style.transform = "translateX(2px)";
                       }
@@ -727,19 +711,11 @@ export default function KingPage() {
                           padding: "2px 7px",
                           borderRadius: 6,
                           background: active
-                            ? isLight
-                              ? "rgba(255, 255, 255, 0.25)"
-                              : "rgba(5, 8, 13, 0.2)"
-                            : isLight
-                            ? "rgba(255, 107, 0, 0.12)"
-                            : "rgba(255, 255, 255, 0.08)",
+                            ? "rgba(255, 255, 255, 0.25)"
+                            : "var(--tag-bg)",
                           color: active
-                            ? isLight
-                              ? "#FFFFFF"
-                              : "#05080D"
-                            : isLight
-                            ? "#FF6B00"
-                            : "var(--accent-lime)",
+                            ? "var(--text-on-accent)"
+                            : "var(--accent-brand)",
                         }}
                       >
                         {item.badge}
@@ -769,8 +745,8 @@ export default function KingPage() {
                 <span style={{ color: isLight ? "#16A34A" : "var(--accent-lime)", fontWeight: 700 }}>● Online</span>
               </div>
               <div>Admin: <strong style={{ color: "var(--text-primary)" }}>Vivek Pawar</strong></div>
-              <div>Database: <span style={{ color: isLight ? "#FF6B00" : "var(--accent-lime)", fontWeight: 700 }}>Prisma PostgreSQL</span></div>
-              <div style={{ color: "var(--text-muted)", marginTop: 4 }}>Theme: {isLight ? "White & Sunfire Orange" : "Cyber Green"}</div>
+              <div>Database: <span style={{ color: "var(--accent-brand)", fontWeight: 700 }}>Prisma PostgreSQL</span></div>
+              <div style={{ color: "var(--text-muted)", marginTop: 4 }}>Theme: {theme === "electric-cyan" ? "Modern Slate & Electric Cyan" : theme === "light" ? "Warm Amber & Slate" : "Cyber Dark"}</div>
             </div>
           ) : (
             <div style={{ textAlign: "center", fontSize: 18, color: "var(--text-muted)", padding: "10px 0" }}>

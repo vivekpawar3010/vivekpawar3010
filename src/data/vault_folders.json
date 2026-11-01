@@ -1,17 +1,5 @@
 [
   {
-    "id": "folder-1",
-    "name": "DSA / LeetCode",
-    "color": "cyan",
-    "description": "LeetCode patterns, templates, dynamic programming and algorithms."
-  },
-  {
-    "id": "folder-2",
-    "name": "System Design",
-    "color": "purple",
-    "description": "Microservices, caching architectures, and distributed systems."
-  },
-  {
     "id": "folder-3",
     "name": "Interview Prep",
     "color": "emerald",
@@ -42,4 +30,3 @@
     "description": "General thoughts, bookmarks, and quick scratchpad notes."
   }
 ]
-

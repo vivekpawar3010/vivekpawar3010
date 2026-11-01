@@ -55,47 +55,47 @@
   --shadow-lime: 0 0 25px rgba(200, 255, 69, 0.35);
 }
 
-/* ─── 2. Orange Dominant Mode (Pure Sunfire Orange & Warm Clean White) ────── */
+/* ─── 2. Orange Dominant Mode (Palette 1: Warm Amber & Slate) ─────────────── */
 [data-theme="light"],
 [data-theme="warm-amber"] {
-  --bg-base: #FFFDF9;
-  --bg-primary: #FFFDF9;
+  --bg-base: #FAF8F5;
+  --bg-primary: #FAF8F5;
   --bg-secondary: #FFF7ED;
   --bg-surface: #FFFFFF;
   --bg-card: #FFFFFF;
   --bg-card-hover: #FFF7ED;
   --bg-glass: rgba(255, 255, 255, 0.94);
 
-  --border-subtle: rgba(234, 88, 12, 0.18);
+  --border-subtle: #EAE4DA;
   --border-light: rgba(234, 88, 12, 0.28);
   --border-cyan: rgba(234, 88, 12, 0.28);
-  --border-lime: rgba(234, 88, 12, 0.38);
-  --border-highlight: rgba(234, 88, 12, 0.7);
+  --border-lime: #EA580C;
+  --border-highlight: #EA580C;
 
   --text-primary: #111827;
   --text-secondary: #4B5563;
   --text-muted: #9CA3AF;
 
-  /* Strict Orange Dominance: All highlights & accents in Orange */
+  /* Palette 1 Tokens: Warm Amber Dominance */
   --accent-brand: #EA580C;
   --accent-lime: #EA580C;
   --accent-orange: #EA580C;
   --accent-cyan: #EA580C;
-  --accent-secondary: #F97316;
-  --accent-highlight: #EA580C;
+  --accent-secondary: #0D9488;
+  --accent-highlight: #D97706;
   --accent-purple: #EA580C;
-  --accent-emerald: #EA580C;
-  --accent-amber: #EA580C;
+  --accent-emerald: #0D9488;
+  --accent-amber: #D97706;
   --accent-rose: #EA580C;
   --text-on-accent: #FFFFFF;
 
   --aura-glow-start: #EA580C;
-  --aura-glow-end: #F97316;
-  --aura-glow: linear-gradient(135deg, #EA580C 0%, #F97316 100%);
+  --aura-glow-end: #10B981;
+  --aura-glow: linear-gradient(135deg, #EA580C 0%, #10B981 100%);
 
   --badge-bg: rgba(234, 88, 12, 0.08);
   --input-bg: #FFFFFF;
-  --nav-bg: rgba(255, 253, 249, 0.92);
+  --nav-bg: rgba(250, 248, 245, 0.92);
   --shadow-card: 0 10px 30px -10px rgba(234, 88, 12, 0.1), 0 4px 14px rgba(17, 24, 39, 0.04);
   --shadow-lime: 0 4px 20px rgba(234, 88, 12, 0.38);
 }
@@ -151,7 +151,7 @@
   box-shadow: 0 16px 36px -8px rgba(234, 88, 12, 0.16), 0 0 20px rgba(234, 88, 12, 0.08);
 }
 
-/* ─── 3. Blue Dominant Mode (Pure Electric Cyan & Cool Clean Slate) ────────── */
+/* ─── 3. Blue Dominant Mode (Palette 2: Modern Slate & Electric Cyan) ─────── */
 [data-theme="electric-cyan"] {
   --bg-base: #F8FAFC;
   --bg-primary: #F8FAFC;
@@ -161,32 +161,32 @@
   --bg-card-hover: #F0F9FF;
   --bg-glass: rgba(255, 255, 255, 0.94);
 
-  --border-subtle: rgba(2, 132, 199, 0.18);
+  --border-subtle: #E2E8F0;
   --border-light: rgba(2, 132, 199, 0.28);
-  --border-cyan: rgba(2, 132, 199, 0.28);
-  --border-lime: rgba(2, 132, 199, 0.38);
-  --border-highlight: rgba(2, 132, 199, 0.7);
+  --border-cyan: #0284C7;
+  --border-lime: #0284C7;
+  --border-highlight: #0284C7;
 
   --text-primary: #0F172A;
   --text-secondary: #64748B;
   --text-muted: #94A3B8;
 
-  /* Strict Blue Dominance: All highlights & accents in Blue/Cyan */
+  /* Palette 2 Tokens: Modern Slate & Electric Cyan Dominance */
   --accent-brand: #0284C7;
   --accent-lime: #0284C7;
   --accent-orange: #0284C7;
   --accent-cyan: #0284C7;
-  --accent-secondary: #38BDF8;
-  --accent-highlight: #0284C7;
+  --accent-secondary: #059669;
+  --accent-highlight: #38BDF8;
   --accent-purple: #0284C7;
-  --accent-emerald: #0284C7;
-  --accent-amber: #0284C7;
+  --accent-emerald: #059669;
+  --accent-amber: #38BDF8;
   --accent-rose: #0284C7;
   --text-on-accent: #FFFFFF;
 
-  --aura-glow-start: #0284C7;
-  --aura-glow-end: #38BDF8;
-  --aura-glow: linear-gradient(135deg, #0284C7 0%, #38BDF8 100%);
+  --aura-glow-start: #38BDF8;
+  --aura-glow-end: #34D399;
+  --aura-glow: linear-gradient(135deg, #38BDF8 0%, #34D399 100%);
 
   --badge-bg: rgba(2, 132, 199, 0.08);
   --input-bg: #FFFFFF;

@@ -52,8 +52,8 @@ export async function POST(request) {
       if (!folderName) {
         return NextResponse.json({ error: 'Folder name is required.' }, { status: 400 });
       }
-      const notes = await deleteVaultFolder(folderName, moveToFolder || 'General');
-      const folders = await getVaultFolders();
+      const folders = await deleteVaultFolder(folderName, moveToFolder || '');
+      const notes = await getVaultNotes();
       return NextResponse.json({ success: true, folders, notes });
     }
 
