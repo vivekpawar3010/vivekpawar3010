@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import defaultProfile from "../data/profile";
 import { useAvatarMode } from "../lib/useAvatarMode";
+import HolographicPortrait from "./HolographicPortrait";
 
 export default function About() {
   const [profile, setProfile] = useState(defaultProfile);
@@ -118,7 +119,7 @@ export default function About() {
               fontWeight: 900,
               lineHeight: 1.15,
               marginBottom: "1.2rem",
-              color: "#F5F7FA",
+              color: "var(--text-primary)",
               letterSpacing: "-0.02em",
             }}
           >
@@ -164,7 +165,7 @@ export default function About() {
                   width: 36,
                   height: 36,
                   borderRadius: "50%",
-                  background: "rgba(11, 18, 28, 0.8)",
+                  background: "var(--bg-card)",
                   border: "1px solid var(--border-subtle)",
                   display: "flex",
                   alignItems: "center",
@@ -183,7 +184,7 @@ export default function About() {
                   width: 36,
                   height: 36,
                   borderRadius: "50%",
-                  background: "rgba(11, 18, 28, 0.8)",
+                  background: "var(--bg-card)",
                   border: "1px solid var(--border-subtle)",
                   display: "flex",
                   alignItems: "center",
@@ -204,7 +205,7 @@ export default function About() {
                   width: 36,
                   height: 36,
                   borderRadius: "50%",
-                  background: "rgba(11, 18, 28, 0.8)",
+                  background: "var(--bg-card)",
                   border: "1px solid var(--border-subtle)",
                   display: "flex",
                   alignItems: "center",
@@ -223,7 +224,7 @@ export default function About() {
                   width: 36,
                   height: 36,
                   borderRadius: "50%",
-                  background: "rgba(11, 18, 28, 0.8)",
+                  background: "var(--bg-card)",
                   border: "1px solid var(--border-subtle)",
                   display: "flex",
                   alignItems: "center",
@@ -243,7 +244,7 @@ export default function About() {
                   width: 36,
                   height: 36,
                   borderRadius: "50%",
-                  background: "rgba(11, 18, 28, 0.8)",
+                  background: "var(--bg-card)",
                   border: "1px solid var(--border-subtle)",
                   display: "flex",
                   alignItems: "center",
@@ -261,7 +262,7 @@ export default function About() {
                   width: 36,
                   height: 36,
                   borderRadius: "50%",
-                  background: "rgba(11, 18, 28, 0.8)",
+                  background: "var(--bg-card)",
                   border: "1px solid var(--border-subtle)",
                   display: "flex",
                   alignItems: "center",
@@ -283,159 +284,9 @@ export default function About() {
           </div>
         </div>
 
-        {/* Right: Portrait with Glowing Halo + Badges + Code Card */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "1.5rem", flexWrap: "wrap" }}>
-          {/* Circular Portrait with Floating Badges */}
-          <div style={{ position: "relative", width: 200, height: 200 }}>
-            <div
-              onClick={toggleAvatarMode}
-              style={{
-                width: "100%",
-                height: "100%",
-                borderRadius: "50%",
-                padding: 3,
-                background: "linear-gradient(135deg, var(--accent-lime) 0%, #22D3EE 100%)",
-                boxShadow: "0 0 35px rgba(200, 255, 69, 0.4)",
-                cursor: "pointer",
-                position: "relative",
-              }}
-              title="Click to toggle avatar (Vivek 👤 ↔ Rock Lee 🍃)"
-            >
-              <div
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  borderRadius: "50%",
-                  overflow: "hidden",
-                  background: "#05080D",
-                }}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={currentSrc}
-                  alt="Vivek Pawar"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                  }}
-                  onError={(e) => {
-                    e.currentTarget.src = "/images/avatar.png";
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Floating Badge: Problem Solver */}
-            <div
-              style={{
-                position: "absolute",
-                top: -8,
-                left: -35,
-                background: "rgba(11, 18, 28, 0.95)",
-                border: "1px solid rgba(255, 255, 255, 0.15)",
-                borderRadius: "8px",
-                padding: "4px 10px",
-                fontSize: "10px",
-                fontWeight: 700,
-                color: "#F5F7FA",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
-              }}
-            >
-              <span style={{ color: "var(--accent-lime)" }}>&lt;/&gt;</span> Problem Solver
-            </div>
-
-            {/* Floating Badge: Always Learning */}
-            <div
-              style={{
-                position: "absolute",
-                bottom: 8,
-                left: -30,
-                background: "rgba(11, 18, 28, 0.95)",
-                border: "1px solid rgba(255, 255, 255, 0.15)",
-                borderRadius: "8px",
-                padding: "4px 10px",
-                fontSize: "10px",
-                fontWeight: 700,
-                color: "#F5F7FA",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
-              }}
-            >
-              <span>🎓</span> Always Learning
-            </div>
-
-            {/* Floating Badge: Building Real Products */}
-            <div
-              style={{
-                position: "absolute",
-                bottom: 35,
-                right: -45,
-                background: "rgba(11, 18, 28, 0.95)",
-                border: "1px solid rgba(255, 255, 255, 0.15)",
-                borderRadius: "8px",
-                padding: "4px 10px",
-                fontSize: "10px",
-                fontWeight: 700,
-                color: "#F5F7FA",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
-              }}
-            >
-              <span>📦</span> Building Real Products
-            </div>
-          </div>
-
-          {/* Code Card: // vivek.js */}
-          <div
-            style={{
-              width: "min(280px, 90vw)",
-              background: "rgba(11, 18, 28, 0.95)",
-              border: "1px solid rgba(255, 255, 255, 0.12)",
-              borderRadius: "12px",
-              padding: "12px 14px",
-              fontFamily: "var(--font-mono)",
-              fontSize: "11px",
-              lineHeight: 1.5,
-              boxShadow: "0 10px 30px rgba(0,0,0,0.6)",
-            }}
-          >
-            <div style={{ color: "var(--text-muted)", marginBottom: 4 }}>// vivek.js</div>
-            <div>
-              <span style={{ color: "#a855f7" }}>const</span>{" "}
-              <span style={{ color: "var(--accent-lime)" }}>vivek</span> = &#123;
-            </div>
-            <div style={{ paddingLeft: 10 }}>
-              <span style={{ color: "#38bdf8" }}>role</span>: <span style={{ color: "#fbbf24" }}>&quot;Software Developer&quot;</span>,
-            </div>
-            <div style={{ paddingLeft: 10 }}>
-              <span style={{ color: "#38bdf8" }}>location</span>: <span style={{ color: "#fbbf24" }}>&quot;Pandharpur, India&quot;</span>,
-            </div>
-            <div style={{ paddingLeft: 10 }}>
-              <span style={{ color: "#38bdf8" }}>education</span>: <span style={{ color: "#fbbf24" }}>&quot;B.Tech CSE (Graduate)&quot;</span>,
-            </div>
-            <div style={{ paddingLeft: 10 }}>
-              <span style={{ color: "#38bdf8" }}>passionateAbout</span>: [
-            </div>
-            <div style={{ paddingLeft: 20, color: "#fbbf24" }}>
-              &quot;Web Development&quot;,<br />
-              &quot;AI & Real World Products&quot;,<br />
-              &quot;EdTech&quot;,<br />
-              &quot;AgriTech&quot;
-            </div>
-            <div style={{ paddingLeft: 10 }}>],</div>
-            <div style={{ paddingLeft: 10 }}>
-              <span style={{ color: "#38bdf8" }}>motto</span>: <span style={{ color: "var(--accent-lime)" }}>&quot;Build. Learn. Improve.&quot;</span>
-            </div>
-            <div>&#125;;</div>
-          </div>
+        {/* Right: Interactive Animated Holographic Portrait with 3D Parallax & Cyber Rings */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", minHeight: 460 }}>
+          <HolographicPortrait />
         </div>
       </div>
 
@@ -455,7 +306,7 @@ export default function About() {
             style={{
               padding: "1.1rem 1.2rem",
               borderRadius: 12,
-              background: "rgba(11, 18, 28, 0.8)",
+              background: "var(--bg-card)",
               border: "1px solid var(--border-subtle)",
               textAlign: "center",
             }}
@@ -465,7 +316,7 @@ export default function About() {
               style={{
                 fontSize: "1.85rem",
                 fontWeight: 900,
-                color: "#F5F7FA",
+                color: "var(--text-primary)",
                 lineHeight: 1.1,
                 fontFamily: "var(--font-heading)",
               }}
@@ -498,7 +349,7 @@ export default function About() {
                 View Details →
               </span>
             </div>
-            <h2 style={{ fontSize: "1.45rem", fontWeight: 800, margin: "0 0 6px", color: "#F5F7FA" }}>
+            <h2 style={{ fontSize: "1.45rem", fontWeight: 800, margin: "0 0 6px", color: "var(--text-primary)" }}>
               My Academic Journey
             </h2>
             <p style={{ fontSize: "0.88rem", color: "var(--text-secondary)", margin: "0 0 1.2rem" }}>
@@ -521,7 +372,7 @@ export default function About() {
                   width: 52,
                   height: 52,
                   borderRadius: 8,
-                  background: "linear-gradient(135deg, rgba(34, 211, 238, 0.2) 0%, rgba(11, 18, 28, 0.9) 100%)",
+                  background: "var(--bg-card)", border: "1px solid var(--border-subtle)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -532,7 +383,7 @@ export default function About() {
                 🏛️
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "#F5F7FA" }}>
+                <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text-primary)" }}>
                   B.Tech in Computer Science and Engineering
                 </div>
                 <div style={{ fontSize: "0.82rem", color: "var(--text-secondary)", marginTop: 2 }}>
@@ -564,7 +415,7 @@ export default function About() {
           {/* From Curiosity to Creation Timeline (Image 2) */}
           <div className="glass-card" style={{ padding: "1.8rem", borderRadius: 14 }}>
             <div className="section-tag">My Journey</div>
-            <h2 style={{ fontSize: "1.45rem", fontWeight: 800, margin: "0 0 6px", color: "#F5F7FA" }}>
+            <h2 style={{ fontSize: "1.45rem", fontWeight: 800, margin: "0 0 6px", color: "var(--text-primary)" }}>
               From Curiosity to Creation
             </h2>
             <p style={{ fontSize: "0.88rem", color: "var(--text-secondary)", margin: "0 0 1.5rem" }}>
@@ -607,7 +458,7 @@ export default function About() {
                       width: 28,
                       height: 28,
                       borderRadius: "50%",
-                      background: "#05080D",
+                      background: "var(--bg-card)",
                       border: "2px solid var(--accent-lime)",
                       display: "flex",
                       alignItems: "center",
@@ -634,7 +485,7 @@ export default function About() {
                         >
                           {item.year}
                         </span>
-                        <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "#F5F7FA" }}>
+                        <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text-primary)" }}>
                           {item.title}
                         </span>
                       </div>
@@ -661,14 +512,14 @@ export default function About() {
               position: "relative",
               overflow: "hidden",
               border: "1px solid rgba(255, 255, 255, 0.12)",
-              background: "linear-gradient(180deg, rgba(11, 18, 28, 0.7) 0%, rgba(5, 8, 13, 0.95) 100%)",
+              background: "var(--bg-card)",
             }}
           >
             <div style={{ fontSize: 32, color: "var(--accent-lime)", lineHeight: 1, marginBottom: 8 }}>“</div>
             <p
               style={{
                 fontSize: "1.02rem",
-                color: "#F5F7FA",
+                color: "var(--text-primary)",
                 fontWeight: 600,
                 lineHeight: 1.6,
                 margin: "0 0 1rem",
@@ -689,7 +540,7 @@ export default function About() {
           {/* Interests Section */}
           <div className="glass-card" style={{ padding: "1.8rem", borderRadius: 14 }}>
             <div className="section-tag">Interests</div>
-            <h2 style={{ fontSize: "1.45rem", fontWeight: 800, margin: "0 0 6px", color: "#F5F7FA" }}>
+            <h2 style={{ fontSize: "1.45rem", fontWeight: 800, margin: "0 0 6px", color: "var(--text-primary)" }}>
               Things I&apos;m Passionate About
             </h2>
             <p style={{ fontSize: "0.88rem", color: "var(--text-secondary)", margin: "0 0 1.2rem" }}>
@@ -719,7 +570,7 @@ export default function About() {
                     <span style={{ fontSize: 24 }}>{item.icon}</span>
                     <span className="card-hint-badge">Explore <span>→</span></span>
                   </div>
-                  <div style={{ fontSize: "0.92rem", fontWeight: 700, color: "#F5F7FA" }}>{item.title}</div>
+                  <div style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--text-primary)" }}>{item.title}</div>
                   <div className="hover-reveal-content">
                     <div style={{ fontSize: "0.8rem", color: "var(--accent-lime)", marginTop: 4, lineHeight: 1.4 }}>
                       {item.desc}
@@ -738,7 +589,7 @@ export default function About() {
                 View All Achievements →
               </Link>
             </div>
-            <h2 style={{ fontSize: "1.45rem", fontWeight: 800, margin: "0 0 6px", color: "#F5F7FA" }}>
+            <h2 style={{ fontSize: "1.45rem", fontWeight: 800, margin: "0 0 6px", color: "var(--text-primary)" }}>
               Certifications & Achievements
             </h2>
             <p style={{ fontSize: "0.88rem", color: "var(--text-secondary)", margin: "0 0 1.2rem" }}>
@@ -761,7 +612,7 @@ export default function About() {
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <span style={{ fontSize: 24 }}>☁️</span>
                   <div>
-                    <div style={{ fontSize: "0.92rem", fontWeight: 700, color: "#F5F7FA" }}>
+                    <div style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--text-primary)" }}>
                       Introduction to Responsible AI
                     </div>
                     <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
@@ -787,7 +638,7 @@ export default function About() {
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <span style={{ fontSize: 24 }}>☁️</span>
                   <div>
-                    <div style={{ fontSize: "0.92rem", fontWeight: 700, color: "#F5F7FA" }}>
+                    <div style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--text-primary)" }}>
                       Introduction to Large Language Models
                     </div>
                     <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
@@ -803,7 +654,7 @@ export default function About() {
           {/* Beyond Code (Image 2) */}
           <div className="glass-card" style={{ padding: "1.8rem", borderRadius: 14 }}>
             <div className="section-tag">Beyond Code</div>
-            <h2 style={{ fontSize: "1.45rem", fontWeight: 800, margin: "0 0 6px", color: "#F5F7FA" }}>
+            <h2 style={{ fontSize: "1.45rem", fontWeight: 800, margin: "0 0 6px", color: "var(--text-primary)" }}>
               A Bit About Me
             </h2>
             <p style={{ fontSize: "0.88rem", color: "var(--text-secondary)", margin: "0 0 1.2rem" }}>
@@ -830,7 +681,7 @@ export default function About() {
                     background: "rgba(255, 255, 255, 0.04)",
                     border: "1px solid var(--border-subtle)",
                     fontSize: "12px",
-                    color: "#F5F7FA",
+                    color: "var(--text-primary)",
                   }}
                 >
                   <span>{h.icon}</span>
@@ -880,13 +731,13 @@ export default function About() {
           borderRadius: 20,
           textAlign: "center",
           border: "1px solid rgba(200, 255, 69, 0.3)",
-          background: "radial-gradient(circle at 50% 120%, rgba(200, 255, 69, 0.12) 0%, rgba(34, 211, 238, 0.08) 50%, rgba(11, 18, 28, 0.95) 80%)",
+          background: "var(--bg-card)",
         }}
       >
         <div className="section-tag" style={{ justifyContent: "center", marginBottom: 8 }}>
           Next Steps
         </div>
-        <h2 style={{ fontSize: "clamp(1.6rem, 3.5vw, 2.3rem)", fontWeight: 800, margin: "0 0 10px", color: "#F5F7FA" }}>
+        <h2 style={{ fontSize: "clamp(1.6rem, 3.5vw, 2.3rem)", fontWeight: 800, margin: "0 0 10px", color: "var(--text-primary)" }}>
           Ready to explore <span className="lime-underline">my work &amp; impact?</span>
         </h2>
         <p style={{ color: "var(--text-secondary)", maxWidth: 540, margin: "0 auto 1.8rem", fontSize: "0.95rem" }}>

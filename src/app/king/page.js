@@ -17,6 +17,10 @@ export default function KingPage() {
   const [error, setError] = useState("");
   const [loadingAuth, setLoadingAuth] = useState(false);
   const [activeSection, setActiveSection] = useState("profile");
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [theme, setTheme] = useState("dark");
+  const [avatarMode, setAvatarMode] = useState("real");
   const [stats, setStats] = useState({
     projects: 6,
     tasks: 0,
@@ -24,10 +28,18 @@ export default function KingPage() {
     unreadMessages: 0,
     vaultNotes: 0,
     dbStatus: "Online",
+    latency: "~12ms",
   });
 
-  // Check persistent session on mount & load quick stats
+  // Sync theme from localStorage on mount & listen to changes
   useEffect(() => {
+    const savedTheme = localStorage.getItem("portfolio_theme") || "dark";
+    setTheme(savedTheme);
+    document.documentElement.setAttribute("data-theme", savedTheme);
+
+    const savedAvatar = localStorage.getItem("portfolio_avatar_mode") || "real";
+    setAvatarMode(savedAvatar);
+
     const auth = localStorage.getItem("king_authenticated");
     if (auth === "true") {
       setIsAuthenticated(true);
@@ -48,9 +60,21 @@ export default function KingPage() {
         unreadMessages: msgs.filter((m) => !m.read).length,
         vaultNotes: vault.status === "fulfilled" && Array.isArray(vault.value?.notes) ? vault.value.notes.length : 0,
         dbStatus: "Online",
+        latency: "~14ms",
       });
     });
   }, [isAuthenticated]);
+
+  const toggleTheme = () => {
+    let next = "light";
+    if (theme === "dark") next = "light";
+    else if (theme === "light") next = "electric-cyan";
+    else next = "dark";
+    setTheme(next);
+    localStorage.setItem("portfolio_theme", next);
+    document.documentElement.setAttribute("data-theme", next);
+    window.dispatchEvent(new Event("themechange"));
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -83,7 +107,23 @@ export default function KingPage() {
     localStorage.removeItem("king_authenticated");
   };
 
-  // ─── 1. Login Screen (Dark Futuristic Terminal Passcode) ─────────────────────
+  const isLight = theme === "light" || theme === "electric-cyan" || theme === "warm-amber";
+
+  // Navigation Items
+  const navItems = [
+    { id: "profile", label: "Profile & Hero Content", icon: "👤", badge: null, desc: "Personal bio, contact, and headline" },
+    { id: "projects", label: "Projects Manager", icon: "💼", badge: stats.projects, desc: "Live production portfolio projects" },
+    { id: "skills", label: "Skills & Tech Stack", icon: "⚡", badge: null, desc: "Languages, frameworks, and proficiencies" },
+    { id: "tasks", label: "Daily Streaks & Tasks", icon: "🔥", badge: stats.tasks, desc: "Habit streaks, AI scores & general tasks" },
+    { id: "friends", label: "LeetCode Rivalry Hub", icon: "🏆", badge: null, desc: "Friend rankings & DSA battle stats" },
+    { id: "messages", label: "Inquiries & Inbox", icon: "📬", badge: stats.unreadMessages > 0 ? `${stats.unreadMessages} new` : null, desc: "Messages received from contact form" },
+    { id: "vault", label: "Personal Vault & Notes", icon: "🔐", badge: stats.vaultNotes > 0 ? stats.vaultNotes : null, desc: "Private categorized folder notes" },
+    { id: "inspector", label: "Database & Architecture", icon: "🗄️", badge: "Live", desc: "Prisma PostgreSQL sync & latency" },
+  ];
+
+  const currentNav = navItems.find((n) => n.id === activeSection) || navItems[0];
+
+  // ─── 1. Login Screen (User-side Glassmorphism + Orbiting Rings + Theme Toggle) ───
   if (!isAuthenticated) {
     return (
       <main
@@ -93,36 +133,91 @@ export default function KingPage() {
           alignItems: "center",
           justifyContent: "center",
           padding: "2rem 1.25rem",
-          background: "radial-gradient(circle at 50% 30%, rgba(200, 255, 69, 0.04) 0%, #05080D 70%)",
+          position: "relative",
+          overflow: "hidden",
         }}
       >
+        {/* Top-Right Theme Toggle Pill */}
+        <div style={{ position: "absolute", top: 20, right: 24, zIndex: 10 }}>
+          <button
+            onClick={toggleTheme}
+            type="button"
+            className="btn-dark-pill"
+            style={{
+              padding: "6px 14px",
+              fontSize: "12px",
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              cursor: "pointer",
+            }}
+          >
+            <span>{isLight ? "☀️ Sunfire Light (White & Orange)" : "🌙 Cyber Dark"}</span>
+            <span style={{ fontSize: "10px", color: "var(--accent-lime)" }}>[Switch]</span>
+          </button>
+        </div>
+
+        {/* Orbiting Cyber Ring 1 (Background visual) */}
+        <div
+          style={{
+            position: "absolute",
+            width: 520,
+            height: 520,
+            borderRadius: "50%",
+            border: isLight ? "2px dashed rgba(255, 107, 0, 0.25)" : "2px dashed rgba(200, 255, 69, 0.25)",
+            boxShadow: isLight ? "0 0 40px rgba(255, 107, 0, 0.12)" : "0 0 40px rgba(200, 255, 69, 0.15)",
+            transform: "rotateX(68deg) rotateY(-18deg)",
+            pointerEvents: "none",
+            animation: "orbitSpin 22s linear infinite",
+          }}
+        />
+
+        {/* Orbiting Cyber Ring 2 */}
+        <div
+          style={{
+            position: "absolute",
+            width: 580,
+            height: 580,
+            borderRadius: "50%",
+            border: "1.5px solid rgba(2, 132, 199, 0.22)",
+            transform: "rotateX(72deg) rotateY(24deg)",
+            pointerEvents: "none",
+            animation: "orbitSpinRev 18s linear infinite",
+          }}
+        />
+
+        {/* Glassmorphic Login Card */}
         <div
           className="glass-card"
           style={{
-            maxWidth: 440,
+            maxWidth: 450,
             width: "100%",
             padding: "2.8rem 2.2rem",
             textAlign: "center",
-            boxShadow: "0 25px 50px -15px rgba(0, 0, 0, 0.8), 0 0 30px rgba(200, 255, 69, 0.1)",
-            border: "1px solid rgba(200, 255, 69, 0.35)",
-            background: "rgba(11, 18, 28, 0.95)",
-            borderRadius: 18,
+            position: "relative",
+            zIndex: 2,
+            borderRadius: 20,
           }}
         >
-          {/* Glowing Badge */}
+          {/* Glowing Crown Emblem with Pulse */}
           <div
             style={{
-              width: 64,
-              height: 64,
-              borderRadius: 18,
-              background: "linear-gradient(135deg, rgba(200, 255, 69, 0.2) 0%, rgba(34, 211, 238, 0.2) 100%)",
-              border: "1px solid var(--accent-lime)",
+              width: 70,
+              height: 70,
+              borderRadius: 20,
+              background: isLight
+                ? "linear-gradient(135deg, rgba(255, 107, 0, 0.2) 0%, rgba(251, 146, 60, 0.15) 100%)"
+                : "linear-gradient(135deg, rgba(200, 255, 69, 0.2) 0%, rgba(34, 211, 238, 0.2) 100%)",
+              border: `1.5px solid ${isLight ? "var(--accent-orange)" : "var(--accent-lime)"}`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 30,
+              fontSize: 32,
               margin: "0 auto 1.4rem",
-              boxShadow: "0 0 25px rgba(200, 255, 69, 0.35)",
+              boxShadow: isLight
+                ? "0 0 30px rgba(255, 107, 0, 0.35)"
+                : "0 0 30px rgba(200, 255, 69, 0.35)",
+              animation: "floatCrown 4s ease-in-out infinite",
             }}
           >
             👑
@@ -133,17 +228,24 @@ export default function KingPage() {
           </div>
           <h1
             style={{
-              fontSize: "1.9rem",
+              fontSize: "2rem",
               fontWeight: 900,
-              color: "#F5F7FA",
+              color: "var(--text-primary)",
               marginBottom: 8,
               letterSpacing: "-0.02em",
             }}
           >
             King <span className="lime-underline">Deck</span>
           </h1>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.92rem", marginBottom: "2rem" }}>
-            Private Control Deck for Vivek Pawar. Authorized access only.
+          <p
+            style={{
+              color: "var(--text-secondary)",
+              fontSize: "0.92rem",
+              marginBottom: "2rem",
+              lineHeight: 1.5,
+            }}
+          >
+            Private Command Hub for Vivek Pawar. Full encrypted control of projects, daily habit streaks, and personal vault.
           </p>
 
           <form onSubmit={handleLogin}>
@@ -158,19 +260,24 @@ export default function KingPage() {
                 style={{
                   width: "100%",
                   padding: "13px 16px",
-                  background: "rgba(5, 8, 13, 0.9)",
-                  border: error ? "1px solid #f43f5e" : "1px solid rgba(255, 255, 255, 0.15)",
-                  borderRadius: 10,
-                  color: "#F5F7FA",
+                  background: isLight ? "#FFFFFF" : "rgba(5, 8, 13, 0.9)",
+                  border: error
+                    ? "1px solid #f43f5e"
+                    : isLight
+                    ? "1px solid rgba(249, 115, 22, 0.3)"
+                    : "1px solid rgba(255, 255, 255, 0.15)",
+                  borderRadius: 12,
+                  color: "var(--text-primary)",
                   fontSize: "1.05rem",
                   textAlign: "center",
                   letterSpacing: "0.2em",
                   outline: "none",
                   fontFamily: "var(--font-mono)",
+                  boxShadow: isLight ? "0 2px 8px rgba(255, 107, 0, 0.08)" : "none",
                 }}
               />
               {error && (
-                <div style={{ color: "#fb7185", fontSize: "0.82rem", marginTop: 8 }}>
+                <div style={{ color: "#fb7185", fontSize: "0.85rem", marginTop: 8, fontWeight: 600 }}>
                   ✕ {error}
                 </div>
               )}
@@ -180,9 +287,15 @@ export default function KingPage() {
               type="submit"
               disabled={loadingAuth}
               className="btn-lime"
-              style={{ width: "100%", justifyContent: "center", padding: "13px", fontSize: "0.95rem" }}
+              style={{
+                width: "100%",
+                justifyContent: "center",
+                padding: "13px",
+                fontSize: "0.95rem",
+                fontWeight: 800,
+              }}
             >
-              {loadingAuth ? "Validating Key..." : "Unlock King Deck 👑"}
+              {loadingAuth ? "Validating Authorization..." : "Unlock King Deck 👑"}
             </button>
           </form>
 
@@ -190,11 +303,12 @@ export default function KingPage() {
             <Link
               href="/"
               style={{
-                fontSize: "0.85rem",
+                fontSize: "0.88rem",
                 color: "var(--text-muted)",
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 6,
+                fontWeight: 600,
                 transition: "color 0.2s ease",
               }}
               onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent-lime)")}
@@ -204,210 +318,428 @@ export default function KingPage() {
             </Link>
           </div>
         </div>
+
+        <style jsx>{`
+          @keyframes orbitSpin {
+            0% { transform: rotateX(68deg) rotateY(-18deg) rotateZ(0deg); }
+            100% { transform: rotateX(68deg) rotateY(-18deg) rotateZ(360deg); }
+          }
+          @keyframes orbitSpinRev {
+            0% { transform: rotateX(72deg) rotateY(24deg) rotateZ(360deg); }
+            100% { transform: rotateX(72deg) rotateY(24deg) rotateZ(0deg); }
+          }
+          @keyframes floatCrown {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+          }
+        `}</style>
       </main>
     );
   }
 
-  // ─── 2. Authenticated King Dashboard ─────────────────────────────────────────
-  const navItems = [
-    { id: "profile", label: "Profile & Hero Editor", icon: "👤", badge: null },
-    { id: "projects", label: "Projects Manager", icon: "💼", badge: stats.projects },
-    { id: "skills", label: "Skills Manager", icon: "⚡", badge: null },
-    { id: "tasks", label: "Task Tracker", icon: "📋", badge: stats.tasks },
-    { id: "friends", label: "LeetCode Rivalry", icon: "🏆", badge: null },
-    { id: "messages", label: "Inquiries Inbox", icon: "📬", badge: stats.unreadMessages > 0 ? `${stats.unreadMessages} new` : null },
-    { id: "vault", label: "Personal Vault & Notes", icon: "🔐", badge: stats.vaultNotes > 0 ? stats.vaultNotes : null },
-    { id: "inspector", label: "Database & Architecture", icon: "🗄️", badge: "Live" },
-  ];
-
+  // ─── 2. Authenticated King Dashboard (Ultra-Crisp User-Side UI + Light/Dark Mode) ───
   return (
-    <div style={{ minHeight: "calc(100vh - 68px)", background: "#05080D", display: "flex", flexDirection: "column" }}>
-      {/* ── Top KPI & Live DB Strip ── */}
+    <div
+      style={{
+        minHeight: "calc(100vh - 68px)",
+        background: "var(--bg-primary)",
+        color: "var(--text-primary)",
+        display: "flex",
+        flexDirection: "column",
+        transition: "background-color 0.3s ease, color 0.3s ease",
+      }}
+    >
+      {/* ── Top Executive KPI & Database Strip ── */}
       <header
         style={{
-          background: "rgba(11, 18, 28, 0.95)",
+          background: isLight ? "rgba(255, 255, 255, 0.95)" : "rgba(11, 18, 28, 0.95)",
           borderBottom: "1px solid var(--border-subtle)",
-          padding: "0.8rem 1.8rem",
+          backdropFilter: "blur(18px)",
+          WebkitBackdropFilter: "blur(18px)",
+          padding: "0.75rem 1.6rem",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           flexWrap: "wrap",
           gap: "1rem",
+          boxShadow: isLight ? "0 4px 20px rgba(249, 115, 22, 0.05)" : "none",
+          position: "sticky",
+          top: 0,
+          zIndex: 40,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+        {/* Left Brand Badge */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          {/* Mobile Menu Toggle Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            type="button"
+            className="king-mobile-nav-toggle"
+            aria-label="Toggle Navigation"
+            style={{
+              display: "none",
+              padding: "6px 10px",
+              borderRadius: 8,
+              background: "var(--bg-card)",
+              border: "1px solid var(--border-subtle)",
+              color: "var(--text-primary)",
+              cursor: "pointer",
+            }}
+          >
+            {mobileMenuOpen ? "✕" : "☰"}
+          </button>
+
           <div
             style={{
-              width: 38,
-              height: 38,
-              borderRadius: 10,
-              background: "linear-gradient(135deg, rgba(200, 255, 69, 0.2) 0%, rgba(34, 211, 238, 0.2) 100%)",
-              border: "1px solid var(--accent-lime)",
+              width: 40,
+              height: 40,
+              borderRadius: 12,
+              background: isLight
+                ? "linear-gradient(135deg, rgba(255, 107, 0, 0.2) 0%, rgba(251, 146, 60, 0.15) 100%)"
+                : "linear-gradient(135deg, rgba(200, 255, 69, 0.2) 0%, rgba(34, 211, 238, 0.2) 100%)",
+              border: `1px solid ${isLight ? "var(--accent-orange)" : "var(--accent-lime)"}`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 18,
+              fontSize: 20,
+              boxShadow: isLight ? "0 0 15px rgba(255, 107, 0, 0.25)" : "0 0 15px rgba(200, 255, 69, 0.25)",
             }}
           >
             👑
           </div>
+
           <div>
-            <div style={{ fontSize: "1rem", fontWeight: 800, color: "#F5F7FA" }}>
-              King Sanctuary <span style={{ color: "var(--accent-lime)", fontSize: "12px" }}>v2.5</span>
+            <div style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--text-primary)" }}>
+              King Sanctuary
             </div>
             <div style={{ fontSize: "11px", color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#C8FF45", boxShadow: "0 0 6px #C8FF45" }} />
-              PostgreSQL Connected &amp; Synced via Prisma
+              <span
+                style={{
+                  width: 7,
+                  height: 7,
+                  borderRadius: "50%",
+                  background: isLight ? "#16A34A" : "#C8FF45",
+                  boxShadow: isLight ? "0 0 6px #16A34A" : "0 0 6px #C8FF45",
+                  display: "inline-block",
+                }}
+              />
+              Prisma PostgreSQL Synced &bull; Latency {stats.latency}
             </div>
           </div>
         </div>
 
-        {/* Quick KPI Badges */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+        {/* Right Actions: KPI Badges + Admin Avatar Control + Theme Switcher + Lock */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          {/* Admin Exclusive Avatar Control */}
           <div
+            className="kpi-chip"
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 8,
+              gap: 6,
               padding: "5px 12px",
-              borderRadius: 8,
-              background: "rgba(255, 255, 255, 0.03)",
+              borderRadius: 9999,
+              background: "var(--bg-card)",
               border: "1px solid var(--border-subtle)",
               fontSize: "12px",
+              fontWeight: 600,
             }}
           >
-            <span style={{ color: "var(--text-secondary)" }}>Projects:</span>
-            <span style={{ color: "var(--accent-lime)", fontWeight: 700 }}>{stats.projects}</span>
+            <span style={{ color: "var(--text-muted)" }}>Active Avatar:</span>
+            <button
+              type="button"
+              onClick={() => {
+                const next = avatarMode === "real" ? "rocklee" : "real";
+                setAvatarMode(next);
+                localStorage.setItem("portfolio_avatar_mode", next);
+                window.dispatchEvent(new CustomEvent("portfolio_avatar_changed", { detail: { mode: next } }));
+              }}
+              style={{
+                background: "transparent",
+                border: "none",
+                cursor: "pointer",
+                fontWeight: 800,
+                color: isLight ? "#FF6B00" : "var(--accent-lime)",
+                fontSize: "12px",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
+                padding: 0,
+              }}
+              title="Only Admin controls the active public avatar"
+            >
+              <span>{avatarMode === "real" ? "👤 Vivek Real Cutout" : "🍃 Rock Lee"}</span>
+              <span style={{ fontSize: "10px", color: "var(--text-muted)" }}>[Swap]</span>
+            </button>
           </div>
-
+          {/* KPI Badge: Projects */}
           <div
+            className="kpi-chip"
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 8,
+              gap: 6,
               padding: "5px 12px",
-              borderRadius: 8,
-              background: "rgba(255, 255, 255, 0.03)",
+              borderRadius: 9999,
+              background: "var(--bg-card)",
               border: "1px solid var(--border-subtle)",
               fontSize: "12px",
+              fontWeight: 600,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
             }}
           >
-            <span style={{ color: "var(--text-secondary)" }}>Tasks:</span>
-            <span style={{ color: "#22D3EE", fontWeight: 700 }}>{stats.tasks}</span>
+            <span style={{ color: "var(--text-muted)" }}>💼 Projects:</span>
+            <span style={{ color: isLight ? "#FF6B00" : "var(--accent-lime)", fontWeight: 800 }}>{stats.projects}</span>
           </div>
 
+          {/* KPI Badge: Tasks & Streaks */}
           <div
+            className="kpi-chip"
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 8,
+              gap: 6,
               padding: "5px 12px",
-              borderRadius: 8,
-              background: stats.unreadMessages > 0 ? "rgba(244, 63, 94, 0.12)" : "rgba(255, 255, 255, 0.03)",
-              border: stats.unreadMessages > 0 ? "1px solid rgba(244, 63, 94, 0.3)" : "1px solid var(--border-subtle)",
+              borderRadius: 9999,
+              background: "var(--bg-card)",
+              border: "1px solid var(--border-subtle)",
               fontSize: "12px",
+              fontWeight: 600,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
             }}
           >
-            <span style={{ color: "var(--text-secondary)" }}>Inbox:</span>
-            <span style={{ color: stats.unreadMessages > 0 ? "#f43f5e" : "#F5F7FA", fontWeight: 700 }}>
-              {stats.unreadMessages > 0 ? `${stats.unreadMessages} unread` : stats.messages}
+            <span style={{ color: "var(--text-muted)" }}>🔥 Tasks:</span>
+            <span style={{ color: "var(--accent-cyan)", fontWeight: 800 }}>{stats.tasks}</span>
+          </div>
+
+          {/* KPI Badge: Messages Inbox */}
+          <div
+            className="kpi-chip"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "5px 12px",
+              borderRadius: 9999,
+              background: stats.unreadMessages > 0 ? "rgba(244, 63, 94, 0.12)" : "var(--bg-card)",
+              border: stats.unreadMessages > 0 ? "1px solid rgba(244, 63, 94, 0.4)" : "1px solid var(--border-subtle)",
+              fontSize: "12px",
+              fontWeight: 600,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+            }}
+          >
+            <span style={{ color: "var(--text-muted)" }}>📬 Inbox:</span>
+            <span style={{ color: stats.unreadMessages > 0 ? "#f43f5e" : "var(--text-primary)", fontWeight: 800 }}>
+              {stats.unreadMessages > 0 ? `${stats.unreadMessages} new` : stats.messages}
             </span>
           </div>
 
+          {/* ☀️ / 🌙 Master Theme Switcher Pill */}
+          <button
+            onClick={toggleTheme}
+            type="button"
+            title={`Active: ${isLight ? "Sunfire Light (White & Orange)" : "Cyber Dark (Green & Cyan)"}. Click to toggle!`}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "5px 14px",
+              borderRadius: 9999,
+              background: isLight ? "rgba(255, 107, 0, 0.15)" : "rgba(255, 255, 255, 0.06)",
+              border: isLight ? "1px solid rgba(255, 107, 0, 0.4)" : "1px solid var(--border-subtle)",
+              color: isLight ? "#FF6B00" : "var(--accent-lime)",
+              fontSize: "12px",
+              fontWeight: 800,
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+            }}
+          >
+            <span>{isLight ? "☀️ Sunfire (White & Orange)" : "🌙 Cyber Dark"}</span>
+          </button>
+
+          {/* View Public Portfolio CTA */}
           <Link
             href="/"
             className="btn-dark-pill"
-            style={{ padding: "6px 14px", fontSize: "12px" }}
+            style={{ padding: "5px 14px", fontSize: "12px", fontWeight: 700 }}
           >
-            <span>🌐</span> View Portfolio
+            <span>🌐</span> Portfolio
           </Link>
 
+          {/* Lock Admin Session */}
           <button
             onClick={handleLogout}
+            type="button"
+            title="Lock Admin Control Session"
             style={{
               background: "rgba(244, 63, 94, 0.1)",
-              border: "1px solid rgba(244, 63, 94, 0.3)",
+              border: "1px solid rgba(244, 63, 94, 0.35)",
               color: "#fb7185",
-              padding: "6px 12px",
-              borderRadius: "9999px",
+              padding: "5px 12px",
+              borderRadius: 9999,
               fontSize: "12px",
               fontWeight: 700,
               cursor: "pointer",
+              transition: "all 0.2s ease",
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(244, 63, 94, 0.2)")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(244, 63, 94, 0.1)")}
           >
             Lock 🔒
           </button>
         </div>
       </header>
 
-      {/* ── Main Layout (Sidebar + Content) ── */}
+      {/* ── Main Layout: Sidebar + Content Area ── */}
       <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
-        {/* Sidebar */}
+        {/* Sidebar Navigation */}
         <aside
           style={{
-            width: 280,
-            background: "rgba(10, 16, 24, 0.98)",
+            width: isSidebarCollapsed ? 80 : 290,
+            background: isLight ? "rgba(255, 255, 255, 0.98)" : "rgba(10, 16, 24, 0.98)",
             borderRight: "1px solid var(--border-subtle)",
-            padding: "1.5rem 1rem",
+            padding: "1.4rem 0.9rem",
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
             flexShrink: 0,
+            transition: "width 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
+            position: "relative",
           }}
+          className={`king-sidebar ${mobileMenuOpen ? "king-mobile-open" : ""}`}
         >
           <div>
+            {/* Navigation Header with Collapse Toggle */}
             <div
               style={{
-                fontSize: "10px",
-                fontWeight: 800,
-                color: "var(--text-muted)",
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                padding: "0 10px 10px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: isSidebarCollapsed ? "center" : "space-between",
+                padding: "0 8px 12px",
+                borderBottom: "1px solid var(--border-subtle)",
+                marginBottom: 12,
               }}
             >
-              Control Navigation
+              {!isSidebarCollapsed && (
+                <span
+                  style={{
+                    fontSize: "10px",
+                    fontWeight: 800,
+                    color: "var(--text-muted)",
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Workspace Control
+                </span>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar to Compact Mode"}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: "var(--text-muted)",
+                  cursor: "pointer",
+                  fontSize: "12px",
+                  padding: "4px 8px",
+                  borderRadius: 6,
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent-lime)")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
+              >
+                {isSidebarCollapsed ? "⇥" : "⇤ Collapse"}
+              </button>
             </div>
 
+            {/* Navigation Buttons List */}
             <nav style={{ display: "grid", gap: 6 }}>
               {navItems.map((item) => {
                 const active = activeSection === item.id;
                 return (
                   <button
                     key={item.id}
-                    onClick={() => setActiveSection(item.id)}
+                    onClick={() => {
+                      setActiveSection(item.id);
+                      setMobileMenuOpen(false);
+                    }}
+                    title={isSidebarCollapsed ? `${item.label} (${item.desc})` : item.desc}
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      justifyContent: "space-between",
+                      justifyContent: isSidebarCollapsed ? "center" : "space-between",
                       width: "100%",
-                      padding: "10px 12px",
-                      borderRadius: 10,
+                      padding: isSidebarCollapsed ? "12px 0" : "10px 14px",
+                      borderRadius: 12,
                       fontSize: "0.88rem",
-                      fontWeight: active ? 700 : 500,
-                      color: active ? "#05080D" : "#cbd5e1",
-                      background: active ? "var(--accent-lime)" : "transparent",
-                      border: active ? "1px solid var(--accent-lime)" : "1px solid transparent",
+                      fontWeight: active ? 800 : 500,
+                      color: active
+                        ? isLight
+                          ? "#FFFFFF"
+                          : "#05080D"
+                        : "var(--text-secondary)",
+                      background: active
+                        ? isLight
+                          ? "linear-gradient(135deg, #FF6B00 0%, #F97316 100%)"
+                          : "var(--accent-lime)"
+                        : "transparent",
+                      border: active
+                        ? isLight
+                          ? "1px solid #FF6B00"
+                          : "1px solid var(--accent-lime)"
+                        : "1px solid transparent",
                       cursor: "pointer",
                       textAlign: "left",
                       transition: "all 0.18s ease",
-                      boxShadow: active ? "0 4px 14px rgba(200, 255, 69, 0.3)" : "none",
+                      boxShadow: active
+                        ? isLight
+                          ? "0 4px 16px rgba(255, 107, 0, 0.35)"
+                          : "0 4px 16px rgba(200, 255, 69, 0.35)"
+                        : "none",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!active) {
+                        e.currentTarget.style.background = isLight ? "rgba(255, 107, 0, 0.08)" : "rgba(255, 255, 255, 0.05)";
+                        e.currentTarget.style.color = "var(--text-primary)";
+                        e.currentTarget.style.transform = "translateX(2px)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!active) {
+                        e.currentTarget.style.background = "transparent";
+                        e.currentTarget.style.color = "var(--text-secondary)";
+                        e.currentTarget.style.transform = "translateX(0)";
+                      }
                     }}
                   >
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <span style={{ fontSize: 16 }}>{item.icon}</span>
-                      <span>{item.label}</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <span style={{ fontSize: 18 }}>{item.icon}</span>
+                      {!isSidebarCollapsed && <span>{item.label}</span>}
                     </div>
 
-                    {item.badge && (
+                    {!isSidebarCollapsed && item.badge && (
                       <span
                         style={{
                           fontSize: "10px",
                           fontWeight: 800,
-                          padding: "2px 6px",
+                          padding: "2px 7px",
                           borderRadius: 6,
-                          background: active ? "rgba(5, 8, 13, 0.2)" : "rgba(255, 255, 255, 0.08)",
-                          color: active ? "#05080D" : "var(--accent-lime)",
+                          background: active
+                            ? isLight
+                              ? "rgba(255, 255, 255, 0.25)"
+                              : "rgba(5, 8, 13, 0.2)"
+                            : isLight
+                            ? "rgba(255, 107, 0, 0.12)"
+                            : "rgba(255, 255, 255, 0.08)",
+                          color: active
+                            ? isLight
+                              ? "#FFFFFF"
+                              : "#05080D"
+                            : isLight
+                            ? "#FF6B00"
+                            : "var(--accent-lime)",
                         }}
                       >
                         {item.badge}
@@ -419,35 +751,163 @@ export default function KingPage() {
             </nav>
           </div>
 
-          <div
-            style={{
-              padding: "12px",
-              borderRadius: 10,
-              background: "rgba(255, 255, 255, 0.02)",
-              border: "1px solid var(--border-subtle)",
-              fontSize: "11px",
-              color: "var(--text-muted)",
-              lineHeight: 1.5,
-            }}
-          >
-            Logged in as <strong style={{ color: "#F5F7FA" }}>Administrator</strong>
-            <br />
-            Database: <span style={{ color: "var(--accent-lime)" }}>Prisma PostgreSQL</span>
-          </div>
+          {/* Bottom Environment & Database Summary Card */}
+          {!isSidebarCollapsed ? (
+            <div
+              className="glass-card"
+              style={{
+                padding: "12px 14px",
+                borderRadius: 12,
+                fontSize: "11px",
+                color: "var(--text-secondary)",
+                lineHeight: 1.5,
+                marginTop: "1rem",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+                <span style={{ fontWeight: 800, color: "var(--text-primary)" }}>Active Session</span>
+                <span style={{ color: isLight ? "#16A34A" : "var(--accent-lime)", fontWeight: 700 }}>● Online</span>
+              </div>
+              <div>Admin: <strong style={{ color: "var(--text-primary)" }}>Vivek Pawar</strong></div>
+              <div>Database: <span style={{ color: isLight ? "#FF6B00" : "var(--accent-lime)", fontWeight: 700 }}>Prisma PostgreSQL</span></div>
+              <div style={{ color: "var(--text-muted)", marginTop: 4 }}>Theme: {isLight ? "White & Sunfire Orange" : "Cyber Green"}</div>
+            </div>
+          ) : (
+            <div style={{ textAlign: "center", fontSize: 18, color: "var(--text-muted)", padding: "10px 0" }}>
+              👑
+            </div>
+          )}
         </aside>
 
-        {/* Content View */}
-        <main style={{ flex: 1, padding: "2.5rem 3rem", overflowY: "auto", background: "#05080D" }}>
-          {activeSection === "profile" && <ProfileEditor />}
-          {activeSection === "projects" && <ProjectsManager />}
-          {activeSection === "skills" && <SkillsManager />}
-          {activeSection === "tasks" && <TaskManager />}
-          {activeSection === "friends" && <LeetCodeFriends />}
-          {activeSection === "messages" && <MessagesInbox />}
-          {activeSection === "vault" && <PersonalVault />}
-          {activeSection === "inspector" && <DatabaseInspector />}
+        {/* ── Main Executive Content Workspace ── */}
+        <main
+          style={{
+            flex: 1,
+            padding: "2rem 2.5rem",
+            overflowY: "auto",
+            background: "var(--bg-primary)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "1.5rem",
+            position: "relative",
+          }}
+        >
+          {/* Section Breadcrumb & Header Hero Banner */}
+          <div
+            className="glass-card"
+            style={{
+              padding: "1.4rem 1.8rem",
+              borderRadius: 16,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "1rem",
+            }}
+          >
+            <div>
+              <div className="section-tag" style={{ marginBottom: 4 }}>
+                {currentNav.icon} King Deck &bull; {currentNav.label}
+              </div>
+              <h2
+                style={{
+                  fontSize: "1.5rem",
+                  fontWeight: 900,
+                  margin: "0 0 4px",
+                  color: "var(--text-primary)",
+                  letterSpacing: "-0.01em",
+                }}
+              >
+                {currentNav.label}
+              </h2>
+              <p style={{ margin: 0, fontSize: "0.9rem", color: "var(--text-secondary)" }}>
+                {currentNav.desc}
+              </p>
+            </div>
+
+            {/* Quick Action Navigation Buttons */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              <button
+                type="button"
+                onClick={() => setActiveSection("tasks")}
+                className="btn-dark-pill"
+                style={{
+                  padding: "6px 14px",
+                  fontSize: "12px",
+                  fontWeight: 700,
+                  borderColor: activeSection === "tasks" ? "var(--accent-lime)" : "var(--border-subtle)",
+                }}
+              >
+                <span>🔥</span> Daily Streaks
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveSection("vault")}
+                className="btn-dark-pill"
+                style={{
+                  padding: "6px 14px",
+                  fontSize: "12px",
+                  fontWeight: 700,
+                  borderColor: activeSection === "vault" ? "var(--accent-lime)" : "var(--border-subtle)",
+                }}
+              >
+                <span>🔐</span> Vault Folders
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveSection("inspector")}
+                className="btn-dark-pill"
+                style={{
+                  padding: "6px 14px",
+                  fontSize: "12px",
+                  fontWeight: 700,
+                  borderColor: activeSection === "inspector" ? "var(--accent-lime)" : "var(--border-subtle)",
+                }}
+              >
+                <span>🗄️</span> DB Status
+              </button>
+            </div>
+          </div>
+
+          {/* Active Section Content Mount */}
+          <div style={{ flex: 1 }}>
+            {activeSection === "profile" && <ProfileEditor />}
+            {activeSection === "projects" && <ProjectsManager />}
+            {activeSection === "skills" && <SkillsManager />}
+            {activeSection === "tasks" && <TaskManager />}
+            {activeSection === "friends" && <LeetCodeFriends />}
+            {activeSection === "messages" && <MessagesInbox />}
+            {activeSection === "vault" && <PersonalVault />}
+            {activeSection === "inspector" && <DatabaseInspector />}
+          </div>
         </main>
       </div>
+
+      <style jsx>{`
+        @media (max-width: 900px) {
+          .king-mobile-nav-toggle {
+            display: inline-flex !important;
+          }
+          .kpi-chip {
+            display: none !important;
+          }
+          .king-sidebar {
+            position: fixed !important;
+            top: 60px;
+            bottom: 0;
+            left: -320px;
+            z-index: 50;
+            width: 280px !important;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            transition: left 0.3s ease !important;
+          }
+          .king-sidebar.king-mobile-open {
+            left: 0 !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

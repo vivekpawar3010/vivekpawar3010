@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useAvatarMode } from "../lib/useAvatarMode";
+import HolographicPortrait from "./HolographicPortrait";
 
 export default function GreenJupiterPlanet() {
   const canvasRef = useRef(null);
@@ -10,6 +11,7 @@ export default function GreenJupiterPlanet() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
   const [terminalMinimized, setTerminalMinimized] = useState(false);
+  const [viewMode, setViewMode] = useState("jupiter"); // "jupiter" | "hologram"
   const { toggleAvatarMode, isRockLee } = useAvatarMode();
 
   useEffect(() => {
@@ -47,8 +49,8 @@ export default function GreenJupiterPlanet() {
       sparkle: Math.random() * Math.PI * 2,
     }));
 
-    // Jupiter atmospheric gas bands configuration (Green / Emerald / Obsidian / Lime)
-    const bands = [
+    // Jupiter atmospheric gas bands configuration (Green / Emerald in dark mode; Sunfire Orange / Amber in light mode)
+    const greenBands = [
       { y: -0.9, height: 0.22, colorA: "#041e11", colorB: "#093b22", speed: 0.008 },
       { y: -0.68, height: 0.18, colorA: "#0a522f", colorB: "#116d3f", speed: -0.012 },
       { y: -0.5, height: 0.24, colorA: "#10b981", colorB: "#059669", speed: 0.015 },
@@ -60,9 +62,39 @@ export default function GreenJupiterPlanet() {
       { y: 0.8, height: 0.22, colorA: "#022c22", colorB: "#041e11", speed: 0.007 },
     ];
 
+    const orangeBands = [
+      { y: -0.9, height: 0.22, colorA: "#7c2d12", colorB: "#9a3412", speed: 0.008 },
+      { y: -0.68, height: 0.18, colorA: "#c2410c", colorB: "#ea580c", speed: -0.012 },
+      { y: -0.5, height: 0.24, colorA: "#ea580c", colorB: "#d97706", speed: 0.015 },
+      { y: -0.26, height: 0.2, colorA: "#9a3412", colorB: "#7c2d12", speed: -0.01 },
+      { y: -0.06, height: 0.26, colorA: "#f97316", colorB: "#ea580c", speed: 0.02 }, // Equatorial Zone
+      { y: 0.2, height: 0.2, colorA: "#ea580c", colorB: "#c2410c", speed: -0.014 },
+      { y: 0.4, height: 0.22, colorA: "#ea580c", colorB: "#f97316", speed: 0.018 },
+      { y: 0.62, height: 0.18, colorA: "#9a3412", colorB: "#7c2d12", speed: -0.01 },
+      { y: 0.8, height: 0.22, colorA: "#7c2d12", colorB: "#431407", speed: 0.007 },
+    ];
+
+    const cyanBands = [
+      { y: -0.9, height: 0.22, colorA: "#082f49", colorB: "#0c4a6e", speed: 0.008 },
+      { y: -0.68, height: 0.18, colorA: "#0369a1", colorB: "#0284c7", speed: -0.012 },
+      { y: -0.5, height: 0.24, colorA: "#38bdf8", colorB: "#0284c7", speed: 0.015 },
+      { y: -0.26, height: 0.2, colorA: "#0c4a6e", colorB: "#082f49", speed: -0.01 },
+      { y: -0.06, height: 0.26, colorA: "#7dd3fc", colorB: "#38bdf8", speed: 0.02 }, // Equatorial Zone
+      { y: 0.2, height: 0.2, colorA: "#0284c7", colorB: "#0369a1", speed: -0.014 },
+      { y: 0.4, height: 0.22, colorA: "#38bdf8", colorB: "#0284c7", speed: 0.018 },
+      { y: 0.62, height: 0.18, colorA: "#0c4a6e", colorB: "#082f49", speed: -0.01 },
+      { y: 0.8, height: 0.22, colorA: "#082f49", colorB: "#0f172a", speed: 0.007 },
+    ];
+
     const render = () => {
       time += 0.015;
       ctx.clearRect(0, 0, width, height);
+
+      const activeTheme = (typeof document !== "undefined" && document.documentElement.getAttribute("data-theme")) || "dark";
+      const isCyan = activeTheme === "electric-cyan";
+      const isWarm = activeTheme === "light" || activeTheme === "warm-amber";
+      const isLight = isCyan || isWarm;
+      const bands = isCyan ? cyanBands : isWarm ? orangeBands : greenBands;
 
       // Smooth spring lerp to mouse tilt
       tiltX += (mousePos.x * 14 - tiltX) * 0.06;
@@ -80,10 +112,22 @@ export default function GreenJupiterPlanet() {
         currentCenterY,
         radius * 1.38
       );
-      glowGrad.addColorStop(0, "rgba(200, 255, 69, 0.28)");
-      glowGrad.addColorStop(0.35, "rgba(34, 211, 238, 0.18)");
-      glowGrad.addColorStop(0.7, "rgba(16, 185, 129, 0.09)");
-      glowGrad.addColorStop(1, "rgba(5, 8, 13, 0)");
+      if (isCyan) {
+        glowGrad.addColorStop(0, "rgba(2, 132, 199, 0.35)");
+        glowGrad.addColorStop(0.35, "rgba(56, 189, 248, 0.22)");
+        glowGrad.addColorStop(0.7, "rgba(5, 150, 105, 0.1)");
+        glowGrad.addColorStop(1, "rgba(248, 250, 252, 0)");
+      } else if (isWarm) {
+        glowGrad.addColorStop(0, "rgba(234, 88, 12, 0.35)");
+        glowGrad.addColorStop(0.35, "rgba(249, 115, 22, 0.22)");
+        glowGrad.addColorStop(0.7, "rgba(13, 148, 136, 0.1)");
+        glowGrad.addColorStop(1, "rgba(250, 248, 245, 0)");
+      } else {
+        glowGrad.addColorStop(0, "rgba(200, 255, 69, 0.28)");
+        glowGrad.addColorStop(0.35, "rgba(34, 211, 238, 0.18)");
+        glowGrad.addColorStop(0.7, "rgba(16, 185, 129, 0.09)");
+        glowGrad.addColorStop(1, "rgba(5, 8, 13, 0)");
+      }
 
       ctx.save();
       ctx.fillStyle = glowGrad;
@@ -101,11 +145,25 @@ export default function GreenJupiterPlanet() {
       ctx.arc(0, 0, radius * 1.58, Math.PI, 0, false); // top half (behind planet)
       ctx.lineWidth = 18;
       const ringBackGrad = ctx.createLinearGradient(-radius * 1.58, 0, radius * 1.58, 0);
-      ringBackGrad.addColorStop(0, "rgba(34, 211, 238, 0.1)");
-      ringBackGrad.addColorStop(0.5, "rgba(200, 255, 69, 0.4)");
-      ringBackGrad.addColorStop(1, "rgba(34, 211, 238, 0.1)");
-      ctx.strokeStyle = ringBackGrad;
-      ctx.shadowColor = "#C8FF45";
+      if (isCyan) {
+        ringBackGrad.addColorStop(0, "rgba(2, 132, 199, 0.1)");
+        ringBackGrad.addColorStop(0.5, "rgba(56, 189, 248, 0.45)");
+        ringBackGrad.addColorStop(1, "rgba(2, 132, 199, 0.1)");
+        ctx.strokeStyle = ringBackGrad;
+        ctx.shadowColor = "#0284C7";
+      } else if (isWarm) {
+        ringBackGrad.addColorStop(0, "rgba(234, 88, 12, 0.1)");
+        ringBackGrad.addColorStop(0.5, "rgba(249, 115, 22, 0.45)");
+        ringBackGrad.addColorStop(1, "rgba(234, 88, 12, 0.1)");
+        ctx.strokeStyle = ringBackGrad;
+        ctx.shadowColor = "#EA580C";
+      } else {
+        ringBackGrad.addColorStop(0, "rgba(34, 211, 238, 0.1)");
+        ringBackGrad.addColorStop(0.5, "rgba(200, 255, 69, 0.4)");
+        ringBackGrad.addColorStop(1, "rgba(34, 211, 238, 0.1)");
+        ctx.strokeStyle = ringBackGrad;
+        ctx.shadowColor = "#C8FF45";
+      }
       ctx.shadowBlur = 18;
       ctx.stroke();
 
@@ -113,7 +171,7 @@ export default function GreenJupiterPlanet() {
       ctx.beginPath();
       ctx.arc(0, 0, radius * 1.44, Math.PI, 0, false);
       ctx.lineWidth = 2.5;
-      ctx.strokeStyle = "rgba(200, 255, 69, 0.45)";
+      ctx.strokeStyle = isCyan ? "rgba(56, 189, 248, 0.45)" : isWarm ? "rgba(234, 88, 12, 0.45)" : "rgba(200, 255, 69, 0.45)";
       ctx.stroke();
 
       // ── Back Orbital Stardust Motes ──
@@ -156,9 +214,15 @@ export default function GreenJupiterPlanet() {
         currentCenterY,
         radius
       );
-      coreGrad.addColorStop(0, "#064e3b");
-      coreGrad.addColorStop(0.6, "#022c22");
-      coreGrad.addColorStop(1, "#011711");
+      if (isLight) {
+        coreGrad.addColorStop(0, "#c2410c");
+        coreGrad.addColorStop(0.6, "#7c2d12");
+        coreGrad.addColorStop(1, "#431407");
+      } else {
+        coreGrad.addColorStop(0, "#064e3b");
+        coreGrad.addColorStop(0.6, "#022c22");
+        coreGrad.addColorStop(1, "#011711");
+      }
       ctx.fillStyle = coreGrad;
       ctx.fillRect(currentCenterX - radius, currentCenterY - radius, radius * 2, radius * 2);
 
@@ -205,10 +269,14 @@ export default function GreenJupiterPlanet() {
 
       // ── Printed Code Line in Upper Atmospheric Zone ──
       ctx.font = "bold 9px 'Fira Code', monospace";
-      ctx.fillStyle = "rgba(200, 255, 69, 0.6)";
+      ctx.fillStyle = isCyan
+        ? "rgba(2, 132, 199, 0.85)"
+        : isWarm
+        ? "rgba(234, 88, 12, 0.85)"
+        : "rgba(200, 255, 69, 0.65)";
       ctx.fillText("// while(alive) { learn(); build(); improve(); }", currentCenterX - radius * 0.65, currentCenterY - radius * 0.45);
 
-      // ── 4. The Iconic "Great Green Storm Vortex" ──
+      // ── 4. The Iconic "Great Jupiter Storm Vortex" ──
       const stormX = currentCenterX + Math.cos(time * 0.35) * (radius * 0.42);
       const stormY = currentCenterY + radius * 0.26 + Math.sin(time * 0.35) * 5;
       const stormRadiusX = 36;
@@ -218,10 +286,22 @@ export default function GreenJupiterPlanet() {
       ctx.translate(stormX, stormY);
       ctx.rotate(-0.1);
       const stormGrad = ctx.createRadialGradient(0, 0, 3, 0, 0, stormRadiusX);
-      stormGrad.addColorStop(0, "#C8FF45"); // Eye of the storm
-      stormGrad.addColorStop(0.4, "#10b981");
-      stormGrad.addColorStop(0.8, "#047857");
-      stormGrad.addColorStop(1, "rgba(6, 78, 59, 0)");
+      if (isCyan) {
+        stormGrad.addColorStop(0, "#bae6fd"); // Eye of the storm
+        stormGrad.addColorStop(0.4, "#38bdf8");
+        stormGrad.addColorStop(0.8, "#0284c7");
+        stormGrad.addColorStop(1, "rgba(8, 47, 73, 0)");
+      } else if (isWarm) {
+        stormGrad.addColorStop(0, "#fed7aa"); // Eye of the storm
+        stormGrad.addColorStop(0.4, "#ea580c");
+        stormGrad.addColorStop(0.8, "#c2410c");
+        stormGrad.addColorStop(1, "rgba(124, 45, 18, 0)");
+      } else {
+        stormGrad.addColorStop(0, "#C8FF45"); // Eye of the storm
+        stormGrad.addColorStop(0.4, "#10b981");
+        stormGrad.addColorStop(0.8, "#047857");
+        stormGrad.addColorStop(1, "rgba(6, 78, 59, 0)");
+      }
 
       ctx.fillStyle = stormGrad;
       ctx.beginPath();
@@ -229,7 +309,11 @@ export default function GreenJupiterPlanet() {
       ctx.fill();
 
       // Swirling storm rings inside
-      ctx.strokeStyle = "rgba(200, 255, 69, 0.65)";
+      ctx.strokeStyle = isCyan
+        ? "rgba(56, 189, 248, 0.85)"
+        : isWarm
+        ? "rgba(234, 88, 12, 0.85)"
+        : "rgba(200, 255, 69, 0.65)";
       ctx.lineWidth = 1.6;
       ctx.beginPath();
       ctx.ellipse(0, 0, stormRadiusX * 0.65, stormRadiusY * 0.65, time * 2, 0, Math.PI * 2);
@@ -263,9 +347,19 @@ export default function GreenJupiterPlanet() {
         currentCenterY,
         radius
       );
-      limbGrad.addColorStop(0, "rgba(200, 255, 69, 0)");
-      limbGrad.addColorStop(0.85, "rgba(200, 255, 69, 0.3)");
-      limbGrad.addColorStop(1, "rgba(34, 211, 238, 0.75)"); // Emerald-cyan atmospheric edge
+      if (isCyan) {
+        limbGrad.addColorStop(0, "rgba(2, 132, 199, 0)");
+        limbGrad.addColorStop(0.85, "rgba(2, 132, 199, 0.35)");
+        limbGrad.addColorStop(1, "rgba(56, 189, 248, 0.75)");
+      } else if (isWarm) {
+        limbGrad.addColorStop(0, "rgba(234, 88, 12, 0)");
+        limbGrad.addColorStop(0.85, "rgba(234, 88, 12, 0.35)");
+        limbGrad.addColorStop(1, "rgba(249, 115, 22, 0.75)");
+      } else {
+        limbGrad.addColorStop(0, "rgba(200, 255, 69, 0)");
+        limbGrad.addColorStop(0.85, "rgba(200, 255, 69, 0.3)");
+        limbGrad.addColorStop(1, "rgba(34, 211, 238, 0.75)");
+      }
 
       ctx.fillStyle = limbGrad;
       ctx.beginPath();
@@ -283,11 +377,25 @@ export default function GreenJupiterPlanet() {
       ctx.arc(0, 0, radius * 1.58, 0, Math.PI, false); // bottom half (in front)
       ctx.lineWidth = 18;
       const ringFrontGrad = ctx.createLinearGradient(-radius * 1.58, 0, radius * 1.58, 0);
-      ringFrontGrad.addColorStop(0, "rgba(34, 211, 238, 0.25)");
-      ringFrontGrad.addColorStop(0.5, "rgba(200, 255, 69, 0.8)");
-      ringFrontGrad.addColorStop(1, "rgba(34, 211, 238, 0.25)");
-      ctx.strokeStyle = ringFrontGrad;
-      ctx.shadowColor = "#C8FF45";
+      if (isCyan) {
+        ringFrontGrad.addColorStop(0, "rgba(2, 132, 199, 0.25)");
+        ringFrontGrad.addColorStop(0.5, "rgba(56, 189, 248, 0.85)");
+        ringFrontGrad.addColorStop(1, "rgba(2, 132, 199, 0.25)");
+        ctx.strokeStyle = ringFrontGrad;
+        ctx.shadowColor = "#0284C7";
+      } else if (isWarm) {
+        ringFrontGrad.addColorStop(0, "rgba(234, 88, 12, 0.25)");
+        ringFrontGrad.addColorStop(0.5, "rgba(249, 115, 22, 0.85)");
+        ringFrontGrad.addColorStop(1, "rgba(234, 88, 12, 0.25)");
+        ctx.strokeStyle = ringFrontGrad;
+        ctx.shadowColor = "#EA580C";
+      } else {
+        ringFrontGrad.addColorStop(0, "rgba(34, 211, 238, 0.25)");
+        ringFrontGrad.addColorStop(0.5, "rgba(200, 255, 69, 0.8)");
+        ringFrontGrad.addColorStop(1, "rgba(34, 211, 238, 0.25)");
+        ctx.strokeStyle = ringFrontGrad;
+        ctx.shadowColor = "#C8FF45";
+      }
       ctx.shadowBlur = 22;
       ctx.stroke();
 
@@ -356,25 +464,90 @@ export default function GreenJupiterPlanet() {
         margin: "0 auto",
       }}
     >
-      {/* Canvas rendering the enlarged Green Jupiter gas giant with rotating rings */}
-      <canvas
-        ref={canvasRef}
-        style={{
-          width: "min(520px, 94vw)",
-          height: "min(520px, 94vw)",
-          display: "block",
-          filter: isHovered
-            ? "drop-shadow(0 0 45px rgba(200, 255, 69, 0.5))"
-            : "drop-shadow(0 0 30px rgba(200, 255, 69, 0.35))",
-          transition: "filter 0.3s ease",
-          zIndex: 1,
-        }}
-      />
-
-      {/* Center VP Core Emblem / Avatar Switcher */}
+      {/* ── Top Hero Mode Switcher: 🪐 Jupiter 3D | 👤 Vivek Hologram ── */}
       <div
-        onClick={toggleAvatarMode}
-        title="Jupiter Core • Click to toggle: Vivek Pawar 👤 ↔ Rock Lee 🍃"
+        style={{
+          position: "absolute",
+          top: -14,
+          zIndex: 10,
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          padding: "4px 8px",
+          borderRadius: "9999px",
+          background: "var(--bg-glass)",
+          border: "1px solid var(--border-lime)",
+          backdropFilter: "blur(14px)",
+          boxShadow: "0 8px 24px rgba(0, 0, 0, 0.8), 0 0 15px rgba(200, 255, 69, 0.2)",
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => setViewMode("jupiter")}
+          style={{
+            padding: "5px 14px",
+            borderRadius: "9999px",
+            border: "none",
+            background: viewMode === "jupiter" ? "var(--accent-lime)" : "transparent",
+            color: viewMode === "jupiter" ? "var(--text-on-accent)" : "var(--text-secondary)",
+            fontSize: "11px",
+            fontWeight: 800,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            transition: "all 0.2s ease",
+          }}
+        >
+          <span>🪐</span> 3D Jupiter
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setViewMode("hologram")}
+          style={{
+            padding: "5px 14px",
+            borderRadius: "9999px",
+            border: "none",
+            background: viewMode === "hologram" ? "var(--accent-lime)" : "transparent",
+            color: viewMode === "hologram" ? "var(--text-on-accent)" : "var(--text-secondary)",
+            fontSize: "11px",
+            fontWeight: 800,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            transition: "all 0.2s ease",
+          }}
+        >
+          <span>👤</span> Vivek Hologram
+        </button>
+      </div>
+
+      {viewMode === "hologram" ? (
+        <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <HolographicPortrait />
+        </div>
+      ) : (
+        <>
+          {/* Canvas rendering the enlarged Green Jupiter gas giant with rotating rings */}
+          <canvas
+            ref={canvasRef}
+            style={{
+              width: "min(520px, 94vw)",
+              height: "min(520px, 94vw)",
+              display: "block",
+              filter: isHovered
+                ? "drop-shadow(0 0 45px rgba(200, 255, 69, 0.5))"
+                : "drop-shadow(0 0 30px rgba(200, 255, 69, 0.35))",
+              transition: "filter 0.3s ease",
+              zIndex: 1,
+            }}
+          />
+
+      {/* Center VP Core Emblem */}
+      <div
+        title="Jupiter Core Planetary Emblem • VP"
         style={{
           position: "absolute",
           top: "50%",
@@ -383,19 +556,17 @@ export default function GreenJupiterPlanet() {
           width: 68,
           height: 68,
           borderRadius: "50%",
-          background: "rgba(5, 8, 13, 0.85)",
-          border: "2px solid rgba(200, 255, 69, 0.85)",
-          boxShadow: "0 0 30px rgba(200, 255, 69, 0.55), inset 0 0 18px rgba(34, 211, 238, 0.4)",
+          background: "var(--bg-glass)",
+          border: "2px solid var(--border-lime)",
+          boxShadow: "0 0 30px rgba(200, 255, 69, 0.4), inset 0 0 18px rgba(34, 211, 238, 0.4)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          cursor: "pointer",
           backdropFilter: "blur(8px)",
           zIndex: 3,
+          pointerEvents: "none",
           transition: "transform 0.25s ease, box-shadow 0.25s ease",
         }}
-        onMouseEnter={(e) => (e.currentTarget.style.transform = "translate(-50%, -50%) scale(1.1)")}
-        onMouseLeave={(e) => (e.currentTarget.style.transform = "translate(-50%, -50%) scale(1)")}
       >
         <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
           <path d="M8 12L18 30L23 20L15 12H8Z" fill="#22D3EE" />
@@ -408,7 +579,7 @@ export default function GreenJupiterPlanet() {
             bottom: -3,
             right: -3,
             fontSize: 11,
-            background: "#05080D",
+            background: "var(--input-bg)",
             borderRadius: "50%",
             width: 18,
             height: 18,
@@ -436,7 +607,7 @@ export default function GreenJupiterPlanet() {
           fontWeight: 700,
           color: "#F5F7FA",
           border: "1px solid rgba(255, 255, 255, 0.14)",
-          background: "rgba(11, 18, 28, 0.9)",
+          background: "var(--bg-card)",
           boxShadow: "0 8px 20px rgba(0, 0, 0, 0.6)",
           zIndex: 4,
           cursor: "default",
@@ -467,7 +638,7 @@ export default function GreenJupiterPlanet() {
           fontWeight: 700,
           color: "#F5F7FA",
           border: "1px solid rgba(255, 255, 255, 0.14)",
-          background: "rgba(11, 18, 28, 0.9)",
+          background: "var(--bg-card)",
           boxShadow: "0 8px 20px rgba(0, 0, 0, 0.6)",
           zIndex: 4,
           cursor: "default",
@@ -498,7 +669,7 @@ export default function GreenJupiterPlanet() {
           fontWeight: 700,
           color: "#F5F7FA",
           border: "1px solid rgba(255, 255, 255, 0.14)",
-          background: "rgba(11, 18, 28, 0.9)",
+          background: "var(--bg-card)",
           boxShadow: "0 8px 20px rgba(0, 0, 0, 0.6)",
           zIndex: 4,
           cursor: "default",
@@ -530,7 +701,7 @@ export default function GreenJupiterPlanet() {
           fontWeight: 700,
           color: "#F5F7FA",
           border: "1px solid rgba(255, 255, 255, 0.14)",
-          background: "rgba(11, 18, 28, 0.9)",
+          background: "var(--bg-card)",
           boxShadow: "0 8px 20px rgba(0, 0, 0, 0.6)",
           zIndex: 4,
           cursor: "default",
@@ -556,7 +727,7 @@ export default function GreenJupiterPlanet() {
           bottom: "-4%",
           right: "0%",
           width: "min(300px, 85vw)",
-          background: "rgba(11, 18, 28, 0.88)",
+          background: "var(--bg-card)",
           borderRadius: "12px",
           border: "1px solid rgba(200, 255, 69, 0.3)",
           boxShadow: "0 20px 45px rgba(0, 0, 0, 0.8), 0 0 20px rgba(200, 255, 69, 0.12)",
@@ -634,15 +805,15 @@ export default function GreenJupiterPlanet() {
           bottom: "-2%",
           left: "4%",
           width: 210,
-          background: "rgba(11, 18, 28, 0.92)",
-          border: "1px solid rgba(255, 255, 255, 0.12)",
+          background: "var(--bg-glass)",
+          border: "1px solid var(--border-subtle)",
           borderRadius: "10px",
           padding: "8px 12px",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           gap: 8,
-          boxShadow: "0 10px 25px rgba(0,0,0,0.6)",
+          boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
           zIndex: 5,
           textDecoration: "none",
           transition: "transform 0.2s ease, border-color 0.2s ease",
@@ -653,18 +824,20 @@ export default function GreenJupiterPlanet() {
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.transform = "translateY(0)";
-          e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.12)";
+          e.currentTarget.style.borderColor = "var(--border-subtle)";
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 16, color: "#f97316" }}>⚡</span>
-          <span style={{ fontSize: "11px", fontWeight: 700, color: "#F5F7FA", lineHeight: 1.3 }}>
+          <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-primary)", lineHeight: 1.3 }}>
             Turning ideas into <br />
             real products.
           </span>
         </div>
         <span style={{ color: "var(--accent-lime)", fontSize: "13px" }}>→</span>
       </Link>
+        </>
+      )}
     </div>
   );
 }

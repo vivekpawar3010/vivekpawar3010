@@ -1,13 +1,26 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&family=Fira+Code:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap');
 
-/* ─── Master Design System Tokens (Dark Futuristic Neon) ─────────────────── */
+/* ─── Unified Typography Tokens (From Screenshots) ────────────────────────── */
+:root {
+  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Fira Code', monospace;
+  --font-hand: 'Caveat', cursive;
+
+  --transition-fast: 0.18s ease;
+  --transition-normal: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─── 1. Cyber Dark Mode (High-Tech Futuristic Neon) ───────────────────────── */
 :root,
 [data-theme="dark"] {
+  --bg-base: #05080D;
   --bg-primary: #05080D;
   --bg-secondary: #0A1018;
+  --bg-surface: #0B121C;
   --bg-card: #0B121C;
   --bg-card-hover: #101926;
-  --bg-glass: rgba(11, 18, 28, 0.85);
+  --bg-glass: rgba(11, 18, 28, 0.88);
 
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-light: rgba(255, 255, 255, 0.14);
@@ -19,58 +32,211 @@
   --text-secondary: #A7B2C4;
   --text-muted: #64748B;
 
+  --accent-brand: #C8FF45;
   --accent-lime: #C8FF45;
   --accent-cyan: #22D3EE;
+  --accent-orange: #F97316;
+  --accent-secondary: #10B981;
+  --accent-highlight: #F59E0B;
   --accent-purple: #8B5CF6;
   --accent-emerald: #10B981;
   --accent-amber: #F59E0B;
   --accent-rose: #F43F5E;
+  --text-on-accent: #05080D;
+
+  --aura-glow-start: #C8FF45;
+  --aura-glow-end: #22D3EE;
+  --aura-glow: linear-gradient(135deg, #C8FF45 0%, #22D3EE 100%);
 
   --badge-bg: rgba(255, 255, 255, 0.05);
   --input-bg: #090E17;
   --nav-bg: rgba(5, 8, 13, 0.88);
   --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.65);
   --shadow-lime: 0 0 25px rgba(200, 255, 69, 0.35);
-
-  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'Fira Code', monospace;
-  --font-hand: 'Caveat', cursive;
-
-  --transition-fast: 0.18s ease;
-  --transition-normal: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ─── Light Theme Compatibility ───────────────────────────────────────────── */
-[data-theme="light"] {
-  --bg-primary: #F8FAFC;
-  --bg-secondary: #FFFFFF;
+/* ─── 2. Orange Dominant Mode (Pure Sunfire Orange & Warm Clean White) ────── */
+[data-theme="light"],
+[data-theme="warm-amber"] {
+  --bg-base: #FFFDF9;
+  --bg-primary: #FFFDF9;
+  --bg-secondary: #FFF7ED;
+  --bg-surface: #FFFFFF;
   --bg-card: #FFFFFF;
-  --bg-card-hover: #F1F5F9;
-  --bg-glass: rgba(255, 255, 255, 0.92);
+  --bg-card-hover: #FFF7ED;
+  --bg-glass: rgba(255, 255, 255, 0.94);
 
-  --border-subtle: rgba(0, 0, 0, 0.08);
-  --border-light: rgba(0, 0, 0, 0.14);
-  --border-cyan: rgba(2, 132, 199, 0.25);
-  --border-lime: rgba(101, 163, 13, 0.4);
-  --border-highlight: rgba(101, 163, 13, 0.5);
+  --border-subtle: rgba(234, 88, 12, 0.18);
+  --border-light: rgba(234, 88, 12, 0.28);
+  --border-cyan: rgba(234, 88, 12, 0.28);
+  --border-lime: rgba(234, 88, 12, 0.38);
+  --border-highlight: rgba(234, 88, 12, 0.7);
+
+  --text-primary: #111827;
+  --text-secondary: #4B5563;
+  --text-muted: #9CA3AF;
+
+  /* Strict Orange Dominance: All highlights & accents in Orange */
+  --accent-brand: #EA580C;
+  --accent-lime: #EA580C;
+  --accent-orange: #EA580C;
+  --accent-cyan: #EA580C;
+  --accent-secondary: #F97316;
+  --accent-highlight: #EA580C;
+  --accent-purple: #EA580C;
+  --accent-emerald: #EA580C;
+  --accent-amber: #EA580C;
+  --accent-rose: #EA580C;
+  --text-on-accent: #FFFFFF;
+
+  --aura-glow-start: #EA580C;
+  --aura-glow-end: #F97316;
+  --aura-glow: linear-gradient(135deg, #EA580C 0%, #F97316 100%);
+
+  --badge-bg: rgba(234, 88, 12, 0.08);
+  --input-bg: #FFFFFF;
+  --nav-bg: rgba(255, 253, 249, 0.92);
+  --shadow-card: 0 10px 30px -10px rgba(234, 88, 12, 0.1), 0 4px 14px rgba(17, 24, 39, 0.04);
+  --shadow-lime: 0 4px 20px rgba(234, 88, 12, 0.38);
+}
+
+[data-theme="light"] body,
+[data-theme="warm-amber"] body {
+  background-color: var(--bg-primary);
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(234, 88, 12, 0.07) 0%, transparent 45%),
+    radial-gradient(circle at 90% 80%, rgba(249, 115, 22, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(251, 146, 60, 0.04) 0%, transparent 50%);
+}
+
+[data-theme="light"] .btn-lime,
+[data-theme="warm-amber"] .btn-lime {
+  background: linear-gradient(135deg, #EA580C 0%, #F97316 100%) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 16px rgba(234, 88, 12, 0.35) !important;
+}
+
+[data-theme="light"] .btn-lime:hover,
+[data-theme="warm-amber"] .btn-lime:hover {
+  background: linear-gradient(135deg, #C2410C 0%, #EA580C 100%) !important;
+  box-shadow: 0 6px 24px rgba(234, 88, 12, 0.5) !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="light"] .btn-dark-pill,
+[data-theme="warm-amber"] .btn-dark-pill {
+  background: #FFFFFF;
+  color: var(--text-primary);
+  border: 1px solid rgba(234, 88, 12, 0.25);
+  box-shadow: 0 2px 8px rgba(234, 88, 12, 0.08);
+}
+
+[data-theme="light"] .btn-dark-pill:hover,
+[data-theme="warm-amber"] .btn-dark-pill:hover {
+  background: #FFF7ED;
+  border-color: #EA580C;
+  color: #EA580C;
+}
+
+[data-theme="light"] .glass-card,
+[data-theme="warm-amber"] .glass-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(234, 88, 12, 0.16);
+  box-shadow: 0 10px 30px -10px rgba(234, 88, 12, 0.08), 0 4px 14px rgba(17, 24, 39, 0.04);
+}
+
+[data-theme="light"] .glass-card:hover,
+[data-theme="warm-amber"] .glass-card:hover {
+  border-color: rgba(234, 88, 12, 0.45);
+  box-shadow: 0 16px 36px -8px rgba(234, 88, 12, 0.16), 0 0 20px rgba(234, 88, 12, 0.08);
+}
+
+/* ─── 3. Blue Dominant Mode (Pure Electric Cyan & Cool Clean Slate) ────────── */
+[data-theme="electric-cyan"] {
+  --bg-base: #F8FAFC;
+  --bg-primary: #F8FAFC;
+  --bg-secondary: #F0F9FF;
+  --bg-surface: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F0F9FF;
+  --bg-glass: rgba(255, 255, 255, 0.94);
+
+  --border-subtle: rgba(2, 132, 199, 0.18);
+  --border-light: rgba(2, 132, 199, 0.28);
+  --border-cyan: rgba(2, 132, 199, 0.28);
+  --border-lime: rgba(2, 132, 199, 0.38);
+  --border-highlight: rgba(2, 132, 199, 0.7);
 
   --text-primary: #0F172A;
-  --text-secondary: #334155;
-  --text-muted: #64748B;
+  --text-secondary: #64748B;
+  --text-muted: #94A3B8;
 
-  --accent-lime: #4D7C0F;
+  /* Strict Blue Dominance: All highlights & accents in Blue/Cyan */
+  --accent-brand: #0284C7;
+  --accent-lime: #0284C7;
+  --accent-orange: #0284C7;
   --accent-cyan: #0284C7;
-  --accent-purple: #7C3AED;
-  --accent-emerald: #059669;
-  --accent-amber: #D97706;
-  --accent-rose: #E11D48;
+  --accent-secondary: #38BDF8;
+  --accent-highlight: #0284C7;
+  --accent-purple: #0284C7;
+  --accent-emerald: #0284C7;
+  --accent-amber: #0284C7;
+  --accent-rose: #0284C7;
+  --text-on-accent: #FFFFFF;
 
-  --badge-bg: rgba(0, 0, 0, 0.04);
+  --aura-glow-start: #0284C7;
+  --aura-glow-end: #38BDF8;
+  --aura-glow: linear-gradient(135deg, #0284C7 0%, #38BDF8 100%);
+
+  --badge-bg: rgba(2, 132, 199, 0.08);
   --input-bg: #FFFFFF;
-  --nav-bg: rgba(255, 255, 255, 0.92);
-  --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
-  --shadow-lime: 0 0 20px rgba(101, 163, 13, 0.2);
+  --nav-bg: rgba(248, 250, 252, 0.92);
+  --shadow-card: 0 10px 30px -10px rgba(2, 132, 199, 0.1), 0 4px 14px rgba(15, 23, 42, 0.04);
+  --shadow-lime: 0 4px 20px rgba(2, 132, 199, 0.38);
+}
+
+[data-theme="electric-cyan"] body {
+  background-color: var(--bg-primary);
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(2, 132, 199, 0.07) 0%, transparent 45%),
+    radial-gradient(circle at 90% 80%, rgba(56, 189, 248, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(14, 165, 233, 0.04) 0%, transparent 50%);
+}
+
+[data-theme="electric-cyan"] .btn-lime {
+  background: linear-gradient(135deg, #0284C7 0%, #38BDF8 100%) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 16px rgba(2, 132, 199, 0.35) !important;
+}
+
+[data-theme="electric-cyan"] .btn-lime:hover {
+  background: linear-gradient(135deg, #0369A1 0%, #0284C7 100%) !important;
+  box-shadow: 0 6px 24px rgba(2, 132, 199, 0.5) !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="electric-cyan"] .btn-dark-pill {
+  background: #FFFFFF;
+  color: var(--text-primary);
+  border: 1px solid rgba(2, 132, 199, 0.25);
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.08);
+}
+
+[data-theme="electric-cyan"] .btn-dark-pill:hover {
+  background: #F0F9FF;
+  border-color: #0284C7;
+  color: #0284C7;
+}
+
+[data-theme="electric-cyan"] .glass-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(2, 132, 199, 0.16);
+  box-shadow: 0 10px 30px -10px rgba(2, 132, 199, 0.08), 0 4px 14px rgba(15, 23, 42, 0.04);
+}
+
+[data-theme="electric-cyan"] .glass-card:hover {
+  border-color: rgba(2, 132, 199, 0.45);
+  box-shadow: 0 16px 36px -8px rgba(2, 132, 199, 0.16), 0 0 20px rgba(2, 132, 199, 0.08);
 }
 
 * {
@@ -221,6 +387,36 @@ a {
   transform: translateY(-2px);
   box-shadow: 0 6px 24px rgba(200, 255, 69, 0.55);
   color: #05080D !important;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--accent-lime);
+  color: #05080D;
+  padding: 10px 22px;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.92rem;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 2px 14px rgba(200, 255, 69, 0.35);
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(200, 255, 69, 0.55);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent-lime) 0%, var(--accent-cyan) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
 }
 
 .btn-dark-pill {

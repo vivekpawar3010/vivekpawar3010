@@ -2,13 +2,40 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAvatarMode } from "../lib/useAvatarMode";
 
 export default function Navbar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [theme, setTheme] = useState("dark");
   const { currentSrc, toggleAvatarMode, isRockLee } = useAvatarMode();
+
+  useEffect(() => {
+    const saved = localStorage.getItem("portfolio_theme") || "dark";
+    setTheme(saved);
+    document.documentElement.setAttribute("data-theme", saved);
+  }, []);
+
+  const toggleTheme = () => {
+    // Cycles through: Cyber Dark -> Warm Amber (Palette 1) -> Electric Cyan (Palette 2)
+    let nextTheme = "light";
+    if (theme === "dark") nextTheme = "light";
+    else if (theme === "light") nextTheme = "electric-cyan";
+    else nextTheme = "dark";
+
+    setTheme(nextTheme);
+    localStorage.setItem("portfolio_theme", nextTheme);
+    document.documentElement.setAttribute("data-theme", nextTheme);
+    window.dispatchEvent(new Event("themechange"));
+  };
+
+  const themeMeta = {
+    dark: { icon: "🌙", label: "Dark", color: "var(--accent-brand)", bg: "rgba(255, 255, 255, 0.05)" },
+    light: { icon: "☀️", label: "Warm Amber", color: "#EA580C", bg: "rgba(234, 88, 12, 0.12)" },
+    "electric-cyan": { icon: "🌊", label: "Electric Cyan", color: "#0284C7", bg: "rgba(2, 132, 199, 0.12)" },
+  };
+  const activeMeta = themeMeta[theme] || themeMeta.dark;
 
   const navLinks = [
     { label: "About", href: "/about" },
@@ -44,25 +71,24 @@ export default function Navbar() {
           height: 72,
         }}
       >
-        {/* Brand / Logo merged with Home Button + Dual Profile Switcher */}
+        {/* Brand / Logo merged with Home Button */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          {/* VP Logo with Dual Avatar Switcher */}
-          <button
-            onClick={toggleAvatarMode}
-            type="button"
-            title={`Active: ${isRockLee ? "Rock Lee Avatar" : "Vivek Real Portrait"}. Click to toggle avatar!`}
+          {/* VP Brand Monogram Logo */}
+          <Link
+            href="/"
+            title="Vivek Pawar • Software Developer"
             style={{
               position: "relative",
               width: 40,
               height: 40,
               borderRadius: "10px",
               background: "linear-gradient(135deg, rgba(34, 211, 238, 0.15) 0%, rgba(200, 255, 69, 0.15) 100%)",
-              border: "1px solid rgba(200, 255, 69, 0.4)",
+              border: "1px solid var(--border-lime)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               cursor: "pointer",
-              boxShadow: "0 0 15px rgba(200, 255, 69, 0.2)",
+              boxShadow: "0 0 15px rgba(200, 255, 69, 0.15)",
               transition: "transform 0.2s ease, box-shadow 0.2s ease",
               padding: 0,
             }}
@@ -90,27 +116,7 @@ export default function Navbar() {
                 </linearGradient>
               </defs>
             </svg>
-
-            {/* Ninja/Real Avatar Toggle Indicator */}
-            <span
-              style={{
-                position: "absolute",
-                bottom: -4,
-                right: -4,
-                width: 16,
-                height: 16,
-                borderRadius: "50%",
-                background: "#05080D",
-                border: "1px solid var(--border-subtle)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 9,
-              }}
-            >
-              {isRockLee ? "🍃" : "👤"}
-            </span>
-          </button>
+          </Link>
 
           {/* Merged Home Link with active indicator */}
           <Link
@@ -132,7 +138,7 @@ export default function Navbar() {
               style={{
                 fontSize: "1.15rem",
                 fontWeight: 800,
-                color: pathname === "/" ? "var(--accent-lime)" : "#F5F7FA",
+                color: pathname === "/" ? "var(--accent-lime)" : "var(--text-primary)",
                 letterSpacing: "-0.01em",
               }}
             >
@@ -272,6 +278,36 @@ export default function Navbar() {
             <span>GitHub</span>
           </Link>
 
+          {/* Single Icon Theme Switcher */}
+          <button
+            onClick={toggleTheme}
+            type="button"
+            aria-label="Change Color Theme"
+            style={{
+              width: 38,
+              height: 38,
+              borderRadius: "50%",
+              background: "var(--bg-card)",
+              border: "1px solid var(--border-subtle)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 17,
+              cursor: "pointer",
+              transition: "transform 0.2s ease, border-color 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "scale(1.08)";
+              e.currentTarget.style.borderColor = "var(--accent-lime)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "scale(1)";
+              e.currentTarget.style.borderColor = "var(--border-subtle)";
+            }}
+          >
+            <span>{theme === "light" ? "☀️" : theme === "electric-cyan" ? "🌊" : "🌙"}</span>
+          </button>
+
           {/* Let's Talk Button */}
           <Link href="/contact" className="btn-lime" style={{ padding: "8px 18px", fontSize: "0.88rem" }}>
             Let&apos;s Talk <span>→</span>
@@ -302,7 +338,7 @@ export default function Navbar() {
       {mobileOpen && (
         <div
           style={{
-            background: "rgba(5, 8, 13, 0.98)",
+            background: "var(--bg-card)",
             borderBottom: "1px solid var(--border-subtle)",
             padding: "1rem 1.25rem 1.5rem",
             display: "flex",
@@ -311,6 +347,28 @@ export default function Navbar() {
           }}
           className="mobile-drawer"
         >
+          {/* Mobile Theme Switcher */}
+          <button
+            onClick={toggleTheme}
+            type="button"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "10px 14px",
+              borderRadius: 8,
+              fontSize: "0.92rem",
+              fontWeight: 700,
+              background: theme === "light" ? "rgba(255, 107, 0, 0.12)" : "rgba(255, 255, 255, 0.05)",
+              border: theme === "light" ? "1px solid rgba(255, 107, 0, 0.4)" : "1px solid var(--border-subtle)",
+              color: theme === "light" ? "#FF6B00" : "var(--accent-lime)",
+              cursor: "pointer",
+              marginBottom: 4,
+            }}
+          >
+            <span>Theme Mode</span>
+            <span>{theme === "light" ? "☀️ Sunfire Light (White & Orange)" : "🌙 Cyber Dark"}</span>
+          </button>
           {/* Custom Profile Links in Mobile */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 4 }}>
             <Link
@@ -354,6 +412,27 @@ export default function Navbar() {
               <span>🐙</span> GitHub Profile
             </Link>
           </div>
+
+          <button
+            onClick={toggleTheme}
+            type="button"
+            aria-label="Change Color Theme"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              padding: "10px",
+              borderRadius: 8,
+              background: "var(--bg-card)",
+              border: "1px solid var(--border-subtle)",
+              color: "var(--text-primary)",
+              fontSize: "1.2rem",
+              cursor: "pointer",
+            }}
+          >
+            <span>{theme === "light" ? "☀️" : theme === "electric-cyan" ? "🌊" : "🌙"}</span>
+          </button>
 
           <Link
             href="/"

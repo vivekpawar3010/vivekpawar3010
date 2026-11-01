@@ -17,7 +17,7 @@ export default function Experience() {
             fontSize: "clamp(2.4rem, 5vw, 3.8rem)",
             marginBottom: "0.75rem",
             fontWeight: 900,
-            color: "#F5F7FA",
+            color: "var(--text-primary)",
             letterSpacing: "-0.02em",
           }}
         >
@@ -48,23 +48,23 @@ export default function Experience() {
             alignItems: "center",
             justifyContent: "space-between",
             textDecoration: "none",
-            border: "1px solid rgba(245, 158, 11, 0.35)",
-            background: "radial-gradient(circle at 100% 50%, rgba(245, 158, 11, 0.12) 0%, rgba(11, 18, 28, 0.95) 70%)",
+            border: "1px solid var(--border-subtle)",
+            background: "var(--bg-card)",
             boxShadow: "0 0 20px rgba(245, 158, 11, 0.1)",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <span style={{ fontSize: 32 }}>⚡</span>
             <div>
-              <div style={{ fontSize: "1.1rem", fontWeight: 800, color: "#F5F7FA" }}>
+              <div style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--text-primary)" }}>
                 LeetCode Custom Profile
               </div>
-              <div style={{ fontSize: "0.82rem", color: "#fbbf24", fontWeight: 600, marginTop: 2 }}>
+              <div style={{ fontSize: "0.82rem", color: "var(--accent-lime)", fontWeight: 600, marginTop: 2 }}>
                 500+ Solved • Rating ~1718 • Badges &amp; Contests
               </div>
             </div>
           </div>
-          <span style={{ color: "#fbbf24", fontSize: 18, fontWeight: 800 }}>→</span>
+          <span style={{ color: "var(--accent-lime)", fontSize: 18, fontWeight: 800 }}>→</span>
         </Link>
 
         {/* GitHub Custom Profile Card */}
@@ -78,23 +78,23 @@ export default function Experience() {
             alignItems: "center",
             justifyContent: "space-between",
             textDecoration: "none",
-            border: "1px solid rgba(34, 211, 238, 0.35)",
-            background: "radial-gradient(circle at 100% 50%, rgba(34, 211, 238, 0.12) 0%, rgba(11, 18, 28, 0.95) 70%)",
+            border: "1px solid var(--border-subtle)",
+            background: "var(--bg-card)",
             boxShadow: "0 0 20px rgba(34, 211, 238, 0.1)",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <span style={{ fontSize: 32 }}>🐙</span>
             <div>
-              <div style={{ fontSize: "1.1rem", fontWeight: 800, color: "#F5F7FA" }}>
+              <div style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--text-primary)" }}>
                 GitHub Custom Profile
               </div>
-              <div style={{ fontSize: "0.82rem", color: "#22D3EE", fontWeight: 600, marginTop: 2 }}>
+              <div style={{ fontSize: "0.82rem", color: "var(--accent-lime)", fontWeight: 600, marginTop: 2 }}>
                 Live Commits • Pull Requests • Repository Analytics
               </div>
             </div>
           </div>
-          <span style={{ color: "#22D3EE", fontSize: 18, fontWeight: 800 }}>→</span>
+          <span style={{ color: "var(--accent-lime)", fontSize: 18, fontWeight: 800 }}>→</span>
         </Link>
       </div>
 
@@ -102,7 +102,7 @@ export default function Experience() {
       <div style={{ marginBottom: "3.5rem" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: "1.5rem" }}>
           <span style={{ fontSize: 24 }}>💼</span>
-          <h2 style={{ fontSize: "1.5rem", margin: 0, fontWeight: 800, color: "#F5F7FA" }}>
+          <h2 style={{ fontSize: "1.5rem", margin: 0, fontWeight: 800, color: "var(--text-primary)" }}>
             Industry <span style={{ color: "var(--accent-lime)" }}>Internships</span>
           </h2>
         </div>
@@ -116,7 +116,7 @@ export default function Experience() {
                 padding: "2rem",
                 borderRadius: 14,
                 borderLeft: "4px solid var(--accent-lime)",
-                background: "rgba(11, 18, 28, 0.85)",
+                background: "var(--bg-card)",
               }}
             >
               <div
@@ -147,10 +147,10 @@ export default function Experience() {
                       {internship.icon}
                     </div>
                     <div>
-                      <h3 style={{ fontSize: "1.3rem", margin: 0, fontWeight: 800, color: "#F5F7FA" }}>
+                      <h3 style={{ fontSize: "1.3rem", margin: 0, fontWeight: 800, color: "var(--text-primary)" }}>
                         {internship.role}
                       </h3>
-                      <div style={{ fontSize: "0.92rem", color: "#22D3EE", fontWeight: 600 }}>
+                      <div style={{ fontSize: "0.92rem", color: "var(--accent-lime)", fontWeight: 600 }}>
                         {internship.company} · {internship.location}
                       </div>
                     </div>
@@ -198,7 +198,7 @@ export default function Experience() {
                       border: "1px solid var(--border-subtle)",
                       borderRadius: 6,
                       padding: "3px 10px",
-                      color: "#F5F7FA",
+                      color: "var(--text-primary)",
                     }}
                   >
                     {t}
@@ -214,7 +214,7 @@ export default function Experience() {
       <div style={{ marginBottom: "3.5rem" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: "1.5rem" }}>
           <span style={{ fontSize: 24 }}>🏆</span>
-          <h2 style={{ fontSize: "1.5rem", margin: 0, fontWeight: 800, color: "#F5F7FA" }}>
+          <h2 style={{ fontSize: "1.5rem", margin: 0, fontWeight: 800, color: "var(--text-primary)" }}>
             Career <span style={{ color: "var(--accent-lime)" }}>Achievements</span>
           </h2>
         </div>
@@ -234,7 +234,7 @@ export default function Experience() {
                 padding: "1.6rem",
                 borderRadius: 14,
                 border: "1px solid var(--border-subtle)",
-                background: "rgba(11, 18, 28, 0.85)",
+                background: "var(--bg-card)",
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
@@ -253,10 +253,10 @@ export default function Experience() {
                   {item.badge}
                 </span>
               </div>
-              <h3 style={{ fontSize: "1.15rem", fontWeight: 800, margin: "0 0 4px", color: "#F5F7FA" }}>
+              <h3 style={{ fontSize: "1.15rem", fontWeight: 800, margin: "0 0 4px", color: "var(--text-primary)" }}>
                 {item.title}
               </h3>
-              <div style={{ fontSize: "0.85rem", color: "#22D3EE", fontWeight: 600, marginBottom: 8 }}>
+              <div style={{ fontSize: "0.85rem", color: "var(--accent-lime)", fontWeight: 600, marginBottom: 8 }}>
                 {item.subtitle}
               </div>
               <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.5, margin: 0 }}>

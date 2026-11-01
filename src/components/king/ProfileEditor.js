@@ -164,43 +164,47 @@ export default function ProfileEditor() {
               />
             </div>
 
-            {/* Quick Presets */}
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {/* Quick Presets & Admin Avatar Master Controller */}
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
               <button
                 type="button"
-                onClick={() =>
-                  setProfile((prev) => ({ ...prev, avatarUrl: "/images/vivek-profile-photo.png" }))
-                }
+                onClick={() => {
+                  localStorage.setItem("portfolio_avatar_mode", "real");
+                  window.dispatchEvent(new CustomEvent("portfolio_avatar_changed", { detail: { mode: "real" } }));
+                  setProfile((prev) => ({ ...prev, avatarUrl: "/images/vivek-profile-photo.png" }));
+                }}
                 style={{
                   fontSize: "0.8rem",
-                  padding: "4px 10px",
+                  padding: "5px 12px",
                   borderRadius: 6,
-                  border: "1px solid rgba(132, 204, 22, 0.35)",
-                  background: "rgba(132, 204, 22, 0.12)",
-                  color: "#84cc16",
+                  border: "1px solid var(--border-lime)",
+                  background: "rgba(200, 255, 69, 0.15)",
+                  color: "var(--accent-lime)",
                   cursor: "pointer",
-                  fontWeight: 600,
+                  fontWeight: 700,
                 }}
               >
-                👤 Vivek Real Photo (Local)
+                👤 Vivek Real Portrait (Active)
               </button>
               <button
                 type="button"
-                onClick={() =>
-                  setProfile((prev) => ({ ...prev, avatarUrl: "/images/avatar.png" }))
-                }
+                onClick={() => {
+                  localStorage.setItem("portfolio_avatar_mode", "rocklee");
+                  window.dispatchEvent(new CustomEvent("portfolio_avatar_changed", { detail: { mode: "rocklee" } }));
+                  setProfile((prev) => ({ ...prev, avatarUrl: "/images/avatar.png" }));
+                }}
                 style={{
                   fontSize: "0.8rem",
-                  padding: "4px 10px",
+                  padding: "5px 12px",
                   borderRadius: 6,
                   border: "1px solid rgba(56, 189, 248, 0.3)",
                   background: "rgba(56, 189, 248, 0.12)",
                   color: "var(--accent-cyan)",
                   cursor: "pointer",
-                  fontWeight: 600,
+                  fontWeight: 700,
                 }}
               >
-                🍃 Rock Lee Avatar (Local)
+                🍃 Rock Lee Avatar
               </button>
               <button
                 type="button"

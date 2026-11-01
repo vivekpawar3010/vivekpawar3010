@@ -58,8 +58,8 @@ export default function Interactive3DBackground() {
       isGreen: Math.random() > 0.65,
     }));
 
-    // ── Background Green Jupiter Atmospheric Bands ──
-    const bands = [
+    // ── Background Green Jupiter Atmospheric Bands (Green in dark mode, Sunfire Orange in light mode) ──
+    const greenBands = [
       { y: -0.9, height: 0.22, colorA: "#041f12", colorB: "#06381e", speed: 0.006 },
       { y: -0.68, height: 0.18, colorA: "#0a4527", colorB: "#0f6137", speed: -0.009 },
       { y: -0.5, height: 0.24, colorA: "#10b981", colorB: "#047857", speed: 0.012 },
@@ -69,6 +69,30 @@ export default function Interactive3DBackground() {
       { y: 0.4, height: 0.22, colorA: "#10b981", colorB: "#34d399", speed: 0.013 },
       { y: 0.62, height: 0.18, colorA: "#044e31", colorB: "#022c22", speed: -0.008 },
       { y: 0.8, height: 0.22, colorA: "#022c22", colorB: "#041f12", speed: 0.005 },
+    ];
+
+    const orangeBands = [
+      { y: -0.9, height: 0.22, colorA: "#7c2d12", colorB: "#9a3412", speed: 0.006 },
+      { y: -0.68, height: 0.18, colorA: "#c2410c", colorB: "#ea580c", speed: -0.009 },
+      { y: -0.5, height: 0.24, colorA: "#ea580c", colorB: "#d97706", speed: 0.012 },
+      { y: -0.26, height: 0.2, colorA: "#9a3412", colorB: "#7c2d12", speed: -0.008 },
+      { y: -0.06, height: 0.26, colorA: "#f97316", colorB: "#ea580c", speed: 0.015 }, // Equator
+      { y: 0.2, height: 0.2, colorA: "#ea580c", colorB: "#c2410c", speed: -0.01 },
+      { y: 0.4, height: 0.22, colorA: "#ea580c", colorB: "#f97316", speed: 0.013 },
+      { y: 0.62, height: 0.18, colorA: "#9a3412", colorB: "#7c2d12", speed: -0.008 },
+      { y: 0.8, height: 0.22, colorA: "#7c2d12", colorB: "#431407", speed: 0.005 },
+    ];
+
+    const cyanBands = [
+      { y: -0.9, height: 0.22, colorA: "#082f49", colorB: "#0c4a6e", speed: 0.006 },
+      { y: -0.68, height: 0.18, colorA: "#0369a1", colorB: "#0284c7", speed: -0.009 },
+      { y: -0.5, height: 0.24, colorA: "#38bdf8", colorB: "#0284c7", speed: 0.012 },
+      { y: -0.26, height: 0.2, colorA: "#0c4a6e", colorB: "#082f49", speed: -0.008 },
+      { y: -0.06, height: 0.26, colorA: "#7dd3fc", colorB: "#38bdf8", speed: 0.015 }, // Equator
+      { y: 0.2, height: 0.2, colorA: "#0284c7", colorB: "#0369a1", speed: -0.01 },
+      { y: 0.4, height: 0.22, colorA: "#38bdf8", colorB: "#0284c7", speed: 0.013 },
+      { y: 0.62, height: 0.18, colorA: "#0c4a6e", colorB: "#082f49", speed: -0.008 },
+      { y: 0.8, height: 0.22, colorA: "#082f49", colorB: "#0f172a", speed: 0.005 },
     ];
 
     let time = 0;
@@ -81,15 +105,31 @@ export default function Interactive3DBackground() {
       tiltX += (targetTiltX - tiltX) * 0.04;
       tiltY += (targetTiltY - tiltY) * 0.04;
 
+      const activeTheme = (typeof document !== "undefined" && document.documentElement.getAttribute("data-theme")) || "dark";
+      const isCyan = activeTheme === "electric-cyan";
+      const isWarm = activeTheme === "light" || activeTheme === "warm-amber";
+      const isLight = isCyan || isWarm;
+      const bands = isCyan ? cyanBands : isWarm ? orangeBands : greenBands;
+
       // ── 1. Cosmic Stars & Stardust ──
       for (let i = 0; i < stars.length; i++) {
         const s = stars[i];
         const pulse = Math.sin(time * 2 + s.phase) * 0.3 + 0.7;
         const currentAlpha = Math.min(1, Math.max(0.1, s.alpha * pulse));
 
-        ctx.fillStyle = s.isGreen
-          ? `rgba(200, 255, 69, ${currentAlpha})`
-          : `rgba(255, 255, 255, ${currentAlpha})`;
+        if (isCyan) {
+          ctx.fillStyle = s.isGreen
+            ? `rgba(2, 132, 199, ${currentAlpha * 0.65})`
+            : `rgba(56, 189, 248, ${currentAlpha * 0.45})`;
+        } else if (isWarm) {
+          ctx.fillStyle = s.isGreen
+            ? `rgba(234, 88, 12, ${currentAlpha * 0.65})`
+            : `rgba(13, 148, 136, ${currentAlpha * 0.45})`;
+        } else {
+          ctx.fillStyle = s.isGreen
+            ? `rgba(200, 255, 69, ${currentAlpha})`
+            : `rgba(255, 255, 255, ${currentAlpha})`;
+        }
         ctx.beginPath();
         // Subtle parallax on stars
         const starX = (s.x + tiltX * 0.4 + width) % width;
@@ -133,10 +173,17 @@ export default function Interactive3DBackground() {
         jupiterY,
         jupiterR * 1.55
       );
-      corona.addColorStop(0, "rgba(200, 255, 69, 0.25)");
-      corona.addColorStop(0.35, "rgba(34, 211, 238, 0.16)");
-      corona.addColorStop(0.7, "rgba(16, 185, 129, 0.08)");
-      corona.addColorStop(1, "rgba(5, 8, 13, 0)");
+      if (isLight) {
+        corona.addColorStop(0, "rgba(255, 107, 0, 0.22)");
+        corona.addColorStop(0.35, "rgba(251, 146, 60, 0.14)");
+        corona.addColorStop(0.7, "rgba(2, 132, 199, 0.08)");
+        corona.addColorStop(1, "rgba(255, 253, 249, 0)");
+      } else {
+        corona.addColorStop(0, "rgba(200, 255, 69, 0.25)");
+        corona.addColorStop(0.35, "rgba(34, 211, 238, 0.16)");
+        corona.addColorStop(0.7, "rgba(16, 185, 129, 0.08)");
+        corona.addColorStop(1, "rgba(5, 8, 13, 0)");
+      }
 
       ctx.fillStyle = corona;
       ctx.beginPath();
@@ -154,11 +201,25 @@ export default function Interactive3DBackground() {
       ctx.arc(0, 0, jupiterR * 1.7, Math.PI, 0, false);
       ctx.lineWidth = 18;
       const backRingGrad = ctx.createLinearGradient(-jupiterR * 1.7, 0, jupiterR * 1.7, 0);
-      backRingGrad.addColorStop(0, "rgba(34, 211, 238, 0.1)");
-      backRingGrad.addColorStop(0.5, "rgba(200, 255, 69, 0.4)");
-      backRingGrad.addColorStop(1, "rgba(34, 211, 238, 0.1)");
-      ctx.strokeStyle = backRingGrad;
-      ctx.shadowColor = "#C8FF45";
+      if (isCyan) {
+        backRingGrad.addColorStop(0, "rgba(2, 132, 199, 0.1)");
+        backRingGrad.addColorStop(0.5, "rgba(56, 189, 248, 0.45)");
+        backRingGrad.addColorStop(1, "rgba(2, 132, 199, 0.1)");
+        ctx.strokeStyle = backRingGrad;
+        ctx.shadowColor = "#0284C7";
+      } else if (isWarm) {
+        backRingGrad.addColorStop(0, "rgba(234, 88, 12, 0.1)");
+        backRingGrad.addColorStop(0.5, "rgba(249, 115, 22, 0.45)");
+        backRingGrad.addColorStop(1, "rgba(234, 88, 12, 0.1)");
+        ctx.strokeStyle = backRingGrad;
+        ctx.shadowColor = "#EA580C";
+      } else {
+        backRingGrad.addColorStop(0, "rgba(34, 211, 238, 0.1)");
+        backRingGrad.addColorStop(0.5, "rgba(200, 255, 69, 0.4)");
+        backRingGrad.addColorStop(1, "rgba(34, 211, 238, 0.1)");
+        ctx.strokeStyle = backRingGrad;
+        ctx.shadowColor = "#C8FF45";
+      }
       ctx.shadowBlur = 16;
       ctx.stroke();
 
@@ -166,7 +227,7 @@ export default function Interactive3DBackground() {
       ctx.beginPath();
       ctx.arc(0, 0, jupiterR * 1.5, Math.PI, 0, false);
       ctx.lineWidth = 2.5;
-      ctx.strokeStyle = "rgba(200, 255, 69, 0.45)";
+      ctx.strokeStyle = isCyan ? "rgba(56, 189, 248, 0.45)" : isWarm ? "rgba(234, 88, 12, 0.45)" : "rgba(200, 255, 69, 0.45)";
       ctx.stroke();
       ctx.restore();
 
@@ -176,7 +237,7 @@ export default function Interactive3DBackground() {
       ctx.arc(jupiterX, jupiterY, jupiterR, 0, Math.PI * 2);
       ctx.clip();
 
-      // Deep obsidian green base sphere
+      // Base sphere gradient (Green/Obsidian in dark mode, Sunfire Orange in light mode)
       const baseGrad = ctx.createRadialGradient(
         jupiterX - jupiterR * 0.35,
         jupiterY - jupiterR * 0.35,
@@ -185,9 +246,15 @@ export default function Interactive3DBackground() {
         jupiterY,
         jupiterR
       );
-      baseGrad.addColorStop(0, "#0b4226");
-      baseGrad.addColorStop(0.7, "#042013");
-      baseGrad.addColorStop(1, "#020f09");
+      if (isLight) {
+        baseGrad.addColorStop(0, "#c2410c");
+        baseGrad.addColorStop(0.7, "#7c2d12");
+        baseGrad.addColorStop(1, "#431407");
+      } else {
+        baseGrad.addColorStop(0, "#0b4226");
+        baseGrad.addColorStop(0.7, "#042013");
+        baseGrad.addColorStop(1, "#020f09");
+      }
       ctx.fillStyle = baseGrad;
       ctx.fillRect(jupiterX - jupiterR, jupiterY - jupiterR, jupiterR * 2, jupiterR * 2);
 
@@ -248,10 +315,17 @@ export default function Interactive3DBackground() {
       ctx.scale(1.4, 0.7);
 
       const stormGrad = ctx.createRadialGradient(0, 0, 2, 0, 0, stormRad);
-      stormGrad.addColorStop(0, "#C8FF45");
-      stormGrad.addColorStop(0.4, "#10B981");
-      stormGrad.addColorStop(0.75, "#064E3B");
-      stormGrad.addColorStop(1, "rgba(4, 32, 19, 0)");
+      if (isLight) {
+        stormGrad.addColorStop(0, "#fed7aa");
+        stormGrad.addColorStop(0.4, "#f97316");
+        stormGrad.addColorStop(0.75, "#c2410c");
+        stormGrad.addColorStop(1, "rgba(124, 45, 18, 0)");
+      } else {
+        stormGrad.addColorStop(0, "#C8FF45");
+        stormGrad.addColorStop(0.4, "#10B981");
+        stormGrad.addColorStop(0.75, "#064E3B");
+        stormGrad.addColorStop(1, "rgba(4, 32, 19, 0)");
+      }
 
       ctx.fillStyle = stormGrad;
       ctx.beginPath();
@@ -259,7 +333,7 @@ export default function Interactive3DBackground() {
       ctx.fill();
 
       // Concentric eye rings
-      ctx.strokeStyle = "rgba(200, 255, 69, 0.45)";
+      ctx.strokeStyle = isLight ? "rgba(255, 107, 0, 0.55)" : "rgba(200, 255, 69, 0.45)";
       ctx.lineWidth = 1.8;
       ctx.beginPath();
       ctx.arc(0, 0, stormRad * 0.65, 0, Math.PI * 2);
@@ -296,9 +370,19 @@ export default function Interactive3DBackground() {
         jupiterY,
         jupiterR
       );
-      limbGrad.addColorStop(0, "rgba(200, 255, 69, 0)");
-      limbGrad.addColorStop(0.75, "rgba(200, 255, 69, 0.35)");
-      limbGrad.addColorStop(1, "rgba(34, 211, 238, 0.65)");
+      if (isCyan) {
+        limbGrad.addColorStop(0, "rgba(2, 132, 199, 0)");
+        limbGrad.addColorStop(0.75, "rgba(2, 132, 199, 0.35)");
+        limbGrad.addColorStop(1, "rgba(56, 189, 248, 0.75)");
+      } else if (isWarm) {
+        limbGrad.addColorStop(0, "rgba(234, 88, 12, 0)");
+        limbGrad.addColorStop(0.75, "rgba(234, 88, 12, 0.35)");
+        limbGrad.addColorStop(1, "rgba(249, 115, 22, 0.75)");
+      } else {
+        limbGrad.addColorStop(0, "rgba(200, 255, 69, 0)");
+        limbGrad.addColorStop(0.75, "rgba(200, 255, 69, 0.35)");
+        limbGrad.addColorStop(1, "rgba(34, 211, 238, 0.65)");
+      }
 
       ctx.fillStyle = limbGrad;
       ctx.fillRect(jupiterX - jupiterR, jupiterY - jupiterR, jupiterR * 2, jupiterR * 2);
@@ -314,11 +398,25 @@ export default function Interactive3DBackground() {
       ctx.arc(0, 0, jupiterR * 1.7, 0, Math.PI, false); // bottom half (front of planet)
       ctx.lineWidth = 18;
       const frontRingGrad = ctx.createLinearGradient(-jupiterR * 1.7, 0, jupiterR * 1.7, 0);
-      frontRingGrad.addColorStop(0, "rgba(34, 211, 238, 0.3)");
-      frontRingGrad.addColorStop(0.5, "rgba(200, 255, 69, 0.85)");
-      frontRingGrad.addColorStop(1, "rgba(34, 211, 238, 0.3)");
-      ctx.strokeStyle = frontRingGrad;
-      ctx.shadowColor = "#C8FF45";
+      if (isCyan) {
+        frontRingGrad.addColorStop(0, "rgba(2, 132, 199, 0.3)");
+        frontRingGrad.addColorStop(0.5, "rgba(56, 189, 248, 0.85)");
+        frontRingGrad.addColorStop(1, "rgba(2, 132, 199, 0.3)");
+        ctx.strokeStyle = frontRingGrad;
+        ctx.shadowColor = "#0284C7";
+      } else if (isWarm) {
+        frontRingGrad.addColorStop(0, "rgba(234, 88, 12, 0.3)");
+        frontRingGrad.addColorStop(0.5, "rgba(249, 115, 22, 0.85)");
+        frontRingGrad.addColorStop(1, "rgba(234, 88, 12, 0.3)");
+        ctx.strokeStyle = frontRingGrad;
+        ctx.shadowColor = "#EA580C";
+      } else {
+        frontRingGrad.addColorStop(0, "rgba(34, 211, 238, 0.3)");
+        frontRingGrad.addColorStop(0.5, "rgba(200, 255, 69, 0.85)");
+        frontRingGrad.addColorStop(1, "rgba(34, 211, 238, 0.3)");
+        ctx.strokeStyle = frontRingGrad;
+        ctx.shadowColor = "#C8FF45";
+      }
       ctx.shadowBlur = 24;
       ctx.stroke();
 
@@ -326,7 +424,7 @@ export default function Interactive3DBackground() {
       ctx.beginPath();
       ctx.arc(0, 0, jupiterR * 1.5, 0, Math.PI, false);
       ctx.lineWidth = 3;
-      ctx.strokeStyle = "rgba(200, 255, 69, 0.75)";
+      ctx.strokeStyle = isCyan ? "rgba(56, 189, 248, 0.75)" : isWarm ? "rgba(234, 88, 12, 0.75)" : "rgba(200, 255, 69, 0.75)";
       ctx.stroke();
       ctx.restore();
 

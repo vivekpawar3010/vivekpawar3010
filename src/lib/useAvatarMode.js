@@ -3,11 +3,11 @@
 import { useState, useEffect, useCallback } from "react";
 
 export function useAvatarMode(dynamicAvatarUrl) {
-  const [avatarMode, setAvatarMode] = useState("rocklee"); // "real" | "rocklee"
+  const [avatarMode, setAvatarMode] = useState("real"); // "real" | "rocklee"
 
   useEffect(() => {
-    // Read saved preference or default to rocklee
-    const saved = typeof window !== "undefined" ? localStorage.getItem("portfolio_avatar_mode") : null;
+    // Read saved preference set by Admin, default to real portrait
+    const saved = typeof window !== "undefined" ? (localStorage.getItem("portfolio_avatar_mode") || "real") : "real";
     if (saved === "real" || saved === "rocklee") {
       setAvatarMode(saved);
     }

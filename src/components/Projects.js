@@ -95,7 +95,7 @@ export default function Projects() {
               fontWeight: 900,
               lineHeight: 1.15,
               marginBottom: "1.2rem",
-              color: "#F5F7FA",
+              color: "var(--text-primary)",
               letterSpacing: "-0.02em",
             }}
           >
@@ -131,10 +131,10 @@ export default function Projects() {
                   gap: 8,
                   padding: "6px 12px",
                   borderRadius: "9999px",
-                  background: "rgba(11, 18, 28, 0.8)",
+                  background: "var(--bg-card)",
                   border: "1px solid var(--border-subtle)",
                   fontSize: "12px",
-                  color: "#F5F7FA",
+                  color: "var(--text-primary)",
                 }}
               >
                 <span style={{ color: "var(--accent-lime)", fontWeight: 800 }}>{m.val}</span>
@@ -151,20 +151,20 @@ export default function Projects() {
             style={{
               width: "min(380px, 90vw)",
               borderRadius: "14px",
-              border: "1px solid rgba(34, 211, 238, 0.25)",
-              background: "rgba(11, 18, 28, 0.95)",
+              border: "1px solid var(--border-subtle)",
+              background: "var(--bg-card)",
               overflow: "hidden",
-              boxShadow: "0 20px 45px rgba(0,0,0,0.7), 0 0 25px rgba(34, 211, 238, 0.15)",
+              boxShadow: "var(--shadow-card)",
             }}
           >
             <div
               style={{
-                background: "rgba(15, 23, 42, 0.9)",
+                background: "rgba(0, 0, 0, 0.15)",
                 padding: "8px 14px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                borderBottom: "1px solid var(--border-subtle)",
               }}
             >
               <div style={{ display: "flex", gap: 6 }}>
@@ -179,9 +179,9 @@ export default function Projects() {
 
             <div style={{ padding: "16px 18px", fontFamily: "var(--font-mono)", fontSize: "12px", lineHeight: 1.8 }}>
               <div style={{ color: "var(--accent-lime)" }}>&gt; Real World Projects</div>
-              <div style={{ color: "#38bdf8" }}>&gt; Open Source Contributions</div>
-              <div style={{ color: "#F5F7FA" }}>&gt; Modern Tech Stack</div>
-              <div style={{ color: "#F5F7FA" }}>&gt; Clean &amp; Scalable Code</div>
+              <div style={{ color: "var(--accent-cyan)" }}>&gt; Open Source Contributions</div>
+              <div style={{ color: "var(--text-primary)" }}>&gt; Modern Tech Stack</div>
+              <div style={{ color: "var(--text-primary)" }}>&gt; Clean &amp; Scalable Code</div>
               <div style={{ color: "#fbbf24" }}>&gt; Continuous Learning</div>
               <div style={{ color: "var(--accent-lime)" }}>&gt; Building for Impact</div>
             </div>
@@ -221,8 +221,8 @@ export default function Projects() {
                   fontWeight: isSelected ? 800 : 500,
                   cursor: "pointer",
                   border: isSelected ? "1px solid var(--accent-lime)" : "1px solid var(--border-subtle)",
-                  background: isSelected ? "var(--accent-lime)" : "rgba(11, 18, 28, 0.7)",
-                  color: isSelected ? "#05080D" : "var(--text-secondary)",
+                  background: isSelected ? "var(--accent-lime)" : "var(--bg-card)",
+                  color: isSelected ? "var(--text-on-accent)" : "var(--text-secondary)",
                   transition: "all var(--transition-fast)",
                 }}
               >
@@ -247,9 +247,9 @@ export default function Projects() {
               padding: "8px 12px 8px 34px",
               borderRadius: "9999px",
               fontSize: "0.85rem",
-              background: "rgba(11, 18, 28, 0.8)",
+              background: "var(--bg-card)",
               border: "1px solid var(--border-subtle)",
-              color: "#F5F7FA",
+              color: "var(--text-primary)",
             }}
           />
         </div>
@@ -275,85 +275,143 @@ export default function Projects() {
               justifyContent: "space-between",
               borderRadius: 14,
               border: "1px solid var(--border-subtle)",
-              background: "rgba(11, 18, 28, 0.85)",
+              background: "var(--bg-card)",
               cursor: "pointer",
             }}
           >
             <div>
-              {/* Preview Banner */}
+              {/* Preview Banner: Real Live Website Homepage Screenshot / Mockup Preview */}
               <div
                 style={{
                   width: "100%",
-                  height: 170,
+                  height: 180,
                   borderRadius: 10,
-                  background: "linear-gradient(135deg, rgba(34, 211, 238, 0.15) 0%, rgba(11, 18, 28, 0.95) 100%)",
+                  background: "var(--bg-secondary)",
                   border: "1px solid var(--border-subtle)",
                   marginBottom: "1rem",
                   overflow: "hidden",
                   position: "relative",
                   display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  flexDirection: "column",
                 }}
               >
-                <span style={{ fontSize: 40, opacity: 0.85 }}>
-                  {project.id === "pandharpurdarshan"
-                    ? "🏛️"
-                    : project.id === "studybuddy-ai"
-                    ? "📚"
-                    : project.id === "nextgenhire"
-                    ? "💼"
-                    : project.id === "chainride"
-                    ? "🚗"
-                    : project.id === "ecommerce-handmade"
-                    ? "🛍️"
-                    : "🤖"}
-                </span>
-                <a
-                  href={project.link}
-                  target="_blank"
-                  rel="noreferrer"
+                {/* Mini Browser Header */}
+                <div
                   style={{
-                    position: "absolute",
-                    top: 10,
-                    right: 10,
-                    background: "rgba(5, 8, 13, 0.8)",
-                    width: 28,
-                    height: 28,
-                    borderRadius: "50%",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 12,
-                    color: "#F5F7FA",
+                    justifyContent: "space-between",
+                    padding: "6px 10px",
+                    background: "rgba(0, 0, 0, 0.25)",
+                    borderBottom: "1px solid var(--border-subtle)",
+                    fontSize: "10px",
+                    zIndex: 2,
                   }}
                 >
-                  ↗
-                </a>
-                {project.category && (
+                  <div style={{ display: "flex", gap: 5 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#f43f5e" }} />
+                    <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#fbbf24" }} />
+                    <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#22c55e" }} />
+                  </div>
                   <span
                     style={{
-                      position: "absolute",
-                      bottom: 10,
-                      left: 10,
-                      fontSize: "10px",
-                      fontWeight: 700,
-                      padding: "2px 8px",
-                      borderRadius: 4,
-                      background: "rgba(5, 8, 13, 0.85)",
-                      border: "1px solid var(--border-subtle)",
-                      color: "var(--accent-lime)",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
+                      color: "var(--text-muted)",
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "9px",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      maxWidth: "70%",
                     }}
                   >
-                    {project.category}
+                    {project.link ? project.link.replace("https://", "").replace("http://", "") : "project.live"}
                   </span>
-                )}
+                  <a
+                    href={project.link}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      color: "var(--accent-lime)",
+                      fontSize: "11px",
+                      textDecoration: "none",
+                      fontWeight: 700,
+                    }}
+                    title="Open live website"
+                  >
+                    ↗
+                  </a>
+                </div>
+
+                {/* Live Home Page Fetch Image */}
+                <div style={{ position: "relative", flex: 1, overflow: "hidden", background: "rgba(0,0,0,0.1)" }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`https://image.thum.io/get/width/700/crop/480/${project.link || "https://github.com/vivekpawar3010"}`}
+                    alt={`${project.name} Homepage Preview`}
+                    loading="lazy"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      objectPosition: "top center",
+                      transition: "transform 0.3s ease",
+                    }}
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                      if (e.currentTarget.nextSibling) {
+                        e.currentTarget.nextSibling.style.display = "flex";
+                      }
+                    }}
+                  />
+
+                  {/* Fallback Display if image service is offline */}
+                  <div
+                    style={{
+                      display: "none",
+                      width: "100%",
+                      height: "100%",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexDirection: "column",
+                      gap: 6,
+                      background: "linear-gradient(135deg, rgba(34, 211, 238, 0.1) 0%, rgba(200, 255, 69, 0.1) 100%)",
+                      color: "var(--text-primary)",
+                    }}
+                  >
+                    <span style={{ fontSize: 32 }}>
+                      {project.id === "pandharpurdarshan" ? "🏛️" : project.id === "studybuddy-ai" ? "📚" : project.id === "nextgenhire" ? "💼" : project.id === "chainride" ? "🚗" : "🚀"}
+                    </span>
+                    <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--accent-lime)" }}>
+                      {project.name} Home
+                    </span>
+                  </div>
+
+                  {project.category && (
+                    <span
+                      style={{
+                        position: "absolute",
+                        bottom: 8,
+                        left: 8,
+                        fontSize: "9px",
+                        fontWeight: 800,
+                        padding: "2px 7px",
+                        borderRadius: 4,
+                        background: "rgba(0, 0, 0, 0.75)",
+                        border: "1px solid var(--border-subtle)",
+                        color: "var(--accent-lime)",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                        backdropFilter: "blur(6px)",
+                      }}
+                    >
+                      {project.category}
+                    </span>
+                  )}
+                </div>
               </div>
 
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
-                <h3 style={{ fontSize: "1.3rem", fontWeight: 800, margin: 0, color: "#F5F7FA" }}>
+                <h3 style={{ fontSize: "1.3rem", fontWeight: 800, margin: 0, color: "var(--text-primary)" }}>
                   {project.name}
                 </h3>
                 <span className="card-hint-badge">
@@ -376,7 +434,7 @@ export default function Projects() {
               <div className="hover-reveal-content">
                 <p
                   style={{
-                    color: "#cbd5e1",
+                    color: "var(--text-secondary)",
                     fontSize: "0.85rem",
                     lineHeight: 1.55,
                     margin: 0,
@@ -455,7 +513,7 @@ export default function Projects() {
                   fontSize: "clamp(2rem, 4vw, 2.8rem)",
                   fontWeight: 900,
                   margin: "0 0 8px",
-                  color: "#F5F7FA",
+                  color: "var(--text-primary)",
                 }}
               >
                 From Idea to <span className="lime-underline">Impact.</span>
@@ -490,12 +548,12 @@ export default function Projects() {
                 padding: "1.4rem",
                 borderRadius: 12,
                 border: "1px solid var(--border-subtle)",
-                background: "rgba(11, 18, 28, 0.8)",
+                background: "var(--bg-card)",
                 position: "relative",
               }}
             >
               <div style={{ fontSize: 28, marginBottom: 8 }}>{step.icon}</div>
-              <div style={{ fontSize: "1rem", fontWeight: 800, color: "#F5F7FA", marginBottom: 4 }}>
+              <div style={{ fontSize: "1rem", fontWeight: 800, color: "var(--text-primary)", marginBottom: 4 }}>
                 {step.step}
               </div>
               <div style={{ fontSize: "0.82rem", color: "var(--text-secondary)", lineHeight: 1.5 }}>
@@ -516,7 +574,7 @@ export default function Projects() {
           position: "relative",
           overflow: "hidden",
           border: "1px solid rgba(34, 211, 238, 0.3)",
-          background: "radial-gradient(circle at 50% 120%, rgba(34, 211, 238, 0.3) 0%, rgba(200, 255, 69, 0.15) 35%, rgba(11, 18, 28, 0.95) 75%)",
+          background: "radial-gradient(circle at 50% 120%, rgba(34, 211, 238, 0.3) 0%, rgba(200, 255, 69, 0.15) 35%, var(--bg-card) 75%)",
           marginBottom: "3rem",
         }}
       >

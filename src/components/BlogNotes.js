@@ -82,7 +82,7 @@ export default function BlogNotes() {
             fontSize: "clamp(2.4rem, 5vw, 3.6rem)",
             marginBottom: "0.75rem",
             fontWeight: 900,
-            color: "#F5F7FA",
+            color: "var(--text-primary)",
             letterSpacing: "-0.02em",
           }}
         >
@@ -103,7 +103,7 @@ export default function BlogNotes() {
           display: "flex",
           flexDirection: "column",
           gap: "1rem",
-          background: "rgba(11, 18, 28, 0.85)",
+          background: "var(--bg-card)",
         }}
       >
         <div style={{ position: "relative" }}>
@@ -118,10 +118,10 @@ export default function BlogNotes() {
             style={{
               width: "100%",
               padding: "10px 14px 10px 42px",
-              background: "#090E17",
+              background: "var(--input-bg)",
               border: "1px solid var(--border-subtle)",
               borderRadius: "9999px",
-              color: "#F5F7FA",
+              color: "var(--text-primary)",
               fontSize: "0.92rem",
               outline: "none",
             }}
@@ -173,7 +173,7 @@ export default function BlogNotes() {
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
-              background: "rgba(11, 18, 28, 0.85)",
+              background: "var(--bg-card)",
               border: "1px solid var(--border-subtle)",
             }}
           >
@@ -189,7 +189,7 @@ export default function BlogNotes() {
                 {post.category} • {post.date}
               </div>
 
-              <h2 style={{ fontSize: "1.25rem", fontWeight: 800, margin: "0 0 10px", color: "#F5F7FA", lineHeight: 1.4 }}>
+              <h2 style={{ fontSize: "1.25rem", fontWeight: 800, margin: "0 0 10px", color: "var(--text-primary)", lineHeight: 1.4 }}>
                 {post.title}
               </h2>
 
@@ -256,7 +256,7 @@ export default function BlogNotes() {
               overflowY: "auto",
               padding: "2.5rem",
               borderRadius: 16,
-              background: "#0B121C",
+              background: "var(--bg-card)",
               border: "1px solid var(--border-lime)",
               boxShadow: "0 25px 60px rgba(0, 0, 0, 0.8)",
             }}
@@ -289,7 +289,7 @@ export default function BlogNotes() {
               </button>
             </div>
 
-            <h1 style={{ fontSize: "1.8rem", fontWeight: 900, marginBottom: "0.8rem", color: "#F5F7FA" }}>
+            <h1 style={{ fontSize: "1.8rem", fontWeight: 900, marginBottom: "0.8rem", color: "var(--text-primary)" }}>
               {readingPost.title}
             </h1>
 
@@ -299,7 +299,7 @@ export default function BlogNotes() {
 
             <div
               style={{
-                color: "#F5F7FA",
+                color: "var(--text-primary)",
                 fontSize: "0.98rem",
                 lineHeight: 1.7,
                 whiteSpace: "pre-line",
@@ -342,13 +342,13 @@ export default function BlogNotes() {
           borderRadius: 16,
           textAlign: "center",
           border: "1px solid rgba(200, 255, 69, 0.3)",
-          background: "radial-gradient(circle at 50% 120%, rgba(200, 255, 69, 0.1) 0%, rgba(11, 18, 28, 0.95) 70%)",
+          background: "radial-gradient(circle at 50% 120%, rgba(200, 255, 69, 0.1) 0%, var(--bg-card) 70%)",
         }}
       >
         <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "var(--accent-lime)", marginBottom: 6 }}>
           Next Step
         </div>
-        <h3 style={{ fontSize: "1.4rem", fontWeight: 800, margin: "0 0 8px", color: "#F5F7FA" }}>
+        <h3 style={{ fontSize: "1.4rem", fontWeight: 800, margin: "0 0 8px", color: "var(--text-primary)" }}>
           Explore Full Portfolio &amp; Projects
         </h3>
         <p style={{ color: "var(--text-secondary)", maxWidth: 520, margin: "0 auto 1.5rem", fontSize: "0.92rem" }}>

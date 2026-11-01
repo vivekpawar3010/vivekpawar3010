@@ -72,7 +72,7 @@ export default function StatsStrip() {
               justifyContent: "space-between",
               borderRadius: 12,
               border: "1px solid var(--border-subtle)",
-              background: "rgba(11, 18, 28, 0.8)",
+              background: "var(--bg-card)",
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
@@ -95,7 +95,7 @@ export default function StatsStrip() {
                 style={{
                   fontSize: "1.85rem",
                   fontWeight: 900,
-                  color: "#F5F7FA",
+                  color: "var(--text-primary)",
                   lineHeight: 1.1,
                   fontFamily: "var(--font-heading)",
                 }}
@@ -120,7 +120,7 @@ export default function StatsStrip() {
           justifyContent: "center",
           borderRadius: 12,
           border: "1px solid var(--border-subtle)",
-          background: "rgba(11, 18, 28, 0.9)",
+          background: "var(--bg-card)",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
@@ -146,7 +146,7 @@ export default function StatsStrip() {
               alignItems: "center",
               justifyContent: "space-between",
               fontSize: "0.88rem",
-              color: "#F5F7FA",
+              color: "var(--text-primary)",
               fontWeight: 600,
               textDecoration: "none",
               padding: "4px 0",

@@ -492,13 +492,13 @@ export default function GitHubDashboard() {
           borderRadius: 16,
           textAlign: "center",
           border: "1px solid rgba(34, 211, 238, 0.3)",
-          background: "radial-gradient(circle at 50% 120%, rgba(34, 211, 238, 0.1) 0%, rgba(11, 18, 28, 0.95) 70%)",
+          background: "radial-gradient(circle at 50% 120%, rgba(34, 211, 238, 0.1) 0%, var(--bg-card) 70%)",
         }}
       >
         <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "#22D3EE", marginBottom: 6 }}>
           Next Actions
         </div>
-        <h3 style={{ fontSize: "1.4rem", fontWeight: 800, margin: "0 0 8px", color: "#F5F7FA" }}>
+        <h3 style={{ fontSize: "1.4rem", fontWeight: 800, margin: "0 0 8px", color: "var(--text-primary)" }}>
           Explore Full Portfolio &amp; Profiles
         </h3>
         <p style={{ color: "var(--text-secondary)", maxWidth: 520, margin: "0 auto 1.5rem", fontSize: "0.92rem" }}>

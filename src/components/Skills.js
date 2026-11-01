@@ -50,7 +50,7 @@ export default function Skills() {
               fontSize: "clamp(2rem, 4vw, 2.8rem)",
               marginBottom: "0.75rem",
               fontWeight: 900,
-              color: "#F5F7FA",
+              color: "var(--text-primary)",
             }}
           >
             Skills &amp; <span className="lime-underline">Technologies</span>
@@ -84,7 +84,7 @@ export default function Skills() {
                 flexDirection: "column",
                 borderRadius: 14,
                 border: "1px solid var(--border-subtle)",
-                background: "rgba(11, 18, 28, 0.85)",
+                background: "var(--bg-card)",
               }}
             >
               <div
@@ -99,7 +99,7 @@ export default function Skills() {
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <span style={{ fontSize: 24 }}>{group.icon}</span>
-                  <h3 style={{ fontSize: "1.2rem", margin: 0, fontWeight: 700, color: "#F5F7FA" }}>
+                  <h3 style={{ fontSize: "1.2rem", margin: 0, fontWeight: 700, color: "var(--text-primary)" }}>
                     {group.category}
                   </h3>
                 </div>
@@ -123,7 +123,7 @@ export default function Skills() {
                             marginBottom: 6,
                           }}
                         >
-                          <span style={{ fontSize: "0.92rem", fontWeight: 600, color: "#F5F7FA" }}>
+                          <span style={{ fontSize: "0.92rem", fontWeight: 600, color: "var(--text-primary)" }}>
                             {item.name}
                           </span>
                           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>

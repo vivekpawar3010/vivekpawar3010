@@ -124,7 +124,7 @@ export default function Contact() {
               fontWeight: 900,
               lineHeight: 1.15,
               marginBottom: "1.2rem",
-              color: "#F5F7FA",
+              color: "var(--text-primary)",
               letterSpacing: "-0.02em",
             }}
           >
@@ -153,10 +153,10 @@ export default function Contact() {
                 gap: 8,
                 padding: "6px 14px",
                 borderRadius: "9999px",
-                background: "rgba(11, 18, 28, 0.8)",
+                background: "var(--bg-card)",
                 border: "1px solid var(--border-subtle)",
                 fontSize: "12px",
-                color: "#F5F7FA",
+                color: "var(--text-primary)",
                 fontWeight: 600,
               }}
             >
@@ -177,7 +177,7 @@ export default function Contact() {
                 gap: 8,
                 padding: "6px 14px",
                 borderRadius: "9999px",
-                background: "rgba(11, 18, 28, 0.8)",
+                background: "var(--bg-card)",
                 border: "1px solid var(--border-subtle)",
                 fontSize: "12px",
                 color: "var(--text-secondary)",
@@ -192,7 +192,7 @@ export default function Contact() {
                 gap: 8,
                 padding: "6px 14px",
                 borderRadius: "9999px",
-                background: "rgba(11, 18, 28, 0.8)",
+                background: "var(--bg-card)",
                 border: "1px solid var(--border-subtle)",
                 fontSize: "12px",
                 color: "var(--text-secondary)",
@@ -211,7 +211,7 @@ export default function Contact() {
               width: "min(400px, 90vw)",
               borderRadius: "16px",
               border: "1px solid rgba(34, 211, 238, 0.25)",
-              background: "rgba(11, 18, 28, 0.95)",
+              background: "var(--bg-card)",
               overflow: "hidden",
               boxShadow: "0 20px 45px rgba(0,0,0,0.7), 0 0 25px rgba(34, 211, 238, 0.15)",
             }}
@@ -287,7 +287,7 @@ export default function Contact() {
         <div className="glass-card" style={{ padding: "2rem", borderRadius: 16 }}>
           <div className="section-tag">Send a Message</div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.5rem" }}>
-            <h2 style={{ fontSize: "1.6rem", fontWeight: 800, margin: 0, color: "#F5F7FA" }}>
+            <h2 style={{ fontSize: "1.6rem", fontWeight: 800, margin: 0, color: "var(--text-primary)" }}>
               Tell me about your idea!
             </h2>
             <span style={{ fontSize: 24 }}>✈️</span>
@@ -316,7 +316,7 @@ export default function Contact() {
           <form onSubmit={onSubmit} style={{ display: "grid", gap: "1.4rem" }}>
             {/* Name */}
             <div>
-              <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.85rem", fontWeight: 600, marginBottom: 6, color: "#F5F7FA" }}>
+              <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.85rem", fontWeight: 600, marginBottom: 6, color: "var(--text-primary)" }}>
                 <span>👤</span> Your Name
               </label>
               <input
@@ -330,9 +330,9 @@ export default function Contact() {
                   padding: "11px 14px",
                   borderRadius: 10,
                   fontSize: "0.92rem",
-                  background: "#090E17",
+                  background: "var(--input-bg)",
                   border: errors.name ? "1px solid #f43f5e" : "1px solid var(--border-subtle)",
-                  color: "#F5F7FA",
+                  color: "var(--text-primary)",
                 }}
               />
               {errors.name && (
@@ -342,7 +342,7 @@ export default function Contact() {
 
             {/* Email */}
             <div>
-              <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.85rem", fontWeight: 600, marginBottom: 6, color: "#F5F7FA" }}>
+              <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.85rem", fontWeight: 600, marginBottom: 6, color: "var(--text-primary)" }}>
                 <span>✉️</span> Your Email
               </label>
               <input
@@ -356,9 +356,9 @@ export default function Contact() {
                   padding: "11px 14px",
                   borderRadius: 10,
                   fontSize: "0.92rem",
-                  background: "#090E17",
+                  background: "var(--input-bg)",
                   border: errors.email ? "1px solid #f43f5e" : "1px solid var(--border-subtle)",
-                  color: "#F5F7FA",
+                  color: "var(--text-primary)",
                 }}
               />
               {errors.email && (
@@ -369,7 +369,7 @@ export default function Contact() {
             {/* Message */}
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.85rem", fontWeight: 600, color: "#F5F7FA" }}>
+                <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.85rem", fontWeight: 600, color: "var(--text-primary)" }}>
                   <span>💬</span> Your Message
                 </label>
                 <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>
@@ -387,9 +387,9 @@ export default function Contact() {
                   padding: "12px 14px",
                   borderRadius: 10,
                   fontSize: "0.92rem",
-                  background: "#090E17",
+                  background: "var(--input-bg)",
                   border: errors.message ? "1px solid #f43f5e" : "1px solid var(--border-subtle)",
-                  color: "#F5F7FA",
+                  color: "var(--text-primary)",
                   resize: "vertical",
                 }}
               />
@@ -424,7 +424,7 @@ export default function Contact() {
           {/* Other Ways to Reach Me */}
           <div className="glass-card" style={{ padding: "1.8rem", borderRadius: 16 }}>
             <div className="section-tag">Let&apos;s Connect</div>
-            <h2 style={{ fontSize: "1.45rem", fontWeight: 800, margin: "0 0 6px", color: "#F5F7FA" }}>
+            <h2 style={{ fontSize: "1.45rem", fontWeight: 800, margin: "0 0 6px", color: "var(--text-primary)" }}>
               Other Ways to Reach Me
             </h2>
             <p style={{ color: "var(--text-secondary)", fontSize: "0.88rem", margin: "0 0 1.4rem" }}>
@@ -464,7 +464,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", fontWeight: 600 }}>Email</div>
-                    <div style={{ fontSize: "0.92rem", fontWeight: 700, color: "#F5F7FA" }}>
+                    <div style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--text-primary)" }}>
                       vivekpawar3010@gmail.com
                     </div>
                     <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
@@ -510,7 +510,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", fontWeight: 600 }}>LinkedIn</div>
-                    <div style={{ fontSize: "0.92rem", fontWeight: 700, color: "#F5F7FA" }}>
+                    <div style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--text-primary)" }}>
                       linkedin.com/in/vivek-pawar
                     </div>
                     <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
@@ -556,7 +556,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", fontWeight: 600 }}>GitHub</div>
-                    <div style={{ fontSize: "0.92rem", fontWeight: 700, color: "#F5F7FA" }}>
+                    <div style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--text-primary)" }}>
                       github.com/vivekpawar3010
                     </div>
                     <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
@@ -601,7 +601,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", fontWeight: 600 }}>Instagram</div>
-                    <div style={{ fontSize: "0.92rem", fontWeight: 700, color: "#F5F7FA" }}>
+                    <div style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--text-primary)" }}>
                       instagram.com/vivek.pawar.dev
                     </div>
                     <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
@@ -666,7 +666,7 @@ export default function Contact() {
                     borderRadius: "9999px",
                     background: "rgba(255, 255, 255, 0.04)",
                     border: "1px solid var(--border-subtle)",
-                    color: "#F5F7FA",
+                    color: "var(--text-primary)",
                   }}
                 >
                   {badge}
@@ -690,7 +690,7 @@ export default function Contact() {
         {/* Left: Location Card */}
         <div className="glass-card" style={{ padding: "1.8rem", borderRadius: 16 }}>
           <div className="section-tag">Location</div>
-          <h2 style={{ fontSize: "1.45rem", fontWeight: 800, margin: "0 0 6px", color: "#F5F7FA" }}>
+          <h2 style={{ fontSize: "1.45rem", fontWeight: 800, margin: "0 0 6px", color: "var(--text-primary)" }}>
             Based in Pandharpur, India
           </h2>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.88rem", margin: "0 0 1.4rem" }}>
@@ -698,13 +698,13 @@ export default function Contact() {
           </p>
 
           <div style={{ display: "grid", gap: "10px", marginBottom: "1.4rem" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.9rem", color: "#F5F7FA" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.9rem", color: "var(--text-primary)" }}>
               <span>📍</span> Pandharpur, Maharashtra, India
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.9rem", color: "#F5F7FA" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.9rem", color: "var(--text-primary)" }}>
               <span>💻</span> Open to Remote Work
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.9rem", color: "#F5F7FA" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.9rem", color: "var(--text-primary)" }}>
               <span>⏰</span> IST (Indian Standard Time)
             </div>
           </div>
@@ -715,7 +715,7 @@ export default function Contact() {
               width: "100%",
               height: 120,
               borderRadius: 10,
-              background: "radial-gradient(circle at 60% 60%, rgba(34, 211, 238, 0.25) 0%, rgba(11, 18, 28, 0.95) 70%)",
+              background: "radial-gradient(circle at 60% 60%, rgba(34, 211, 238, 0.25) 0%, var(--bg-card) 70%)",
               border: "1px solid var(--border-subtle)",
               display: "flex",
               alignItems: "center",
@@ -731,7 +731,7 @@ export default function Contact() {
                 border: "1px solid var(--accent-lime)",
                 fontSize: "11px",
                 fontWeight: 700,
-                color: "#F5F7FA",
+                color: "var(--text-primary)",
                 display: "flex",
                 alignItems: "center",
                 gap: 6,
@@ -745,7 +745,7 @@ export default function Contact() {
         {/* Right: Things We Can Talk About (6 interactive cards) */}
         <div className="glass-card" style={{ padding: "1.8rem", borderRadius: 16 }}>
           <div className="section-tag">Why Reach Out?</div>
-          <h2 style={{ fontSize: "1.45rem", fontWeight: 800, margin: "0 0 6px", color: "#F5F7FA" }}>
+          <h2 style={{ fontSize: "1.45rem", fontWeight: 800, margin: "0 0 6px", color: "var(--text-primary)" }}>
             Things We Can Talk About
           </h2>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.88rem", margin: "0 0 1.4rem" }}>
@@ -777,7 +777,7 @@ export default function Contact() {
                 }}
               >
                 <div style={{ fontSize: 20, marginBottom: 4 }}>{topic.icon}</div>
-                <div style={{ fontSize: "0.9rem", fontWeight: 700, color: "#F5F7FA" }}>{topic.title}</div>
+                <div style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--text-primary)" }}>{topic.title}</div>
                 <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginTop: 2 }}>
                   {topic.desc}
                 </div>
@@ -797,7 +797,7 @@ export default function Contact() {
           position: "relative",
           overflow: "hidden",
           border: "1px solid rgba(34, 211, 238, 0.3)",
-          background: "radial-gradient(circle at 50% 120%, rgba(34, 211, 238, 0.3) 0%, rgba(200, 255, 69, 0.15) 35%, rgba(11, 18, 28, 0.95) 75%)",
+          background: "radial-gradient(circle at 50% 120%, rgba(34, 211, 238, 0.3) 0%, rgba(200, 255, 69, 0.15) 35%, var(--bg-card) 75%)",
         }}
       >
         <div className="section-tag" style={{ justifyContent: "center" }}>Ready to Create Impact?</div>
@@ -806,7 +806,7 @@ export default function Contact() {
             fontSize: "clamp(2rem, 4vw, 3rem)",
             fontWeight: 900,
             marginBottom: "0.6rem",
-            color: "#F5F7FA",
+            color: "var(--text-primary)",
           }}
         >
           Have an <span className="lime-underline">idea</span> in mind?

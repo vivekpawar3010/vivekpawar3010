@@ -60,7 +60,7 @@ export default function Footer() {
                   <path d="M22 12H30C32.7614 12 35 14.2386 35 17C35 19.7614 32.7614 22 30 22H24L21 28H18L24 16H30C30.5523 16 31 16.4477 31 17C31 17.5523 30.5523 18 30 18H25L22 12Z" fill="#C8FF45" />
                 </svg>
               </div>
-              <span style={{ fontWeight: 800, fontSize: "1.2rem", color: "#F5F7FA" }}>
+              <span style={{ fontWeight: 800, fontSize: "1.2rem", color: "var(--text-primary)" }}>
                 Vivek Pawar<span style={{ color: "var(--accent-lime)" }}>.</span>
               </span>
             </div>
@@ -118,7 +118,7 @@ export default function Footer() {
 
           {/* Quick Navigation Links */}
           <div>
-            <h4 style={{ fontSize: "0.95rem", fontWeight: 700, marginBottom: "1rem", color: "#F5F7FA" }}>
+            <h4 style={{ fontSize: "0.95rem", fontWeight: 700, marginBottom: "1rem", color: "var(--text-primary)" }}>
               Navigation
             </h4>
             <div style={{ display: "grid", gap: 8, fontSize: "0.88rem" }}>
@@ -148,7 +148,7 @@ export default function Footer() {
 
           {/* Availability Status */}
           <div>
-            <h4 style={{ fontSize: "0.95rem", fontWeight: 700, marginBottom: "1rem", color: "#F5F7FA" }}>
+            <h4 style={{ fontSize: "0.95rem", fontWeight: 700, marginBottom: "1rem", color: "var(--text-primary)" }}>
               Current Status
             </h4>
             <div

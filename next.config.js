@@ -5,6 +5,10 @@ const nextConfig = {
   images: {
     formats: ['image/webp', 'image/avif'],
   },
+  experimental: {
+    cpus: 1,
+    workerThreads: false,
+  },
 };
 
 module.exports = nextConfig;

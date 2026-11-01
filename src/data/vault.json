@@ -1,13 +1,13 @@
 [
   {
-    "id": "note-1",
-    "title": "LeetCode Patterns & Templates (Sliding Window & Monotonic Stack)",
+    "id": "note-1793026600763",
+    "title": "Dynamic Programming Patterns 2026",
     "category": "DSA / LeetCode",
-    "content": "### 1. Sliding Window (Variable Size)\n```java\nint left = 0;\nfor (int right = 0; right < n; right++) {\n    // Add nums[right] to window state\n    while (windowConditionViolated) {\n        // Remove nums[left] from window\n        left++;\n    }\n    maxLen = Math.max(maxLen, right - left + 1);\n}\n```\n\n### 2. Monotonic Stack (Next Greater Element)\nUse a decreasing stack to find the next greater element in O(N) time.\n```java\nDeque<Integer> stack = new ArrayDeque<>();\nfor (int i = 0; i < nums.length; i++) {\n    while (!stack.isEmpty() && nums[stack.peek()] < nums[i]) {\n        res[stack.pop()] = nums[i];\n    }\n    stack.push(i);\n}\n```",
+    "content": "### Knapsac### Dynamic Programming 2026 - Knapsack and LCS patterns memoization and tabulation.",
     "pinned": true,
     "color": "cyan",
-    "createdAt": "2026-10-16T12:00:00.000Z",
-    "updatedAt": "2026-10-26T08:30:00.000Z"
+    "createdAt": "2026-10-26T14:56:40.763Z",
+    "updatedAt": "2026-11-01T00:32:30.514Z"
   },
   {
     "id": "note-2",
@@ -20,24 +20,14 @@
     "updatedAt": "2026-10-25T14:20:00.000Z"
   },
   {
-    "id": "note-1793028613384",
-    "title": "Kubernetes & Container Orchestration",
-    "category": "Cloud Architecture",
-    "content": "Mastering Pods, ReplicaSets, Ingress, and Helm charts.",
-    "pinned": false,
-    "color": "cyan",
-    "createdAt": "2026-10-26T15:30:13.384Z",
-    "updatedAt": "2026-10-26T15:30:13.384Z"
-  },
-  {
-    "id": "note-1793026600763",
-    "title": "Dynamic Programming Patterns 2026",
+    "id": "note-1",
+    "title": "LeetCode Patterns & Templates (Sliding Window & Monotonic Stack)",
     "category": "DSA / LeetCode",
-    "content": "### Knapsac### Dynamic Programming 2026 - Knapsack and LCS patterns memoization and tabulation.",
+    "content": "### 1. Sliding Window (Variable Size)\n```java\nint left = 0;\nfor (int right = 0; right < n; right++) {\n    // Add nums[right] to window state\n    while (windowConditionViolated) {\n        // Remove nums[left] from window\n        left++;\n    }\n    maxLen = Math.max(maxLen, right - left + 1);\n}\n```\n\n### 2. Monotonic Stack (Next Greater Element)\nUse a decreasing stack to find the next greater element in O(N) time.\n```java\nDeque<Integer> stack = new ArrayDeque<>();\nfor (int i = 0; i < nums.length; i++) {\n    while (!stack.isEmpty() && nums[stack.peek()] < nums[i]) {\n        res[stack.pop()] = nums[i];\n    }\n    stack.push(i);\n}\n```",
     "pinned": false,
     "color": "cyan",
-    "createdAt": "2026-10-26T14:56:40.763Z",
-    "updatedAt": "2026-10-26T14:56:40.763Z"
+    "createdAt": "2026-10-16T12:00:00.000Z",
+    "updatedAt": "2026-11-01T00:32:28.268Z"
   },
   {
     "id": "note-4",

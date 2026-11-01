@@ -41,7 +41,7 @@ export default function Hero() {
                 lineHeight: 1.12,
                 marginBottom: "1.2rem",
                 letterSpacing: "-0.03em",
-                color: "#F5F7FA",
+                color: "var(--text-primary)",
               }}
             >
               I build useful <br />
@@ -53,7 +53,7 @@ export default function Hero() {
               style={{
                 fontSize: "clamp(1.15rem, 2.2vw, 1.45rem)",
                 fontWeight: 600,
-                color: "#F5F7FA",
+                color: "var(--text-primary)",
                 marginBottom: "1rem",
               }}
             >
@@ -112,7 +112,7 @@ export default function Hero() {
                     width: 38,
                     height: 38,
                     borderRadius: "50%",
-                    background: "rgba(11, 18, 28, 0.8)",
+                    background: "var(--bg-card)",
                     border: "1px solid var(--border-subtle)",
                     display: "flex",
                     alignItems: "center",
@@ -143,7 +143,7 @@ export default function Hero() {
                     width: 38,
                     height: 38,
                     borderRadius: "50%",
-                    background: "rgba(11, 18, 28, 0.8)",
+                    background: "var(--bg-card)",
                     border: "1px solid var(--border-subtle)",
                     display: "flex",
                     alignItems: "center",
@@ -175,7 +175,7 @@ export default function Hero() {
                     width: 38,
                     height: 38,
                     borderRadius: "50%",
-                    background: "rgba(11, 18, 28, 0.8)",
+                    background: "var(--bg-card)",
                     border: "1px solid var(--border-subtle)",
                     display: "flex",
                     alignItems: "center",
@@ -205,7 +205,7 @@ export default function Hero() {
                     width: 38,
                     height: 38,
                     borderRadius: "50%",
-                    background: "rgba(11, 18, 28, 0.8)",
+                    background: "var(--bg-card)",
                     border: "1px solid var(--border-subtle)",
                     display: "flex",
                     alignItems: "center",
@@ -236,7 +236,7 @@ export default function Hero() {
                     width: 38,
                     height: 38,
                     borderRadius: "50%",
-                    background: "rgba(11, 18, 28, 0.8)",
+                    background: "var(--bg-card)",
                     border: "1px solid var(--border-subtle)",
                     display: "flex",
                     alignItems: "center",
@@ -265,7 +265,7 @@ export default function Hero() {
                     width: 38,
                     height: 38,
                     borderRadius: "50%",
-                    background: "rgba(11, 18, 28, 0.8)",
+                    background: "var(--bg-card)",
                     border: "1px solid var(--border-subtle)",
                     display: "flex",
                     alignItems: "center",
