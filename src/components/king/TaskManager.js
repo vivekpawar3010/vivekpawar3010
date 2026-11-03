@@ -10,27 +10,21 @@ export default function TaskManager() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterCategory, setFilterCategory] = useState("all");
 
+  // Expanded task ID for one-line accordion (only expanded card shows details)
+  const [expandedTaskId, setExpandedTaskId] = useState(null);
+
   // New task form state
   const [showAddForm, setShowAddForm] = useState(false);
   const [newTitle, setNewTitle] = useState("");
-  const [newCategory, setNewCategory] = useState("Streak");
+  const [newCategory, setNewCategory] = useState("General");
   const [newPriority, setNewPriority] = useState("High");
   const [newDueDate, setNewDueDate] = useState("Today");
   const [newGoalDays, setNewGoalDays] = useState(30);
-  const [newDailyLog, setNewDailyLog] = useState("");
   const [formError, setFormError] = useState("");
-
-  // Dynamic Custom Tracking Fields for the new task
-  const [customFields, setCustomFields] = useState([
-    { id: "f_num", label: "Problems / Questions Solved", type: "number", target: "5" },
-    { id: "f_topics", label: "Topics & Concepts Read", type: "topics", target: "DSA, System Design" },
-    { id: "f_notes", label: "Daily Reflection & Small Text", type: "text", target: "Key insights" },
-  ]);
 
   // Per-task daily check-in input states: { [taskId]: { numberDone: '', topics: '', note: '', nextDayQueue: '', fieldValues: {} } }
   const [dailyTaskInputs, setDailyTaskInputs] = useState({});
   const [expandedHistoryTaskId, setExpandedHistoryTaskId] = useState(null);
-  const [expandedPillarInfoTaskId, setExpandedPillarInfoTaskId] = useState(null);
 
   // Goal edit modal state
   const [editingGoalTaskId, setEditingGoalTaskId] = useState(null);
@@ -43,7 +37,6 @@ export default function TaskManager() {
     phoneAway: false,
     distractionsClosed: false,
     musicPlaying: false,
-    vocalReady: false,
   });
 
   // Built-in Focus Countdown Timer state per task: { [taskId]: { totalSec: 600, remSec: 600, isRunning: false } }
@@ -64,14 +57,13 @@ export default function TaskManager() {
   const [statusToast, setStatusToast] = useState(null);
 
   const todayStr = new Date().toISOString().split("T")[0];
-  const isSunday = new Date().getDay() === 0;
 
   const showToast = (message, type = "success") => {
     setStatusToast({ message, type });
-    setTimeout(() => setStatusToast(null), 4200);
+    setTimeout(() => setStatusToast(null), 4000);
   };
 
-  // ── Web Audio API Completion Chime ──────────────────────────────────────────
+  // ── Web Audio API Harmonic Completion Chime ────────────────────────────────
   const playFocusCompleteChime = useCallback(() => {
     try {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -95,7 +87,7 @@ export default function TaskManager() {
     }
   }, []);
 
-  // ── Voice Affirmation Synthesizer ─────────────────────────────────────────
+  // ── Voice Affirmation Synthesizer ──────────────────────────────────────────
   const speakAffirmation = (text) => {
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
       window.speechSynthesis.cancel();
@@ -113,7 +105,6 @@ export default function TaskManager() {
       const data = await res.json();
       if (data.tasks) {
         setTasks(data.tasks);
-        // Initialize daily inputs and timers
         const initialInputs = {};
         const initialTimers = {};
         data.tasks.forEach((t) => {
@@ -137,7 +128,6 @@ export default function TaskManager() {
         setDailyTaskInputs((prev) => ({ ...initialInputs, ...prev }));
         setTaskTimers((prev) => {
           const merged = { ...initialTimers };
-          // Preserve currently running timers
           Object.keys(prev).forEach((k) => {
             if (prev[k]?.isRunning) merged[k] = prev[k];
           });
@@ -170,14 +160,13 @@ export default function TaskManager() {
           if (tState && tState.isRunning) {
             hasChanges = true;
             if (tState.remSec <= 1) {
-              // Timer finished!
               next[taskId] = {
                 ...tState,
                 remSec: 0,
                 isRunning: false,
               };
               playFocusCompleteChime();
-              showToast("🎯 Focus Block Complete! Great intensity. Log your daily check-in numbers & breakthrough.", "success");
+              showToast("🎯 Focus Block Complete! Great intensity. Enter what you done today.", "success");
             } else {
               next[taskId] = {
                 ...tState,
@@ -194,7 +183,7 @@ export default function TaskManager() {
     return () => clearInterval(timerIntervalRef.current);
   }, [playFocusCompleteChime]);
 
-  // ── Derived streak tasks & penalty calculations ───────────────────────────
+  // ── Filtered streak tasks & general tasks ─────────────────────────────────
   const streakTasks = useMemo(() => {
     return tasks.filter((t) => t.category === "Streak");
   }, [tasks]);
@@ -203,50 +192,8 @@ export default function TaskManager() {
     return tasks.filter((t) => t.category !== "Streak");
   }, [tasks]);
 
-  // Detect Dry Week and 1-Day Warning conditions across all streak tasks
-  const dryWeekViolations = useMemo(() => {
-    return streakTasks.filter((t) => t.isDryWeek);
-  }, [streakTasks]);
-
-  const warningViolations = useMemo(() => {
-    return streakTasks.filter((t) => t.isWarning && !t.isDryWeek);
-  }, [streakTasks]);
-
-  const isExerciseDryWeek = useMemo(() => {
-    return dryWeekViolations.some((t) => t.title?.toLowerCase().includes("exercise"));
-  }, [dryWeekViolations]);
-
-  // ── Heatmap Data (Last 16 Weeks / 112 Days) ───────────────────────────────
-  const heatmapData = useMemo(() => {
-    const days = [];
-    const today = new Date();
-    const totalDays = 112; // 16 weeks
-
-    // Aggregate check-ins by date: { 'YYYY-MM-DD': count }
-    const checkInsByDate = {};
-    streakTasks.forEach((t) => {
-      if (Array.isArray(t.history)) {
-        t.history.forEach((h) => {
-          if (h.date) {
-            checkInsByDate[h.date] = (checkInsByDate[h.date] || 0) + 1;
-          }
-        });
-      }
-    });
-
-    for (let i = totalDays - 1; i >= 0; i--) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - i);
-      const dStr = d.toISOString().split("T")[0];
-      const count = checkInsByDate[dStr] || 0;
-      days.push({
-        date: dStr,
-        count,
-        level: count === 0 ? 0 : count <= 2 ? 1 : count <= 4 ? 2 : 3,
-      });
-    }
-
-    return days;
+  const totalWeeklyPoints = useMemo(() => {
+    return streakTasks.reduce((sum, t) => sum + (t.weeklyPoints || 0), 0);
   }, [streakTasks]);
 
   // ── Timer Controls ────────────────────────────────────────────────────────
@@ -286,35 +233,6 @@ export default function TaskManager() {
     return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
   };
 
-  // ── Seed 5 Core Habits Action ─────────────────────────────────────────────
-  const handleSeedCoreHabits = async () => {
-    if (
-      !confirm(
-        "⚡ Seed the 5 Core Atomic Habit Pillars from your handwritten notebook into PostgreSQL & JSON? Existing streaks and logs will be preserved."
-      )
-    ) {
-      return;
-    }
-
-    try {
-      const res = await fetch("/api/king/tasks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "seed_core_habits" }),
-      });
-      const data = await res.json();
-      if (data.success && data.tasks) {
-        setTasks(data.tasks);
-        showToast("⚡ 5 Core Habit Pillars loaded directly from notebook into database!", "success");
-      } else {
-        showToast(data.error || "Failed to seed core habits.", "error");
-      }
-    } catch (err) {
-      console.error("Error seeding habits", err);
-      showToast("Network error while seeding core habits.", "error");
-    }
-  };
-
   // ── Master Topic Queue Handlers ───────────────────────────────────────────
   const handleToggleTopicStatus = async (task, topicName) => {
     const currentList = Array.isArray(task.topicsMasterList) ? [...task.topicsMasterList] : [];
@@ -332,7 +250,6 @@ export default function TaskManager() {
       return tm;
     });
 
-    // Optimistic UI update
     setTasks((prev) =>
       prev.map((t) => (t.id === task.id ? { ...t, topicsMasterList: updatedList } : t))
     );
@@ -399,94 +316,13 @@ export default function TaskManager() {
           meta: { nextDayQueue: text },
         }),
       });
-      showToast("Tomorrow's queued topic locked in! No decision fatigue tomorrow.", "success");
+      showToast("Tomorrow's queued topic locked in! No morning hesitation.", "success");
     } catch (err) {
       console.error("Error saving tomorrow queue", err);
     }
   };
 
-  // ── Dynamic Custom Field Handlers (Task Creation) ─────────────────────────
-  const handleAddField = (type = "number") => {
-    const fieldId = `field_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
-    const defaults = {
-      number: { label: "Numeric Metric (e.g. Problems Solved)", target: "5" },
-      topics: { label: "Topics & Algorithms Read", target: "DP, Graphs" },
-      text: { label: "Daily Reflection Note", target: "Notes" },
-    };
-    setCustomFields((prev) => [
-      ...prev,
-      {
-        id: fieldId,
-        label: defaults[type]?.label || "Custom Field",
-        type,
-        target: defaults[type]?.target || "",
-      },
-    ]);
-  };
-
-  const handleUpdateField = (id, key, val) => {
-    setCustomFields((prev) =>
-      prev.map((f) => (f.id === id ? { ...f, [key]: val } : f))
-    );
-  };
-
-  const handleRemoveField = (id) => {
-    setCustomFields((prev) => prev.filter((f) => f.id !== id));
-  };
-
-  // ── Add Task Handler ──────────────────────────────────────────────────────
-  const handleAddTask = async (e) => {
-    e.preventDefault();
-    setFormError("");
-
-    if (!newTitle.trim()) {
-      setFormError("Task title is required.");
-      return;
-    }
-
-    if (newCategory === "Streak" && streakTasks.length >= 5) {
-      setFormError("Maximum 5 Habit Streaks allowed. Please delete or complete an existing streak first.");
-      return;
-    }
-
-    try {
-      const res = await fetch("/api/king/tasks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "add",
-          title: newTitle.trim(),
-          category: newCategory,
-          priority: newPriority,
-          dueDate: newCategory === "Streak" ? `${newGoalDays}-Day Goal` : newDueDate,
-          goalDays: newCategory === "Streak" ? Number(newGoalDays) || 30 : undefined,
-          dailyLog: newCategory === "Streak" ? newDailyLog.trim() : undefined,
-          fields: newCategory === "Streak" ? customFields : [],
-        }),
-      });
-
-      const data = await res.json();
-      if (data.success && data.tasks) {
-        setTasks(data.tasks);
-        setNewTitle("");
-        setNewDailyLog("");
-        setShowAddForm(false);
-        showToast(
-          newCategory === "Streak"
-            ? "🔥 New habit streak activated with custom tracking fields (Max 5 enforced)!"
-            : "📋 General task added successfully!",
-          "success"
-        );
-      } else {
-        setFormError(data.error || "Failed to create task.");
-      }
-    } catch (err) {
-      console.error("Error adding task", err);
-      setFormError("Network error while adding task.");
-    }
-  };
-
-  // ── Check In Streak with Master Topics & Next Day Queue ───────────────────
+  // ── Check In Streak with Numbers Done, Topics Read & Daily Reflection ─────
   const handleStreakCheckIn = async (taskId) => {
     const inputData = dailyTaskInputs[taskId] || {};
     const numberDone = inputData.numberDone !== undefined && inputData.numberDone !== "" ? Number(inputData.numberDone) : undefined;
@@ -515,7 +351,7 @@ export default function TaskManager() {
       if (data.success && data.tasks) {
         setTasks(data.tasks);
         playFocusCompleteChime();
-        showToast("⚡ Daily streak maintained! +10 weekly points awarded & saved to PostgreSQL.", "success");
+        showToast("⚡ Marked complete for today! +10 weekly points awarded.", "success");
       } else {
         showToast(data.error || "Failed to check in.", "error");
       }
@@ -549,10 +385,10 @@ export default function TaskManager() {
     }
   };
 
-  // ── Sunday AI Points Evaluation & Reset (Evaluated out of 350) ─────────────
+  // ── Sunday AI Points Evaluation & Reset ───────────────────────────────────
   const handleRunSundayEvaluation = async () => {
     if (streakTasks.length === 0) {
-      alert("No active streak tasks found to evaluate. Add streak tasks first!");
+      alert("No active streak tasks found to evaluate.");
       return;
     }
 
@@ -563,24 +399,18 @@ export default function TaskManager() {
       const res = await fetch("/api/king/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "evaluate_sunday_points",
-        }),
+        body: JSON.stringify({ action: "evaluate_sunday_points" }),
       });
 
       const data = await res.json();
       if (data.success && data.evaluation) {
         setEvaluationResult(data.evaluation);
         setShowEvaluationModal(true);
-        if (data.tasks) {
-          setTasks(data.tasks);
-        }
+        if (data.tasks) setTasks(data.tasks);
         const evalsRes = await fetch("/api/king/tasks");
         const evalsData = await evalsRes.json();
-        if (evalsData.evaluations) {
-          setEvaluations(evalsData.evaluations);
-        }
-        showToast("✅ Sunday points evaluation complete! Evaluated out of 350 (Points reset to 0 for Sunday).", "success");
+        if (evalsData.evaluations) setEvaluations(evalsData.evaluations);
+        showToast("✅ Sunday points evaluation complete! Evaluated out of 350.", "success");
       } else {
         alert(data.error || "Failed to run Sunday AI evaluation.");
       }
@@ -592,28 +422,45 @@ export default function TaskManager() {
     }
   };
 
-  // ── Reset Weekly Points to Zero ───────────────────────────────────────────
-  const handleResetWeeklyPoints = async () => {
-    if (!confirm("Are you sure you want to reset all active weekly streak points to 0?")) {
+  // ── Add General Task ──────────────────────────────────────────────────────
+  const handleAddTask = async (e) => {
+    e.preventDefault();
+    setFormError("");
+
+    if (!newTitle.trim()) {
+      setFormError("Task title is required.");
       return;
     }
+
     try {
       const res = await fetch("/api/king/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "reset_weekly_points" }),
+        body: JSON.stringify({
+          action: "add",
+          title: newTitle.trim(),
+          category: newCategory,
+          priority: newPriority,
+          dueDate: newDueDate,
+        }),
       });
+
       const data = await res.json();
       if (data.success && data.tasks) {
         setTasks(data.tasks);
-        showToast("🔄 Active weekly streak points reset to 0 for all habits!", "info");
+        setNewTitle("");
+        setShowAddForm(false);
+        showToast("📋 Task added successfully!", "success");
+      } else {
+        setFormError(data.error || "Failed to create task.");
       }
     } catch (err) {
-      console.error("Error resetting weekly points", err);
+      console.error("Error adding task", err);
+      setFormError("Network error while adding task.");
     }
   };
 
-  // ── Update Status for general tasks ───────────────────────────────────────
+  // ── Update General Task Status ────────────────────────────────────────────
   const handleUpdateStatus = async (id, currentStatus) => {
     const nextStatusMap = {
       todo: "in_progress",
@@ -636,7 +483,7 @@ export default function TaskManager() {
           status: nextStatus,
         }),
       });
-      showToast(`Task status moved to ${nextStatus.replace("_", " ")}.`, "info");
+      showToast(`Task moved to ${nextStatus.replace("_", " ")}.`, "info");
     } catch (err) {
       console.error("Error updating status", err);
       loadTasksAndEvaluations();
@@ -644,7 +491,8 @@ export default function TaskManager() {
   };
 
   // ── Delete Task ───────────────────────────────────────────────────────────
-  const handleDeleteTask = async (id, title) => {
+  const handleDeleteTask = async (id, title, e) => {
+    if (e) e.stopPropagation();
     if (!confirm(`Are you sure you want to delete "${title}"?`)) return;
 
     setTasks((prev) => prev.filter((t) => t.id !== id));
@@ -654,14 +502,13 @@ export default function TaskManager() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "delete", id }),
       });
-      showToast(`🗑️ Task "${title}" deleted.`, "info");
+      showToast(`Task "${title}" deleted.`, "info");
     } catch (err) {
       console.error("Error deleting task", err);
       loadTasksAndEvaluations();
     }
   };
 
-  // ── General tasks filtering ───────────────────────────────────────────────
   const filteredGeneralTasks = generalTasks.filter((t) => {
     const matchStatus = filterStatus === "all" || t.status === filterStatus;
     const matchCategory = filterCategory === "all" || t.category === filterCategory;
@@ -692,9 +539,9 @@ export default function TaskManager() {
             top: 24,
             right: 24,
             zIndex: 9999,
-            padding: "12px 20px",
-            borderRadius: 10,
-            fontSize: "0.92rem",
+            padding: "10px 18px",
+            borderRadius: 8,
+            fontSize: "0.9rem",
             fontWeight: 700,
             display: "flex",
             alignItems: "center",
@@ -704,9 +551,7 @@ export default function TaskManager() {
                 ? "rgba(16, 185, 129, 0.95)"
                 : statusToast.type === "warning"
                 ? "rgba(245, 158, 11, 0.95)"
-                : statusToast.type === "info"
-                ? "rgba(56, 189, 248, 0.95)"
-                : "rgba(244, 63, 94, 0.95)",
+                : "rgba(56, 189, 248, 0.95)",
             color: "#FFFFFF",
             boxShadow: "0 10px 30px rgba(0, 0, 0, 0.35)",
             animation: "slideInToast 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
@@ -716,1810 +561,814 @@ export default function TaskManager() {
         </div>
       )}
 
-      {/* ── Main Header ── */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          marginBottom: "1.5rem",
-          flexWrap: "wrap",
-          gap: 12,
-        }}
-      >
-        <div>
-          <h2 style={{ fontSize: "1.6rem", margin: "0 0 6px", color: "var(--text-primary)" }}>
-            ⚡ Atomic Habit Engine & <span className="gradient-text">Kings Task Deck</span>
-          </h2>
-          <p style={{ color: "var(--text-secondary)", margin: 0, fontSize: "0.95rem" }}>
-            The 5 Handwritten Pillars: Identity Lock-In, Minimum Viable Actions, Focus Timers, 7-Day Rewards, & Dry Week Penalties.
-          </p>
-        </div>
-
-        {/* Top Action CTAs */}
-        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-          {/* Seed Core Habits Button */}
-          <button
-            onClick={handleSeedCoreHabits}
-            className="btn-secondary"
-            style={{
-              fontSize: "0.85rem",
-              padding: "9px 16px",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              border: "1.5px solid var(--accent-brand)",
-              color: "var(--accent-brand)",
-              fontWeight: 800,
-            }}
-            title="Seed or sync the 5 exact core habits from your handwritten notebook"
-          >
-            <span>⚡</span>
-            Seed 5 Core Habits (Notebook)
-          </button>
-
-          {/* Sunday AI Evaluation Button */}
-          <button
-            onClick={handleRunSundayEvaluation}
-            disabled={isEvaluating || streakTasks.length === 0}
-            className="btn-lime"
-            style={{
-              fontSize: "0.85rem",
-              padding: "9px 18px",
-              opacity: streakTasks.length === 0 ? 0.5 : 1,
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-            }}
-            title="Calculate Sunday weekly points out of 350 based on numbers and topics read"
-          >
-            <span>✨</span>
-            {isEvaluating ? "Evaluating Week..." : "Evaluate Sunday Points (out of 350)"}
-          </button>
-
-          {/* New Task Trigger Button */}
-          <button
-            onClick={() => {
-              setShowAddForm(!showAddForm);
-              setNewCategory(activeTab === "streaks" ? "Streak" : "LeetCode");
-            }}
-            className="btn-primary"
-            style={{ fontSize: "0.85rem", padding: "9px 18px" }}
-          >
-            {showAddForm ? "Cancel ✕" : activeTab === "streaks" ? "🔥 Custom Streak" : "➕ New Task"}
-          </button>
-        </div>
-      </div>
-
-      {/* ═══════════════════════════════════════════════════════════════════════
-          GLOBAL "DRY WEEK" ACTIVE ALERT BANNER (Miss Once, Not Twice Violation)
-      ════════════════════════════════════════════════════════════════════════ */}
-      {dryWeekViolations.length > 0 && (
-        <div
-          style={{
-            marginBottom: "1.5rem",
-            padding: "1.2rem 1.4rem",
-            borderRadius: 14,
-            background: "linear-gradient(135deg, rgba(225, 29, 72, 0.18) 0%, rgba(159, 18, 57, 0.28) 100%)",
-            border: "2px solid #e11d48",
-            boxShadow: "0 8px 30px rgba(225, 29, 72, 0.25)",
-            animation: "pulseLockdown 2.5s infinite ease-in-out",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "flex-start", gap: 14, flexWrap: "wrap" }}>
-            <div
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: 10,
-                background: "#e11d48",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 24,
-                color: "#ffffff",
-                flexShrink: 0,
-              }}
-            >
-              🚨
-            </div>
-
-            <div style={{ flex: 1, minWidth: 280 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                <h3 style={{ fontSize: "1.18rem", margin: 0, fontWeight: 900, color: "#fda4af" }}>
-                  CRITICAL PROTOCOL: DRY WEEK ACTIVATED (7-DAY PENALTY)
-                </h3>
-                <span
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 900,
-                    padding: "3px 10px",
-                    borderRadius: 12,
-                    background: "#e11d48",
-                    color: "#ffffff",
-                    letterSpacing: "0.05em",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  Miss Once, Not Twice Violated
-                </span>
-              </div>
-
-              <p style={{ margin: "6px 0 10px", color: "var(--text-primary)", fontSize: "0.92rem", lineHeight: 1.5 }}>
-                You missed 2 consecutive days on:{" "}
-                <strong>{dryWeekViolations.map((t) => t.title).join(", ")}</strong>.
-                The notebook penalty rule is in effect for the next 7 days:
-              </p>
-
-              {/* 4 Strict Rules */}
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
-                  gap: 8,
-                  marginBottom: 12,
-                }}
-              >
-                <div style={{ padding: "6px 12px", borderRadius: 8, background: "rgba(0,0,0,0.35)", fontSize: 12, color: "#fecdd3", fontWeight: 700 }}>
-                  🚫 Strictly NO Sweets & Sugar
-                </div>
-                <div style={{ padding: "6px 12px", borderRadius: 8, background: "rgba(0,0,0,0.35)", fontSize: 12, color: "#fecdd3", fontWeight: 700 }}>
-                  🚫 Strictly NO Junk Food
-                </div>
-                <div style={{ padding: "6px 12px", borderRadius: 8, background: "rgba(0,0,0,0.35)", fontSize: 12, color: "#fecdd3", fontWeight: 700 }}>
-                  🚫 Strictly NO Parties & Hangouts
-                </div>
-                <div style={{ padding: "6px 12px", borderRadius: 8, background: "rgba(0,0,0,0.35)", fontSize: 12, color: "#fecdd3", fontWeight: 700 }}>
-                  🚫 Strictly NO Chai for 7 Days!
-                </div>
-              </div>
-
-              {/* Exercise 2X Penalty Badge */}
-              {isExerciseDryWeek && (
-                <div
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 8,
-                    padding: "8px 14px",
-                    borderRadius: 8,
-                    background: "rgba(245, 158, 11, 0.25)",
-                    border: "1.5px solid #f59e0b",
-                    color: "#fde68a",
-                    fontSize: "0.86rem",
-                    fontWeight: 800,
-                  }}
-                >
-                  <span>⚡</span>
-                  <strong>2X TRAINING WEEK MANDATORY:</strong> Double sets on Push-ups (6 sets), Squats (6 sets), Planks (6 sets) & Pull-ups for 7 days!
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── 1-Day Warning Notice (If Missed Yesterday) ── */}
-      {warningViolations.length > 0 && dryWeekViolations.length === 0 && (
-        <div
-          style={{
-            marginBottom: "1.5rem",
-            padding: "10px 16px",
-            borderRadius: 10,
-            background: "rgba(245, 158, 11, 0.15)",
-            border: "1.5px solid #f59e0b",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: 10,
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.9rem" }}>
-            <span style={{ fontSize: 20 }}>⚠️</span>
-            <span style={{ color: "var(--text-primary)" }}>
-              <strong>Miss Once, Not Twice Warning:</strong> You missed yesterday on{" "}
-              <strong>{warningViolations.map((t) => t.title).join(", ")}</strong>. Check in today to prevent triggering the 7-day Dry Week penalty!
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* ── Sunday Evaluation System Info Banner (350 Points Rule) ── */}
+      {/* ── Minimalist Clean Header ── */}
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          padding: "10px 16px",
-          borderRadius: 10,
-          background: "var(--bg-surface)",
-          border: "1px solid var(--border-subtle)",
-          marginBottom: "1.5rem",
+          marginBottom: "1.2rem",
           flexWrap: "wrap",
-          gap: 10,
+          gap: 12,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.88rem" }}>
-          <span style={{ fontSize: 18 }}>💡</span>
-          <span style={{ color: "var(--text-primary)" }}>
-            <strong>Sunday AI Rubric:</strong> 5 streak tasks = 50 pts/day (10 each). 7 days = 350 max points (capped at 335 max by Gemini AI coach). Points reset to 0 every Sunday.
-          </span>
-        </div>
-
-        {evaluations.length > 0 && (
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <button
-            onClick={() => setShowHistoryModal(true)}
+            onClick={() => setActiveTab("streaks")}
             style={{
-              background: "transparent",
-              border: "none",
-              color: "var(--accent-brand)",
-              fontSize: "0.84rem",
-              fontWeight: 700,
+              padding: "7px 16px",
+              borderRadius: 8,
+              fontSize: "0.92rem",
+              fontWeight: 800,
               cursor: "pointer",
-              textDecoration: "underline",
-              padding: 0,
+              border: "none",
+              background: activeTab === "streaks" ? "var(--accent-brand)" : "transparent",
+              color: activeTab === "streaks" ? "var(--text-on-accent)" : "var(--text-secondary)",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              transition: "all 0.2s ease",
             }}
           >
-            📜 View Past Sunday Reports ({evaluations.length})
+            <span>🔥</span> Habit Streaks ({streakTasks.length})
           </button>
-        )}
-      </div>
 
-      {/* ── Mode Switcher (Habit Streaks vs General Tasks) ── */}
-      <div
-        style={{
-          display: "flex",
-          gap: 10,
-          marginBottom: "1.5rem",
-          borderBottom: "1px solid var(--border-subtle)",
-          paddingBottom: "0.8rem",
-        }}
-      >
-        <button
-          onClick={() => setActiveTab("streaks")}
-          style={{
-            padding: "8px 18px",
-            borderRadius: 8,
-            fontSize: "0.95rem",
-            fontWeight: 800,
-            cursor: "pointer",
-            border: "none",
-            background: activeTab === "streaks" ? "var(--accent-brand)" : "transparent",
-            color: activeTab === "streaks" ? "var(--text-on-accent)" : "var(--text-secondary)",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-            transition: "all 0.2s ease",
-          }}
-        >
-          <span>🔥</span> Daily Habit Streaks ({streakTasks.length} / 5)
-        </button>
-
-        <button
-          onClick={() => setActiveTab("general")}
-          style={{
-            padding: "8px 18px",
-            borderRadius: 8,
-            fontSize: "0.95rem",
-            fontWeight: 800,
-            cursor: "pointer",
-            border: "none",
-            background: activeTab === "general" ? "var(--accent-brand)" : "transparent",
-            color: activeTab === "general" ? "var(--text-on-accent)" : "var(--text-secondary)",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-            transition: "all 0.2s ease",
-          }}
-        >
-          <span>📋</span> General Tasks ({generalTasks.length})
-        </button>
-      </div>
-
-      {/* ── Consistency Heatmap (GitHub-Style Grid) ── */}
-      {activeTab === "streaks" && (
-        <div
-          className="glass-card"
-          style={{
-            padding: "1.2rem 1.4rem",
-            borderRadius: 14,
-            marginBottom: "1.8rem",
-            background: "var(--bg-surface)",
-            border: "1px solid var(--border-subtle)",
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
-            <div>
-              <span style={{ fontSize: 13, fontWeight: 800, color: "var(--text-primary)" }}>
-                📊 16-Week Habit Consistency Grid
-              </span>
-              <span style={{ fontSize: 11, color: "var(--text-secondary)", marginLeft: 8 }}>
-                (Combined check-in intensity across all 5 habits)
-              </span>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--text-secondary)" }}>
-              <span>Less</span>
-              <span style={{ width: 10, height: 10, borderRadius: 2, background: "rgba(255,255,255,0.06)", border: "1px solid var(--border-subtle)" }} />
-              <span style={{ width: 10, height: 10, borderRadius: 2, background: "#065f46" }} />
-              <span style={{ width: 10, height: 10, borderRadius: 2, background: "#10b981" }} />
-              <span style={{ width: 10, height: 10, borderRadius: 2, background: "#34d399" }} />
-              <span>More (All 5)</span>
-            </div>
-          </div>
-
-          <div
+          <button
+            onClick={() => setActiveTab("general")}
             style={{
-              display: "grid",
-              gridAutoFlow: "column",
-              gridTemplateRows: "repeat(7, 12px)",
-              gap: 4,
-              overflowX: "auto",
-              paddingBottom: 6,
+              padding: "7px 16px",
+              borderRadius: 8,
+              fontSize: "0.92rem",
+              fontWeight: 800,
+              cursor: "pointer",
+              border: "none",
+              background: activeTab === "general" ? "var(--accent-brand)" : "transparent",
+              color: activeTab === "general" ? "var(--text-on-accent)" : "var(--text-secondary)",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              transition: "all 0.2s ease",
             }}
           >
-            {heatmapData.map((d, i) => {
-              const bgColors = [
-                "rgba(255,255,255,0.06)",
-                "#065f46",
-                "#10b981",
-                "#34d399",
-              ];
-              return (
-                <div
-                  key={i}
-                  title={`${d.date}: ${d.count} / 5 habits checked in`}
-                  style={{
-                    width: 12,
-                    height: 12,
-                    borderRadius: 2,
-                    background: bgColors[d.level],
-                    border: d.level === 0 ? "1px solid var(--border-subtle)" : "none",
-                    cursor: "pointer",
-                  }}
-                />
-              );
-            })}
-          </div>
+            <span>📋</span> Tasks ({generalTasks.length})
+          </button>
         </div>
-      )}
 
-      {/* ── Add Task Form ── */}
+        <button
+          onClick={() => setShowAddForm(!showAddForm)}
+          className="btn-secondary"
+          style={{ fontSize: "0.85rem", padding: "7px 14px" }}
+        >
+          {showAddForm ? "Cancel ✕" : "+ New Task"}
+        </button>
+      </div>
+
+      {/* ── Add General Task Inline Form ── */}
       {showAddForm && (
-        <div
+        <form
+          onSubmit={handleAddTask}
           className="glass-card"
           style={{
-            padding: "1.6rem",
-            marginBottom: "1.8rem",
-            borderRadius: 14,
-            border: "1.5px solid var(--accent-brand)",
+            padding: "1.2rem",
+            marginBottom: "1.4rem",
+            borderRadius: 12,
+            border: "1px solid var(--accent-brand)",
             background: "var(--bg-surface)",
-            animation: "slideDownFade 0.25s ease-out",
+            display: "grid",
+            gap: 10,
           }}
         >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-            <h3 style={{ fontSize: "1.15rem", margin: 0, fontWeight: 800, color: "var(--text-primary)" }}>
-              {newCategory === "Streak" ? "🔥 Activate New Daily Habit Streak" : "📋 Create General Task"}
-            </h3>
-
-            {newCategory === "Streak" && (
-              <span
-                style={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                  padding: "4px 10px",
-                  borderRadius: 12,
-                  background: streakTasks.length >= 5 ? "rgba(244, 63, 94, 0.15)" : "var(--badge-bg)",
-                  color: streakTasks.length >= 5 ? "#fb7185" : "var(--accent-brand)",
-                }}
-              >
-                Streak Slots: {streakTasks.length} / 5 active
-              </span>
-            )}
-          </div>
-
           {formError && (
-            <div
-              style={{
-                padding: "8px 12px",
-                borderRadius: 8,
-                marginBottom: "1rem",
-                background: "rgba(244, 63, 94, 0.15)",
-                border: "1px solid rgba(244, 63, 94, 0.3)",
-                color: "#fb7185",
-                fontSize: "0.88rem",
-              }}
-            >
+            <div style={{ color: "#f43f5e", fontSize: "0.85rem", fontWeight: 700 }}>
               ⚠️ {formError}
             </div>
           )}
-
-          <form onSubmit={handleAddTask} style={{ display: "grid", gap: "1.2rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "var(--text-primary)", marginBottom: 6 }}>
-                {newCategory === "Streak" ? "Streak / Habit Name *" : "Task Title *"}
-              </label>
-              <input
-                type="text"
-                placeholder={
-                  newCategory === "Streak"
-                    ? "e.g. Daily LeetCode (2 Mediums), System Design & Architecture Reading..."
-                    : "e.g. Complete SVERI COE project proposal, Setup Docker container..."
-                }
-                value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
-                required
-                style={{
-                  width: "100%",
-                  padding: "10px 14px",
-                  background: "var(--input-bg)",
-                  border: "1px solid var(--border-light)",
-                  borderRadius: 8,
-                  color: "var(--text-primary)",
-                  fontSize: "0.95rem",
-                }}
-              />
-            </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
-              <div>
-                <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "var(--text-primary)", marginBottom: 6 }}>
-                  Category
-                </label>
-                <select
-                  value={newCategory}
-                  onChange={(e) => {
-                    setNewCategory(e.target.value);
-                    setFormError("");
-                  }}
-                  style={{
-                    width: "100%",
-                    padding: "10px 12px",
-                    background: "var(--input-bg)",
-                    border: "1px solid var(--border-light)",
-                    borderRadius: 8,
-                    color: "var(--text-primary)",
-                    fontSize: "0.9rem",
-                  }}
-                >
-                  <option value="Streak">🔥 Streak (Habit Tracking - Max 5)</option>
-                  <option value="LeetCode">LeetCode / DSA</option>
-                  <option value="Projects">Projects</option>
-                  <option value="College">College / SVERI</option>
-                  <option value="Career">Career / Prep</option>
-                  <option value="General">General</option>
-                </select>
-              </div>
-
-              {newCategory === "Streak" ? (
-                <div>
-                  <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "var(--text-primary)", marginBottom: 6 }}>
-                    Target Goal (Days to follow) 🎯
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="365"
-                    value={newGoalDays}
-                    onChange={(e) => setNewGoalDays(e.target.value)}
-                    required
-                    style={{
-                      width: "100%",
-                      padding: "10px 12px",
-                      background: "var(--input-bg)",
-                      border: "1px solid var(--border-light)",
-                      borderRadius: 8,
-                      color: "var(--text-primary)",
-                      fontSize: "0.9rem",
-                    }}
-                  />
-                </div>
-              ) : (
-                <div>
-                  <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "var(--text-primary)", marginBottom: 6 }}>
-                    Due Date / Target
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Today, Tomorrow, Oct 31"
-                    value={newDueDate}
-                    onChange={(e) => setNewDueDate(e.target.value)}
-                    style={{
-                      width: "100%",
-                      padding: "10px 12px",
-                      background: "var(--input-bg)",
-                      border: "1px solid var(--border-light)",
-                      borderRadius: 8,
-                      color: "var(--text-primary)",
-                      fontSize: "0.9rem",
-                    }}
-                  />
-                </div>
-              )}
-
-              <div>
-                <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "var(--text-primary)", marginBottom: 6 }}>
-                  Priority
-                </label>
-                <select
-                  value={newPriority}
-                  onChange={(e) => setNewPriority(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "10px 12px",
-                    background: "var(--input-bg)",
-                    border: "1px solid var(--border-light)",
-                    borderRadius: 8,
-                    color: "var(--text-primary)",
-                    fontSize: "0.9rem",
-                  }}
-                >
-                  <option value="High">High</option>
-                  <option value="Medium">Medium</option>
-                  <option value="Low">Low</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Dynamic Custom Fields */}
-            {newCategory === "Streak" && (
-              <div
-                style={{
-                  padding: "1.2rem",
-                  borderRadius: 10,
-                  background: "var(--bg-base)",
-                  border: "1px solid var(--border-subtle)",
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, flexWrap: "wrap", gap: 8 }}>
-                  <div>
-                    <label style={{ fontSize: 13, fontWeight: 800, color: "var(--text-primary)", display: "block" }}>
-                      ⚙️ Custom Tracking Fields
-                    </label>
-                    <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>
-                      Every day to maintain your streak, you will enter the numbers done, topics read, and reflections.
-                    </span>
-                  </div>
-
-                  <div style={{ display: "flex", gap: 6 }}>
-                    <button
-                      type="button"
-                      onClick={() => handleAddField("number")}
-                      className="btn-secondary"
-                      style={{ fontSize: 11, padding: "4px 8px" }}
-                    >
-                      + Number Metric
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleAddField("topics")}
-                      className="btn-secondary"
-                      style={{ fontSize: 11, padding: "4px 8px" }}
-                    >
-                      + Topics List
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleAddField("text")}
-                      className="btn-secondary"
-                      style={{ fontSize: 11, padding: "4px 8px" }}
-                    >
-                      + Reflection
-                    </button>
-                  </div>
-                </div>
-
-                <div style={{ display: "grid", gap: 8 }}>
-                  {customFields.map((field, idx) => (
-                    <div
-                      key={field.id}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                        padding: "8px 10px",
-                        borderRadius: 6,
-                        background: "var(--bg-surface)",
-                        border: "1px solid var(--border-subtle)",
-                        flexWrap: "wrap",
-                      }}
-                    >
-                      <span style={{ fontSize: 11, fontWeight: 800, color: "var(--accent-brand)", width: 22 }}>
-                        #{idx + 1}
-                      </span>
-
-                      <input
-                        type="text"
-                        placeholder="Field Name"
-                        value={field.label}
-                        onChange={(e) => handleUpdateField(field.id, "label", e.target.value)}
-                        style={{
-                          flex: 2,
-                          minWidth: 160,
-                          padding: "6px 10px",
-                          background: "var(--input-bg)",
-                          border: "1px solid var(--border-light)",
-                          borderRadius: 6,
-                          color: "var(--text-primary)",
-                          fontSize: "0.85rem",
-                        }}
-                      />
-
-                      <select
-                        value={field.type}
-                        onChange={(e) => handleUpdateField(field.id, "type", e.target.value)}
-                        style={{
-                          flex: 1,
-                          minWidth: 110,
-                          padding: "6px 8px",
-                          background: "var(--input-bg)",
-                          border: "1px solid var(--border-light)",
-                          borderRadius: 6,
-                          color: "var(--text-primary)",
-                          fontSize: "0.82rem",
-                        }}
-                      >
-                        <option value="number">🔢 Number Count</option>
-                        <option value="topics">🏷️ Topics List</option>
-                        <option value="text">✍️ Reflection Text</option>
-                      </select>
-
-                      <input
-                        type="text"
-                        placeholder="Target (e.g. 5)"
-                        value={field.target || ""}
-                        onChange={(e) => handleUpdateField(field.id, "target", e.target.value)}
-                        style={{
-                          flex: 1,
-                          minWidth: 90,
-                          padding: "6px 8px",
-                          background: "var(--input-bg)",
-                          border: "1px solid var(--border-light)",
-                          borderRadius: 6,
-                          color: "var(--text-primary)",
-                          fontSize: "0.82rem",
-                        }}
-                      />
-
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveField(field.id)}
-                        style={{
-                          background: "transparent",
-                          border: "none",
-                          color: "#f43f5e",
-                          cursor: "pointer",
-                          fontSize: 14,
-                          padding: "4px 8px",
-                        }}
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 4 }}>
-              <button
-                type="button"
-                onClick={() => setShowAddForm(false)}
-                className="btn-secondary"
-                style={{ fontSize: "0.88rem", padding: "8px 16px" }}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={newCategory === "Streak" && streakTasks.length >= 5}
-                className="btn-lime"
-                style={{
-                  fontSize: "0.88rem",
-                  padding: "8px 20px",
-                  opacity: newCategory === "Streak" && streakTasks.length >= 5 ? 0.5 : 1,
-                }}
-              >
-                {newCategory === "Streak" ? "🔥 Activate Streak (Max 5)" : "Save Task to Storage"}
-              </button>
-            </div>
-          </form>
-        </div>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <input
+              type="text"
+              placeholder="Task title..."
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              required
+              style={{
+                flex: 2,
+                minWidth: 200,
+                padding: "8px 12px",
+                background: "var(--input-bg)",
+                border: "1px solid var(--border-light)",
+                borderRadius: 6,
+                color: "var(--text-primary)",
+                fontSize: "0.9rem",
+              }}
+            />
+            <select
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              style={{
+                padding: "8px 10px",
+                background: "var(--input-bg)",
+                border: "1px solid var(--border-light)",
+                borderRadius: 6,
+                color: "var(--text-primary)",
+                fontSize: "0.85rem",
+              }}
+            >
+              <option value="General">General</option>
+              <option value="LeetCode">LeetCode / DSA</option>
+              <option value="Projects">Projects</option>
+              <option value="College">College</option>
+              <option value="Career">Career</option>
+            </select>
+            <select
+              value={newPriority}
+              onChange={(e) => setNewPriority(e.target.value)}
+              style={{
+                padding: "8px 10px",
+                background: "var(--input-bg)",
+                border: "1px solid var(--border-light)",
+                borderRadius: 6,
+                color: "var(--text-primary)",
+                fontSize: "0.85rem",
+              }}
+            >
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+            <button type="submit" className="btn-lime" style={{ padding: "8px 18px", fontSize: "0.85rem" }}>
+              Save Task
+            </button>
+          </div>
+        </form>
       )}
 
       {/* ═══════════════════════════════════════════════════════════════════════
-          TAB 1: HABIT STREAKS VIEW (The 5 Core Handwritten Pillars)
+          TAB 1: 5 CORE HABIT STREAKS (ONE-LINE READABLE BY DEFAULT, EXPAND ON CLICK)
       ════════════════════════════════════════════════════════════════════════ */}
       {activeTab === "streaks" && (
         <div>
-          {/* Header row with reset & count */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "1rem",
-              flexWrap: "wrap",
-              gap: 8,
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <h3 style={{ fontSize: "1.15rem", margin: 0, fontWeight: 800, color: "var(--text-primary)" }}>
-                Active Habit Pillars
-              </h3>
-              <span
-                style={{
-                  fontSize: 12,
-                  fontWeight: 800,
-                  padding: "2px 8px",
-                  borderRadius: 12,
-                  background: "var(--badge-bg)",
-                  color: "var(--accent-brand)",
-                  border: "1px solid var(--border-subtle)",
-                }}
-              >
-                Streaks: {streakTasks.length} / 5
-              </span>
-            </div>
+          <div style={{ display: "grid", gap: 10, marginBottom: "2rem" }}>
+            {streakTasks.map((task) => {
+              const currentStreak = task.currentStreak || 0;
+              const goalDays = Number(task.goalDays) || 30;
+              const bestStreak = task.bestStreak || currentStreak;
+              const isCheckedToday = task.lastCheckedDate === todayStr;
+              const isExpanded = expandedTaskId === task.id;
+              const historyList = Array.isArray(task.history) ? task.history : [];
+              const topicsMasterList = Array.isArray(task.topicsMasterList) ? task.topicsMasterList : [];
+              const timerState = taskTimers[task.id] || { totalSec: (task.timerMinutes || 10) * 60, remSec: (task.timerMinutes || 10) * 60, isRunning: false };
 
-            <div style={{ display: "flex", gap: 10 }}>
-              <button
-                onClick={handleResetWeeklyPoints}
-                style={{
-                  background: "transparent",
-                  border: "1px solid var(--border-subtle)",
-                  color: "var(--text-secondary)",
-                  fontSize: "0.8rem",
-                  fontWeight: 700,
-                  padding: "4px 10px",
-                  borderRadius: 6,
-                  cursor: "pointer",
-                }}
-                title="Reset active weekly streak points to 0"
-              >
-                🔄 Reset Weekly Pts to 0
-              </button>
-            </div>
-          </div>
+              const currentInput = dailyTaskInputs[task.id] || {
+                numberDone: "",
+                topics: "",
+                note: task.dailyLog || "",
+                nextDayQueue: task.nextDayQueue || "",
+                fieldValues: {},
+              };
 
-          {/* Habit Task Cards Grid */}
-          {streakTasks.length === 0 ? (
-            <div
-              className="glass-card"
-              style={{
-                padding: "3rem 1.5rem",
-                textAlign: "center",
-                borderRadius: 14,
-                background: "var(--bg-surface)",
-              }}
-            >
-              <div style={{ fontSize: 42, marginBottom: 12 }}>🔥</div>
-              <h4 style={{ fontSize: "1.2rem", margin: "0 0 6px", color: "var(--text-primary)" }}>
-                No Habit Streaks Active Yet
-              </h4>
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", maxWidth: 460, margin: "0 auto 1.4rem" }}>
-                Click below to instantly load your 5 core Atomic Habit pillars from your handwritten notebook.
-              </p>
-              <button
-                onClick={handleSeedCoreHabits}
-                className="btn-lime"
-                style={{ fontSize: "0.9rem", padding: "10px 24px" }}
-              >
-                ⚡ Load 5 Core Habits from Notebook
-              </button>
-            </div>
-          ) : (
-            <div style={{ display: "grid", gap: "1.5rem" }}>
-              {streakTasks.map((task) => {
-                const currentStreak = task.currentStreak || 0;
-                const goalDays = Number(task.goalDays) || 30;
-                const bestStreak = task.bestStreak || currentStreak;
-                const percent = Math.min(100, Math.round((currentStreak / goalDays) * 100));
-                const isCheckedToday = task.lastCheckedDate === todayStr;
-                const isExpanded = expandedHistoryTaskId === task.id;
-                const isPillarInfoExpanded = expandedPillarInfoTaskId === task.id;
-                const historyList = Array.isArray(task.history) ? task.history : [];
-                const topicsMasterList = Array.isArray(task.topicsMasterList) ? task.topicsMasterList : [];
-                const timerState = taskTimers[task.id] || { totalSec: (task.timerMinutes || 10) * 60, remSec: (task.timerMinutes || 10) * 60, isRunning: false };
-
-                const configuredFields = Array.isArray(task.fields) && task.fields.length > 0 ? task.fields : [
-                  { id: "f_num", label: "Number Completed", type: "number", target: "2" },
-                  { id: "f_topics", label: "Topics Read", type: "topics", target: "DSA" },
-                  { id: "f_notes", label: "Daily Reflection", type: "text", target: "Notes" },
-                ];
-
-                const currentInput = dailyTaskInputs[task.id] || {
-                  numberDone: "",
-                  topics: "",
-                  note: task.dailyLog || "",
-                  nextDayQueue: task.nextDayQueue || "",
-                  fieldValues: {},
-                };
-
-                return (
+              return (
+                <div
+                  key={task.id}
+                  className="glass-card"
+                  style={{
+                    borderRadius: 12,
+                    background: "var(--bg-surface)",
+                    border: isExpanded
+                      ? "1.5px solid var(--accent-brand)"
+                      : task.isDryWeek
+                      ? "1.5px solid #e11d48"
+                      : isCheckedToday
+                      ? "1px solid rgba(16, 185, 129, 0.4)"
+                      : "1px solid var(--border-subtle)",
+                    transition: "all 0.2s ease",
+                    overflow: "hidden",
+                  }}
+                >
+                  {/* ─────────────────────────────────────────────────────────
+                      COMPACT ONE-LINE ROW (Just one line to read name of task)
+                  ────────────────────────────────────────────────────────── */}
                   <div
-                    key={task.id}
-                    className="glass-card"
+                    onClick={() => setExpandedTaskId(isExpanded ? null : task.id)}
                     style={{
-                      padding: "1.6rem",
-                      borderRadius: 14,
-                      border: task.isDryWeek
-                        ? "2px solid #e11d48"
-                        : task.isWarning
-                        ? "1.5px solid #f59e0b"
-                        : isCheckedToday
-                        ? "1.5px solid var(--accent-secondary)"
-                        : "1px solid var(--border-subtle)",
-                      background: "var(--bg-surface)",
-                      boxShadow: isCheckedToday ? "0 4px 20px var(--shadow-card)" : "none",
-                      transition: "all 0.25s ease",
+                      padding: "12px 16px",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: 12,
+                      userSelect: "none",
+                      background: isExpanded ? "rgba(2, 132, 199, 0.04)" : "transparent",
                     }}
                   >
-                    {/* Top Row: Title, Badges, Points, Delete */}
+                    {/* Left: Checkmark & Title */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 260 }}>
+                      <div
+                        style={{
+                          width: 22,
+                          height: 22,
+                          borderRadius: "50%",
+                          border: isCheckedToday ? "2px solid #10b981" : "2px solid var(--border-subtle)",
+                          background: isCheckedToday ? "#10b981" : "transparent",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "#ffffff",
+                          fontSize: 12,
+                          fontWeight: 900,
+                          flexShrink: 0,
+                          boxShadow: isCheckedToday ? "0 0 10px rgba(16, 185, 129, 0.5)" : "none",
+                        }}
+                      >
+                        {isCheckedToday ? "✓" : ""}
+                      </div>
+
+                      <div
+                        style={{
+                          fontSize: "0.98rem",
+                          fontWeight: 800,
+                          color: isCheckedToday ? "var(--text-primary)" : "var(--text-primary)",
+                          letterSpacing: "-0.01em",
+                        }}
+                      >
+                        {task.title}
+                      </div>
+                    </div>
+
+                    {/* Right: Badges & Expand Chevron */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+                      {/* Streak badge */}
+                      <span
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 800,
+                          padding: "3px 8px",
+                          borderRadius: 8,
+                          background: "var(--badge-bg)",
+                          color: "var(--accent-brand)",
+                          border: "1px solid var(--border-subtle)",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        🔥 {currentStreak}d
+                      </span>
+
+                      {/* Today Status Pill */}
+                      {isCheckedToday ? (
+                        <span
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 800,
+                            padding: "3px 8px",
+                            borderRadius: 8,
+                            background: "rgba(16, 185, 129, 0.15)",
+                            color: "#10b981",
+                            border: "1px solid rgba(16, 185, 129, 0.3)",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          ✓ Done Today
+                        </span>
+                      ) : (
+                        <span
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 700,
+                            padding: "3px 8px",
+                            borderRadius: 8,
+                            background: "var(--badge-bg)",
+                            color: "var(--text-secondary)",
+                            border: "1px solid var(--border-subtle)",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          To Do
+                        </span>
+                      )}
+
+                      {/* Dry Week / Warning Indicator */}
+                      {task.isDryWeek && (
+                        <span
+                          style={{
+                            fontSize: 10,
+                            fontWeight: 900,
+                            padding: "2px 6px",
+                            borderRadius: 6,
+                            background: "#e11d48",
+                            color: "#fff",
+                            textTransform: "uppercase",
+                          }}
+                        >
+                          Dry Week
+                        </span>
+                      )}
+
+                      {/* Expand indicator */}
+                      <span
+                        style={{
+                          fontSize: 11,
+                          color: "var(--text-secondary)",
+                          transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)",
+                          transition: "transform 0.2s ease",
+                        }}
+                      >
+                        ▼
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* ─────────────────────────────────────────────────────────
+                      EXPANDED DETAILS VIEW (Details + Complete For Today Form)
+                  ────────────────────────────────────────────────────────── */}
+                  {isExpanded && (
                     <div
                       style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "flex-start",
-                        flexWrap: "wrap",
-                        gap: 12,
-                        marginBottom: 12,
+                        padding: "1rem 1.4rem 1.4rem",
+                        borderTop: "1px solid var(--border-subtle)",
+                        background: "var(--bg-base)",
+                        animation: "slideDownFade 0.2s ease-out",
+                        display: "grid",
+                        gap: 14,
                       }}
                     >
-                      <div style={{ flex: 1, minWidth: 280 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                          <span style={{ fontSize: 24 }}>🔥</span>
-                          <h4 style={{ fontSize: "1.22rem", margin: 0, fontWeight: 900, color: "var(--text-primary)" }}>
-                            {task.title}
-                          </h4>
-
-                          {/* Status Badges */}
-                          {isCheckedToday && (
-                            <span
-                              style={{
-                                fontSize: 11,
-                                fontWeight: 800,
-                                padding: "3px 10px",
-                                borderRadius: 12,
-                                background: "rgba(16, 185, 129, 0.15)",
-                                color: "#10b981",
-                                border: "1px solid rgba(16, 185, 129, 0.3)",
+                      {/* Pillar Info Brief */}
+                      <div
+                        style={{
+                          padding: "10px 14px",
+                          borderRadius: 8,
+                          background: "var(--bg-surface)",
+                          border: "1px solid var(--border-subtle)",
+                          fontSize: "0.85rem",
+                          display: "grid",
+                          gap: 6,
+                        }}
+                      >
+                        <div>
+                          <strong style={{ color: "var(--text-primary)" }}>Why:</strong>{" "}
+                          <span style={{ color: "var(--text-secondary)" }}>{task.why}</span>
+                        </div>
+                        <div>
+                          <strong style={{ color: "var(--text-primary)" }}>Fix Do Everyday:</strong>{" "}
+                          <span style={{ color: "var(--accent-secondary)", fontWeight: 700 }}>{task.minimumAction}</span>
+                        </div>
+                        <div>
+                          <strong style={{ color: "var(--text-primary)" }}>Environment:</strong>{" "}
+                          <span style={{ color: "var(--text-secondary)" }}>{task.environmentCue}</span>
+                        </div>
+                        {task.affirmation && (
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 6 }}>
+                            <div>
+                              <strong style={{ color: "var(--accent-brand)" }}>Affirmation:</strong>{" "}
+                              <span style={{ fontStyle: "italic", color: "var(--text-primary)", fontWeight: 700 }}>
+                                &ldquo;{task.affirmation}&rdquo;
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setAffirmationModalHabit(task);
+                                setEnvChecklist({ notebook: false, phoneAway: false, distractionsClosed: false, musicPlaying: false });
                               }}
+                              className="btn-lime"
+                              style={{ padding: "3px 10px", fontSize: 11, fontWeight: 800 }}
                             >
-                              ✓ Maintained Today (+10 pts)
-                            </span>
-                          )}
+                              🗣️ Recite Affirmation
+                            </button>
+                          </div>
+                        )}
+                      </div>
 
-                          {task.isWarning && !task.isDryWeek && !isCheckedToday && (
-                            <span
-                              style={{
-                                fontSize: 11,
-                                fontWeight: 800,
-                                padding: "3px 10px",
-                                borderRadius: 12,
-                                background: "rgba(245, 158, 11, 0.2)",
-                                color: "#f59e0b",
-                                border: "1px solid rgba(245, 158, 11, 0.4)",
-                              }}
-                            >
-                              ⚠️ Missed 1 Day (Dry Week Warning)
-                            </span>
-                          )}
-
-                          {task.isDryWeek && (
-                            <span
-                              style={{
-                                fontSize: 11,
-                                fontWeight: 900,
-                                padding: "3px 10px",
-                                borderRadius: 12,
-                                background: "rgba(225, 29, 72, 0.2)",
-                                color: "#fda4af",
-                                border: "1px solid #e11d48",
-                              }}
-                            >
-                              🚨 DRY WEEK ACTIVE ({task.missedDaysCount} Days Missed)
-                            </span>
-                          )}
+                      {/* Built-in Focus Sprint Timer */}
+                      <div
+                        style={{
+                          padding: "8px 12px",
+                          borderRadius: 8,
+                          background: "var(--bg-surface)",
+                          border: "1px solid var(--border-subtle)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          flexWrap: "wrap",
+                          gap: 8,
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                          <span style={{ fontSize: 18 }}>⏱️</span>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text-secondary)" }}>
+                            Focus Sprint:
+                          </span>
+                          <span style={{ fontFamily: "monospace", fontSize: "1.2rem", fontWeight: 900, color: timerState.isRunning ? "var(--accent-brand)" : "var(--text-primary)" }}>
+                            {formatTime(timerState.remSec)}
+                          </span>
                         </div>
 
-                        <div style={{ display: "flex", gap: 14, marginTop: 8, flexWrap: "wrap", alignItems: "center" }}>
-                          <span style={{ fontSize: "0.92rem", color: "var(--accent-brand)", fontWeight: 800 }}>
-                            🔥 Streak: {currentStreak} Days
-                          </span>
-                          <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>
-                            🏆 Best: {bestStreak} Days
-                          </span>
-                          <span style={{ fontSize: "0.85rem", color: "var(--accent-brand)", fontWeight: 700 }}>
-                            🎯 Goal: {goalDays} Days
-                          </span>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                           <button
-                            onClick={() => {
-                              setEditingGoalTaskId(task.id);
-                              setEditGoalValue(goalDays);
+                            type="button"
+                            onClick={() => resetTimer(task.id, 10)}
+                            style={{ padding: "3px 7px", fontSize: 10, borderRadius: 4, background: "var(--bg-base)", border: "1px solid var(--border-subtle)", color: "var(--text-secondary)", cursor: "pointer" }}
+                          >
+                            10m
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => resetTimer(task.id, 20)}
+                            style={{ padding: "3px 7px", fontSize: 10, borderRadius: 4, background: "var(--bg-base)", border: "1px solid var(--border-subtle)", color: "var(--text-secondary)", cursor: "pointer" }}
+                          >
+                            20m
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => toggleTimer(task.id)}
+                            className={timerState.isRunning ? "btn-secondary" : "btn-lime"}
+                            style={{ padding: "4px 12px", fontSize: 11, fontWeight: 800 }}
+                          >
+                            {timerState.isRunning ? "⏸️ Pause" : "▶️ Start Focus"}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Master Topics Queue Chips */}
+                      {topicsMasterList.length > 0 && (
+                        <div
+                          style={{
+                            padding: "10px 12px",
+                            borderRadius: 8,
+                            background: "var(--bg-surface)",
+                            border: "1px solid var(--border-subtle)",
+                          }}
+                        >
+                          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 800, marginBottom: 6 }}>
+                            <span style={{ color: "var(--text-primary)" }}>🏷️ Topics Queue:</span>
+                            <span style={{ color: "var(--accent-secondary)" }}>
+                              {topicsMasterList.filter((t) => t.status === "mastered").length} / {topicsMasterList.length} Mastered
+                            </span>
+                          </div>
+
+                          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+                            {topicsMasterList.map((tm, idx) => (
+                              <button
+                                key={idx}
+                                type="button"
+                                onClick={() => handleToggleTopicStatus(task, tm.name)}
+                                style={{
+                                  padding: "3px 8px",
+                                  borderRadius: 10,
+                                  fontSize: 11,
+                                  fontWeight: 700,
+                                  cursor: "pointer",
+                                  border: tm.status === "mastered" ? "1px solid #10b981" : "1px solid var(--border-subtle)",
+                                  background: tm.status === "mastered" ? "rgba(16, 185, 129, 0.15)" : "var(--bg-base)",
+                                  color: tm.status === "mastered" ? "#10b981" : "var(--text-primary)",
+                                }}
+                              >
+                                {tm.status === "mastered" ? "✓ " : ""}{tm.name}
+                              </button>
+                            ))}
+                          </div>
+
+                          {/* Add Topic Input */}
+                          <div style={{ display: "flex", gap: 6 }}>
+                            <input
+                              type="text"
+                              placeholder="+ Add topic to this pillar's queue..."
+                              value={newTopicInput[task.id] || ""}
+                              onChange={(e) => setNewTopicInput((prev) => ({ ...prev, [task.id]: e.target.value }))}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  e.preventDefault();
+                                  handleAddMasterTopic(task);
+                                }
+                              }}
+                              style={{
+                                flex: 1,
+                                padding: "4px 8px",
+                                fontSize: 11,
+                                background: "var(--input-bg)",
+                                border: "1px solid var(--border-light)",
+                                borderRadius: 4,
+                                color: "var(--text-primary)",
+                              }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleAddMasterTopic(task)}
+                              className="btn-secondary"
+                              style={{ padding: "4px 8px", fontSize: 11 }}
+                            >
+                              Add
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* ═════════════════════════════════════════════════════════
+                          "COMPLETE FOR TODAY" FORM (Options: What I Done Today)
+                      ══════════════════════════════════════════════════════════ */}
+                      <div
+                        style={{
+                          padding: "12px 14px",
+                          borderRadius: 10,
+                          background: "var(--bg-surface)",
+                          border: "1.5px solid var(--accent-brand)",
+                          display: "grid",
+                          gap: 10,
+                        }}
+                      >
+                        <div style={{ fontSize: 12, fontWeight: 900, color: "var(--accent-brand)", display: "flex", alignItems: "center", gap: 6 }}>
+                          <span>✍️</span> Complete For Today (Enter What You Done):
+                        </div>
+
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 8 }}>
+                          {/* Number Done */}
+                          <div>
+                            <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--text-secondary)", marginBottom: 3 }}>
+                              🔢 Number Completed (e.g. Problems, Sets, Commits):
+                            </label>
+                            <input
+                              type="number"
+                              placeholder="e.g. 2 problems, 12 sets"
+                              value={currentInput.numberDone}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setDailyTaskInputs((prev) => ({
+                                  ...prev,
+                                  [task.id]: { ...(prev[task.id] || {}), numberDone: val },
+                                }));
+                              }}
+                              style={{
+                                width: "100%",
+                                padding: "7px 10px",
+                                background: "var(--input-bg)",
+                                border: "1px solid var(--border-light)",
+                                borderRadius: 6,
+                                color: "var(--text-primary)",
+                                fontSize: "0.85rem",
+                              }}
+                            />
+                          </div>
+
+                          {/* Topics Read */}
+                          <div>
+                            <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--text-secondary)", marginBottom: 3 }}>
+                              🏷️ Topics & Concepts Read Today:
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="e.g. Sliding Window, Next.js Server Actions..."
+                              value={currentInput.topics}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setDailyTaskInputs((prev) => ({
+                                  ...prev,
+                                  [task.id]: { ...(prev[task.id] || {}), topics: val },
+                                }));
+                              }}
+                              style={{
+                                width: "100%",
+                                padding: "7px 10px",
+                                background: "var(--input-bg)",
+                                border: "1px solid var(--border-light)",
+                                borderRadius: 6,
+                                color: "var(--text-primary)",
+                                fontSize: "0.85rem",
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Daily Reflection Note */}
+                        <div>
+                          <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--text-secondary)", marginBottom: 3 }}>
+                            ✍️ Daily Reflection & Breakthrough Note:
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="What key concept or breakthrough did you learn today?"
+                            value={currentInput.note}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setDailyTaskInputs((prev) => ({
+                                ...prev,
+                                [task.id]: { ...(prev[task.id] || {}), note: val },
+                              }));
                             }}
+                            style={{
+                              width: "100%",
+                              padding: "7px 10px",
+                              background: "var(--input-bg)",
+                              border: "1px solid var(--border-light)",
+                              borderRadius: 6,
+                              color: "var(--text-primary)",
+                              fontSize: "0.85rem",
+                            }}
+                          />
+                        </div>
+
+                        {/* Submit Button */}
+                        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 4 }}>
+                          <button
+                            type="button"
+                            onClick={() => handleStreakCheckIn(task.id)}
+                            className="btn-lime"
+                            style={{
+                              padding: "8px 20px",
+                              fontSize: "0.86rem",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 6,
+                              fontWeight: 800,
+                            }}
+                          >
+                            <span>⚡</span>
+                            {isCheckedToday ? "Update Today's Done Details" : "Mark Complete For Today (+10 pts)"}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Logged History Expander */}
+                      {historyList.length > 0 && (
+                        <div style={{ fontSize: 11 }}>
+                          <button
+                            type="button"
+                            onClick={() => setExpandedHistoryTaskId(expandedHistoryTaskId === task.id ? null : task.id)}
                             style={{
                               background: "transparent",
                               border: "none",
                               color: "var(--text-secondary)",
                               cursor: "pointer",
-                              fontSize: 11,
-                              textDecoration: "underline",
                               padding: 0,
+                              textDecoration: "underline",
+                              fontWeight: 700,
                             }}
                           >
-                            ✏️ Edit Goal
+                            {expandedHistoryTaskId === task.id ? "▲ Hide Past History" : `▼ View Past Logged History (${historyList.length} entries)`}
                           </button>
-                        </div>
-                      </div>
 
-                      {/* Right side: Points, Affirmation trigger, 7-day reward */}
-                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                        {/* 7-Day Reward Button */}
-                        {task.weeklyReward && (
-                          <button
-                            onClick={() => setRewardModalHabit(task)}
-                            style={{
-                              background: currentStreak >= 7 ? "rgba(16, 185, 129, 0.15)" : "transparent",
-                              border: "1px solid var(--border-subtle)",
-                              color: currentStreak >= 7 ? "#10b981" : "var(--text-secondary)",
-                              fontSize: "0.82rem",
-                              fontWeight: 800,
-                              padding: "6px 10px",
-                              borderRadius: 8,
-                              cursor: "pointer",
-                            }}
-                            title="View your 7-day reward loop from notebook"
-                          >
-                            🎁 7-Day Reward
-                          </button>
-                        )}
-
-                        <div style={{ textAlign: "right" }}>
-                          <div style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", fontWeight: 700 }}>
-                            Weekly Points
-                          </div>
-                          <div style={{ fontSize: "1.2rem", fontWeight: 900, color: "var(--accent-brand)" }}>
-                            ⚡ {task.weeklyPoints || 0} pts
-                          </div>
-                        </div>
-
-                        <button
-                          onClick={() => handleDeleteTask(task.id, task.title)}
-                          style={{
-                            background: "rgba(244, 63, 94, 0.08)",
-                            border: "1px solid rgba(244, 63, 94, 0.25)",
-                            color: "#f43f5e",
-                            borderRadius: 6,
-                            cursor: "pointer",
-                            fontSize: 13,
-                            padding: "6px 10px",
-                            fontWeight: 700,
-                          }}
-                          title="Delete streak task"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Goal Progress Bar */}
-                    <div style={{ marginBottom: 14 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 5 }}>
-                        <span style={{ color: "var(--text-secondary)" }}>
-                          Goal Milestone Progress: {currentStreak} / {goalDays} Days
-                        </span>
-                        <span style={{ fontWeight: 800, color: percent >= 100 ? "#10b981" : "var(--accent-brand)" }}>
-                          {percent}% {percent >= 100 ? "🎉 Goal Achieved!" : ""}
-                        </span>
-                      </div>
-                      <div
-                        style={{
-                          height: 8,
-                          background: "var(--border-subtle)",
-                          borderRadius: 8,
-                          overflow: "hidden",
-                        }}
-                      >
-                        <div
-                          style={{
-                            height: "100%",
-                            width: `${percent}%`,
-                            background:
-                              percent >= 100
-                                ? "linear-gradient(90deg, #10b981 0%, #06b6d4 100%)"
-                                : "var(--aura-glow)",
-                            transition: "width 0.4s ease",
-                          }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* ═══════════════════════════════════════════════════════════════
-                        PILLAR 1-5 IDENTITY & FOCUS PROTOCOL BOX
-                    ════════════════════════════════════════════════════════════════ */}
-                    <div
-                      style={{
-                        padding: "12px 14px",
-                        marginBottom: 14,
-                        borderRadius: 10,
-                        background: "var(--bg-base)",
-                        border: "1px solid var(--border-subtle)",
-                      }}
-                    >
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                          <span style={{ fontSize: 16 }}>🎯</span>
-                          <span style={{ fontSize: 13, fontWeight: 800, color: "var(--text-primary)" }}>
-                            <strong>Fix Do Everyday:</strong> {task.minimumAction || "Read new topic / practice daily (10 min)."}
-                          </span>
-                        </div>
-
-                        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                          {/* Affirmation Lock-In Modal Trigger */}
-                          {task.affirmation && (
-                            <button
-                              onClick={() => {
-                                setAffirmationModalHabit(task);
-                                setEnvChecklist({
-                                  notebook: false,
-                                  phoneAway: false,
-                                  distractionsClosed: false,
-                                  musicPlaying: false,
-                                  vocalReady: false,
-                                });
-                              }}
-                              className="btn-lime"
+                          {expandedHistoryTaskId === task.id && (
+                            <div
                               style={{
-                                fontSize: "0.8rem",
-                                padding: "4px 12px",
-                                display: "inline-flex",
-                                alignItems: "center",
+                                marginTop: 6,
+                                padding: "8px 10px",
+                                borderRadius: 6,
+                                background: "var(--bg-surface)",
+                                border: "1px solid var(--border-subtle)",
+                                maxHeight: 150,
+                                overflowY: "auto",
+                                display: "grid",
                                 gap: 6,
                               }}
-                              title="Recite the handwritten affirmation out loud and verify environment checklist"
                             >
-                              <span>🗣️</span> Recite Affirmation
-                            </button>
+                              {historyList.slice().reverse().map((entry, hIdx) => (
+                                <div key={hIdx} style={{ borderBottom: "1px solid var(--border-subtle)", paddingBottom: 4 }}>
+                                  <span style={{ color: "var(--accent-brand)", fontWeight: 700 }}>📅 {entry.date}</span>
+                                  {entry.numberDone !== undefined && <span style={{ marginLeft: 8 }}>Count: {entry.numberDone}</span>}
+                                  {entry.topics && entry.topics.length > 0 && <span style={{ marginLeft: 8 }}>[{entry.topics.join(", ")}]</span>}
+                                  {entry.note && <div style={{ color: "var(--text-secondary)", fontStyle: "italic" }}>&ldquo;{entry.note}&rdquo;</div>}
+                                </div>
+                              ))}
+                            </div>
                           )}
-
-                          <button
-                            onClick={() =>
-                              setExpandedPillarInfoTaskId(isPillarInfoExpanded ? null : task.id)
-                            }
-                            style={{
-                              background: "transparent",
-                              border: "none",
-                              color: "var(--accent-brand)",
-                              fontSize: 12,
-                              fontWeight: 700,
-                              cursor: "pointer",
-                              textDecoration: "underline",
-                              padding: 0,
-                            }}
-                          >
-                            {isPillarInfoExpanded ? "Hide Details ▲" : "Why & Penalty ▼"}
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Expandable Pillar Specifications from Notebook */}
-                      {isPillarInfoExpanded && (
-                        <div
-                          style={{
-                            marginTop: 12,
-                            paddingTop: 10,
-                            borderTop: "1px dashed var(--border-subtle)",
-                            display: "grid",
-                            gap: 6,
-                            fontSize: "0.85rem",
-                          }}
-                        >
-                          <div>
-                            <strong style={{ color: "var(--text-primary)" }}>Why (Identity):</strong>{" "}
-                            <span style={{ color: "var(--text-secondary)" }}>{task.why}</span>
-                          </div>
-                          <div>
-                            <strong style={{ color: "var(--text-primary)" }}>Environment Cue:</strong>{" "}
-                            <span style={{ color: "var(--text-secondary)" }}>{task.environmentCue}</span>
-                          </div>
-                          <div>
-                            <strong style={{ color: "var(--text-primary)" }}>7-Day Reward:</strong>{" "}
-                            <span style={{ color: "var(--accent-secondary)" }}>{task.weeklyReward}</span>
-                          </div>
-                          <div>
-                            <strong style={{ color: "#f43f5e" }}>Penalty Rule:</strong>{" "}
-                            <span style={{ color: "var(--text-secondary)" }}>{task.penaltyRule}</span>
-                          </div>
-                          <div>
-                            <strong style={{ color: "var(--accent-brand)" }}>Daily Affirmation:</strong>{" "}
-                            <span style={{ fontStyle: "italic", color: "var(--text-primary)", fontWeight: 700 }}>
-                              &ldquo;{task.affirmation}&rdquo;
-                            </span>
-                          </div>
                         </div>
                       )}
                     </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
 
-                    {/* ═══════════════════════════════════════════════════════════════
-                        BUILT-IN FOCUS COUNTDOWN TIMER (10m / 15m / 20m / 30m)
-                    ════════════════════════════════════════════════════════════════ */}
-                    <div
-                      style={{
-                        padding: "10px 14px",
-                        marginBottom: 14,
-                        borderRadius: 10,
-                        background: timerState.isRunning
-                          ? "linear-gradient(135deg, rgba(2, 132, 199, 0.12) 0%, rgba(14, 165, 233, 0.18) 100%)"
-                          : "var(--bg-base)",
-                        border: timerState.isRunning
-                          ? "1.5px solid var(--accent-brand)"
-                          : "1px solid var(--border-subtle)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        flexWrap: "wrap",
-                        gap: 10,
-                      }}
-                    >
-                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                        <span style={{ fontSize: 20 }}>⏱️</span>
-                        <div>
-                          <span style={{ fontSize: 11, fontWeight: 800, color: "var(--text-secondary)", textTransform: "uppercase" }}>
-                            Focus Sprint Timer
-                          </span>
-                          <div
-                            style={{
-                              fontSize: "1.45rem",
-                              fontWeight: 900,
-                              fontFamily: "monospace",
-                              color: timerState.isRunning ? "var(--accent-brand)" : "var(--text-primary)",
-                              letterSpacing: "0.05em",
-                            }}
-                          >
-                            {formatTime(timerState.remSec)}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Presets and Controls */}
-                      <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                        <button
-                          type="button"
-                          onClick={() => resetTimer(task.id, 10)}
-                          style={{ padding: "4px 8px", fontSize: 11, borderRadius: 6, background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", color: "var(--text-secondary)", cursor: "pointer" }}
-                        >
-                          10m
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => resetTimer(task.id, 15)}
-                          style={{ padding: "4px 8px", fontSize: 11, borderRadius: 6, background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", color: "var(--text-secondary)", cursor: "pointer" }}
-                        >
-                          15m
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => resetTimer(task.id, 20)}
-                          style={{ padding: "4px 8px", fontSize: 11, borderRadius: 6, background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", color: "var(--text-secondary)", cursor: "pointer" }}
-                        >
-                          20m
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => resetTimer(task.id, 30)}
-                          style={{ padding: "4px 8px", fontSize: 11, borderRadius: 6, background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", color: "var(--text-secondary)", cursor: "pointer" }}
-                        >
-                          30m
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => toggleTimer(task.id)}
-                          className={timerState.isRunning ? "btn-secondary" : "btn-lime"}
-                          style={{ padding: "6px 14px", fontSize: "0.84rem", fontWeight: 800 }}
-                        >
-                          {timerState.isRunning ? "⏸️ Pause" : "▶️ Start Focus"}
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => resetTimer(task.id)}
-                          style={{
-                            background: "transparent",
-                            border: "none",
-                            color: "var(--text-secondary)",
-                            cursor: "pointer",
-                            fontSize: 12,
-                            padding: "4px 6px",
-                          }}
-                          title="Reset timer"
-                        >
-                          ↺
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* ═══════════════════════════════════════════════════════════════
-                        MASTER TOPIC QUEUE & "TOMORROW'S QUEUE" PLANNER
-                    ════════════════════════════════════════════════════════════════ */}
-                    {topicsMasterList.length > 0 && (
-                      <div
-                        style={{
-                          padding: "12px 14px",
-                          marginBottom: 14,
-                          borderRadius: 10,
-                          background: "var(--bg-base)",
-                          border: "1px solid var(--border-subtle)",
-                        }}
-                      >
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap: "wrap", gap: 6 }}>
-                          <span style={{ fontSize: 12, fontWeight: 800, color: "var(--text-primary)" }}>
-                            🏷️ Master Topics Queue (Click chip to cycle status: Pending ➔ In Progress ➔ Mastered):
-                          </span>
-                          <span style={{ fontSize: 11, color: "var(--accent-secondary)", fontWeight: 700 }}>
-                            {topicsMasterList.filter((t) => t.status === "mastered").length} / {topicsMasterList.length} Mastered
-                          </span>
-                        </div>
-
-                        {/* Topic Chips */}
-                        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
-                          {topicsMasterList.map((tm, tmIdx) => {
-                            const isMastered = tm.status === "mastered";
-                            const isInProgress = tm.status === "in_progress";
-                            return (
-                              <button
-                                key={tmIdx}
-                                type="button"
-                                onClick={() => handleToggleTopicStatus(task, tm.name)}
-                                style={{
-                                  padding: "4px 10px",
-                                  borderRadius: 12,
-                                  fontSize: 11,
-                                  fontWeight: 700,
-                                  cursor: "pointer",
-                                  border: isMastered
-                                    ? "1px solid #10b981"
-                                    : isInProgress
-                                    ? "1px solid var(--accent-brand)"
-                                    : "1px solid var(--border-subtle)",
-                                  background: isMastered
-                                    ? "rgba(16, 185, 129, 0.15)"
-                                    : isInProgress
-                                    ? "rgba(2, 132, 199, 0.15)"
-                                    : "var(--bg-surface)",
-                                  color: isMastered
-                                    ? "#10b981"
-                                    : isInProgress
-                                    ? "var(--accent-brand)"
-                                    : "var(--text-secondary)",
-                                  display: "inline-flex",
-                                  alignItems: "center",
-                                  gap: 5,
-                                  transition: "all 0.15s ease",
-                                }}
-                                title="Click to toggle status: Pending -> In Progress -> Mastered"
-                              >
-                                <span>{isMastered ? "✓" : isInProgress ? "🔥" : "○"}</span>
-                                <span>{tm.name}</span>
-                              </button>
-                            );
-                          })}
-                        </div>
-
-                        {/* Add Topic Inline Form */}
-                        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                          <input
-                            type="text"
-                            placeholder="+ Add new topic to this pillar's queue..."
-                            value={newTopicInput[task.id] || ""}
-                            onChange={(e) =>
-                              setNewTopicInput((prev) => ({ ...prev, [task.id]: e.target.value }))
-                            }
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                e.preventDefault();
-                                handleAddMasterTopic(task);
-                              }
-                            }}
-                            style={{
-                              flex: 1,
-                              padding: "6px 10px",
-                              background: "var(--input-bg)",
-                              border: "1px solid var(--border-light)",
-                              borderRadius: 6,
-                              color: "var(--text-primary)",
-                              fontSize: "0.82rem",
-                            }}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => handleAddMasterTopic(task)}
-                            className="btn-secondary"
-                            style={{ fontSize: "0.8rem", padding: "6px 12px" }}
-                          >
-                            + Add Topic
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* ═══════════════════════════════════════════════════════════════
-                        TOMORROW'S QUEUED TOPIC (Eliminate Morning Hesitation)
-                    ════════════════════════════════════════════════════════════════ */}
-                    <div
-                      style={{
-                        padding: "10px 14px",
-                        marginBottom: 14,
-                        borderRadius: 10,
-                        background: "var(--bg-base)",
-                        border: "1px solid var(--border-subtle)",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 10,
-                        flexWrap: "wrap",
-                      }}
-                    >
-                      <span style={{ fontSize: 12, fontWeight: 800, color: "var(--accent-brand)", whiteSpace: "nowrap" }}>
-                        📌 Tomorrow&apos;s Topic:
-                      </span>
-                      <input
-                        type="text"
-                        placeholder="Queue topic for tomorrow to avoid hesitation (e.g. Sliding Window edge cases)..."
-                        value={currentInput.nextDayQueue || ""}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          setDailyTaskInputs((prev) => ({
-                            ...prev,
-                            [task.id]: {
-                              ...(prev[task.id] || {}),
-                              nextDayQueue: val,
-                            },
-                          }));
-                        }}
-                        style={{
-                          flex: 1,
-                          minWidth: 200,
-                          padding: "6px 10px",
-                          background: "var(--input-bg)",
-                          border: "1px solid var(--border-light)",
-                          borderRadius: 6,
-                          color: "var(--text-primary)",
-                          fontSize: "0.84rem",
-                        }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleSaveTomorrowQueue(task, currentInput.nextDayQueue)}
-                        className="btn-secondary"
-                        style={{ fontSize: "0.8rem", padding: "6px 12px" }}
-                      >
-                        Lock In Tomorrow
-                      </button>
-                    </div>
-
-                    {/* ═══════════════════════════════════════════════════════════════
-                        DAILY CHECK-IN WITH CONFIGURED CUSTOM FIELDS
-                    ════════════════════════════════════════════════════════════════ */}
-                    <div
-                      style={{
-                        padding: "1.2rem",
-                        background: "var(--bg-base)",
-                        borderRadius: 12,
-                        border: "1px solid var(--border-subtle)",
-                        display: "grid",
-                        gap: 10,
-                      }}
-                    >
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 6 }}>
-                        <label style={{ fontSize: 12, fontWeight: 800, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: 6 }}>
-                          <span>✍️</span> Today&apos;s Streak Entry & Input Fields:
-                        </label>
-                        <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>
-                          Last check-in: <strong>{task.lastCheckedDate || "None"}</strong>
-                        </span>
-                      </div>
-
-                      {/* Dynamic Inputs configured for this task */}
-                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
-                        {configuredFields.map((field) => {
-                          if (field.type === "number") {
-                            return (
-                              <div key={field.id}>
-                                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--text-secondary)", marginBottom: 4 }}>
-                                  🔢 {field.label} {field.target ? `(Target: ${field.target})` : ""}
-                                </label>
-                                <input
-                                  type="number"
-                                  placeholder="Enter number completed..."
-                                  value={currentInput.numberDone}
-                                  onChange={(e) => {
-                                    const val = e.target.value;
-                                    setDailyTaskInputs((prev) => ({
-                                      ...prev,
-                                      [task.id]: {
-                                        ...(prev[task.id] || {}),
-                                        numberDone: val,
-                                        fieldValues: {
-                                          ...(prev[task.id]?.fieldValues || {}),
-                                          [field.id]: val,
-                                        },
-                                      },
-                                    }));
-                                  }}
-                                  style={{
-                                    width: "100%",
-                                    padding: "8px 12px",
-                                    background: "var(--input-bg)",
-                                    border: "1px solid var(--border-light)",
-                                    borderRadius: 6,
-                                    color: "var(--text-primary)",
-                                    fontSize: "0.88rem",
-                                  }}
-                                />
-                              </div>
-                            );
-                          }
-
-                          if (field.type === "topics") {
-                            return (
-                              <div key={field.id} style={{ gridColumn: "1 / -1" }}>
-                                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--text-secondary)", marginBottom: 4 }}>
-                                  🏷️ {field.label} (Comma-separated list of topics/concepts read today)
-                                </label>
-                                <input
-                                  type="text"
-                                  placeholder="e.g. Dynamic Programming, Two Pointers, Next.js Server Actions..."
-                                  value={currentInput.topics}
-                                  onChange={(e) => {
-                                    const val = e.target.value;
-                                    setDailyTaskInputs((prev) => ({
-                                      ...prev,
-                                      [task.id]: {
-                                        ...(prev[task.id] || {}),
-                                        topics: val,
-                                        fieldValues: {
-                                          ...(prev[task.id]?.fieldValues || {}),
-                                          [field.id]: val,
-                                        },
-                                      },
-                                    }));
-                                  }}
-                                  style={{
-                                    width: "100%",
-                                    padding: "8px 12px",
-                                    background: "var(--input-bg)",
-                                    border: "1px solid var(--border-light)",
-                                    borderRadius: 6,
-                                    color: "var(--text-primary)",
-                                    fontSize: "0.88rem",
-                                  }}
-                                />
-                              </div>
-                            );
-                          }
-
-                          return (
-                            <div key={field.id} style={{ gridColumn: "1 / -1" }}>
-                              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "var(--text-secondary)", marginBottom: 4 }}>
-                                ✍️ {field.label} (Daily reflection & notebook summary)
-                              </label>
-                              <input
-                                type="text"
-                                placeholder="Save reflections, breakthroughs, concepts learned..."
-                                value={currentInput.note}
-                                onChange={(e) => {
-                                  const val = e.target.value;
-                                  setDailyTaskInputs((prev) => ({
-                                    ...prev,
-                                    [task.id]: {
-                                      ...(prev[task.id] || {}),
-                                      note: val,
-                                      fieldValues: {
-                                        ...(prev[task.id]?.fieldValues || {}),
-                                        [field.id]: val,
-                                      },
-                                    },
-                                  }));
-                                }}
-                                style={{
-                                  width: "100%",
-                                  padding: "8px 12px",
-                                  background: "var(--input-bg)",
-                                  border: "1px solid var(--border-light)",
-                                  borderRadius: 6,
-                                  color: "var(--text-primary)",
-                                  fontSize: "0.88rem",
-                                }}
-                              />
-                            </div>
-                          );
-                        })}
-                      </div>
-
-                      {/* Submit Daily Check-in Button */}
-                      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 4 }}>
-                        <button
-                          type="button"
-                          onClick={() => handleStreakCheckIn(task.id)}
-                          className="btn-lime"
-                          style={{
-                            padding: "9px 22px",
-                            fontSize: "0.88rem",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: 6,
-                          }}
-                        >
-                          <span>⚡</span>
-                          {isCheckedToday ? "Update Today's Entry" : "Maintain Streak & Save (+10 pts)"}
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* History Expand Toggle */}
-                    {historyList.length > 0 && (
-                      <div style={{ marginTop: 12 }}>
-                        <button
-                          type="button"
-                          onClick={() => setExpandedHistoryTaskId(isExpanded ? null : task.id)}
-                          style={{
-                            background: "transparent",
-                            border: "none",
-                            color: "var(--text-secondary)",
-                            cursor: "pointer",
-                            fontSize: 12,
-                            fontWeight: 700,
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 6,
-                            padding: 0,
-                          }}
-                        >
-                          <span>{isExpanded ? "▲" : "▼"}</span>
-                          <span>
-                            {isExpanded ? "Hide" : "Show"} Logged History ({historyList.length} check-in entries)
-                          </span>
-                        </button>
-
-                        {isExpanded && (
-                          <div
-                            style={{
-                              marginTop: 10,
-                              padding: "10px 14px",
-                              borderRadius: 8,
-                              background: "var(--bg-base)",
-                              border: "1px solid var(--border-subtle)",
-                              display: "grid",
-                              gap: 8,
-                              maxHeight: 220,
-                              overflowY: "auto",
-                            }}
-                          >
-                            {historyList
-                              .slice()
-                              .reverse()
-                              .map((entry, idx) => (
-                                <div
-                                  key={idx}
-                                  style={{
-                                    fontSize: "0.82rem",
-                                    padding: "6px 8px",
-                                    borderBottom: "1px solid var(--border-subtle)",
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    gap: 3,
-                                  }}
-                                >
-                                  <div style={{ display: "flex", justifyContent: "space-between", color: "var(--accent-brand)", fontWeight: 700 }}>
-                                    <span>📅 {entry.date}</span>
-                                    {entry.numberDone !== undefined && (
-                                      <span>Count: {entry.numberDone}</span>
-                                    )}
-                                  </div>
-
-                                  {Array.isArray(entry.topics) && entry.topics.length > 0 && (
-                                    <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 2 }}>
-                                      {entry.topics.map((top, tIdx) => (
-                                        <span
-                                          key={tIdx}
-                                          style={{
-                                            fontSize: 10,
-                                            padding: "1px 6px",
-                                            borderRadius: 8,
-                                            background: "var(--badge-bg)",
-                                            color: "var(--text-primary)",
-                                            border: "1px solid var(--border-subtle)",
-                                          }}
-                                        >
-                                          {top}
-                                        </span>
-                                      ))}
-                                    </div>
-                                  )}
-
-                                  {entry.note && (
-                                    <div style={{ color: "var(--text-secondary)", fontStyle: "italic", marginTop: 2 }}>
-                                      &ldquo;{entry.note}&rdquo;
-                                    </div>
-                                  )}
-                                </div>
-                              ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+          {/* ═══════════════════════════════════════════════════════════════════
+              EVALUATE BUTTON AT THE END (As explicitly requested by user)
+          ════════════════════════════════════════════════════════════════════ */}
+          <div
+            className="glass-card"
+            style={{
+              padding: "1.2rem 1.6rem",
+              borderRadius: 14,
+              background: "var(--bg-surface)",
+              border: "1px solid var(--border-subtle)",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 12,
+            }}
+          >
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 800, color: "var(--text-secondary)", textTransform: "uppercase" }}>
+                Active Weekly Score
+              </div>
+              <div style={{ fontSize: "1.35rem", fontWeight: 900, color: "var(--accent-brand)" }}>
+                ⚡ {totalWeeklyPoints} / 350 pts this week
+              </div>
             </div>
-          )}
+
+            <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+              {evaluations.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setShowHistoryModal(true)}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    color: "var(--accent-brand)",
+                    fontSize: "0.85rem",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    textDecoration: "underline",
+                  }}
+                >
+                  📜 Past Sunday Reports ({evaluations.length})
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={handleRunSundayEvaluation}
+                disabled={isEvaluating}
+                className="btn-lime"
+                style={{
+                  fontSize: "0.88rem",
+                  padding: "9px 20px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  fontWeight: 800,
+                }}
+              >
+                <span>✨</span>
+                {isEvaluating ? "Evaluating..." : "Evaluate Sunday Points (out of 350)"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
       {/* ═══════════════════════════════════════════════════════════════════════
-          TAB 2: GENERAL WORKFLOW TASKS
+          TAB 2: GENERAL TASKS VIEW
       ════════════════════════════════════════════════════════════════════════ */}
       {activeTab === "general" && (
         <div>
-          {/* Filter Bar */}
-          <div
-            style={{
-              display: "flex",
-              gap: 12,
-              marginBottom: "1.2rem",
-              alignItems: "center",
-              flexWrap: "wrap",
-            }}
-          >
-            <div>
-              <label style={{ fontSize: 11, color: "var(--text-secondary)", fontWeight: 700, marginRight: 6 }}>
-                Status:
-              </label>
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                style={{
-                  padding: "6px 10px",
-                  borderRadius: 6,
-                  background: "var(--bg-surface)",
-                  border: "1px solid var(--border-subtle)",
-                  color: "var(--text-primary)",
-                  fontSize: "0.85rem",
-                }}
-              >
-                <option value="all">All</option>
-                <option value="todo">To Do</option>
-                <option value="in_progress">In Progress</option>
-                <option value="completed">Completed</option>
-              </select>
-            </div>
-
-            <div>
-              <label style={{ fontSize: 11, color: "var(--text-secondary)", fontWeight: 700, marginRight: 6 }}>
-                Category:
-              </label>
-              <select
-                value={filterCategory}
-                onChange={(e) => setFilterCategory(e.target.value)}
-                style={{
-                  padding: "6px 10px",
-                  borderRadius: 6,
-                  background: "var(--bg-surface)",
-                  border: "1px solid var(--border-subtle)",
-                  color: "var(--text-primary)",
-                  fontSize: "0.85rem",
-                }}
-              >
-                <option value="all">All</option>
-                <option value="LeetCode">LeetCode / DSA</option>
-                <option value="Projects">Projects</option>
-                <option value="College">College</option>
-                <option value="Career">Career</option>
-                <option value="General">General</option>
-              </select>
-            </div>
-          </div>
-
-          {/* General Tasks List */}
           {filteredGeneralTasks.length === 0 ? (
             <div className="glass-card" style={{ padding: "2rem", textAlign: "center", borderRadius: 12, background: "var(--bg-surface)" }}>
-              <div style={{ color: "var(--text-secondary)" }}>No general tasks found for this filter.</div>
+              <div style={{ color: "var(--text-secondary)" }}>No general tasks found.</div>
             </div>
           ) : (
-            <div style={{ display: "grid", gap: 10 }}>
+            <div style={{ display: "grid", gap: 8 }}>
               {filteredGeneralTasks.map((task) => (
                 <div
                   key={task.id}
                   className="glass-card"
                   style={{
-                    padding: "1rem 1.2rem",
+                    padding: "10px 14px",
                     borderRadius: 10,
                     background: "var(--bg-surface)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
                     gap: 12,
-                    flexWrap: "wrap",
                     border: "1px solid var(--border-subtle)",
                   }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 240 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1 }}>
                     <button
                       type="button"
                       onClick={() => handleUpdateStatus(task.id, task.status)}
                       style={{
-                        width: 22,
-                        height: 22,
+                        width: 20,
+                        height: 20,
                         borderRadius: "50%",
                         border: "2px solid var(--border-subtle)",
-                        background:
-                          task.status === "completed"
-                            ? "#10b981"
-                            : task.status === "in_progress"
-                            ? "#0284c7"
-                            : "transparent",
+                        background: task.status === "completed" ? "#10b981" : "transparent",
                         cursor: "pointer",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                         color: "#fff",
-                        fontSize: 12,
-                        flexShrink: 0,
+                        fontSize: 11,
                       }}
-                      title={`Status: ${task.status}. Click to cycle.`}
                     >
-                      {task.status === "completed" ? "✓" : task.status === "in_progress" ? "•" : ""}
+                      {task.status === "completed" ? "✓" : ""}
                     </button>
-
-                    <div>
-                      <div
-                        style={{
-                          fontSize: "0.95rem",
-                          fontWeight: 700,
-                          color: task.status === "completed" ? "var(--text-secondary)" : "var(--text-primary)",
-                          textDecoration: task.status === "completed" ? "line-through" : "none",
-                        }}
-                      >
-                        {task.title}
-                      </div>
-                      <div style={{ display: "flex", gap: 8, marginTop: 4, alignItems: "center", fontSize: 11 }}>
-                        <span
-                          style={{
-                            padding: "2px 8px",
-                            borderRadius: 10,
-                            background: "var(--badge-bg)",
-                            color: "var(--text-secondary)",
-                          }}
-                        >
-                          {task.category}
-                        </span>
-                        <span style={{ color: getPriorityColor(task.priority), fontWeight: 700 }}>
-                          {task.priority} Priority
-                        </span>
-                        {task.dueDate && (
-                          <span style={{ color: "var(--text-secondary)" }}>Due: {task.dueDate}</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteTask(task.id, task.title)}
+                    <span
                       style={{
-                        background: "transparent",
-                        border: "none",
-                        color: "#f43f5e",
-                        cursor: "pointer",
-                        fontSize: 14,
-                        padding: "4px 8px",
+                        fontSize: "0.92rem",
+                        fontWeight: 700,
+                        color: task.status === "completed" ? "var(--text-secondary)" : "var(--text-primary)",
+                        textDecoration: task.status === "completed" ? "line-through" : "none",
                       }}
                     >
-                      ✕
-                    </button>
+                      {task.title}
+                    </span>
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={(e) => handleDeleteTask(task.id, task.title, e)}
+                    style={{ background: "transparent", border: "none", color: "#f43f5e", cursor: "pointer", fontSize: 13 }}
+                  >
+                    ✕
+                  </button>
                 </div>
               ))}
             </div>
@@ -2528,7 +1377,7 @@ export default function TaskManager() {
       )}
 
       {/* ═══════════════════════════════════════════════════════════════════════
-          MODAL 1: IDENTITY SHIFT & ENVIRONMENT LOCK-IN MODAL
+          MODAL: RECITATION & AFFIRMATION LOCK-IN
       ════════════════════════════════════════════════════════════════════════ */}
       {affirmationModalHabit && (
         <div
@@ -2547,145 +1396,68 @@ export default function TaskManager() {
           <div
             className="glass-card"
             style={{
-              width: "min(560px, 94vw)",
-              padding: "2rem",
-              borderRadius: 16,
+              width: "min(520px, 94vw)",
+              padding: "1.8rem",
+              borderRadius: 14,
               background: "var(--bg-surface)",
               border: "2px solid var(--accent-brand)",
-              boxShadow: "0 20px 50px rgba(0, 0, 0, 0.4)",
-              animation: "slideDownFade 0.25s ease-out",
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 22 }}>🗣️</span>
-                <h3 style={{ fontSize: "1.2rem", margin: 0, fontWeight: 900, color: "var(--text-primary)" }}>
-                  Identity Shift & Lock-In Protocol
-                </h3>
-              </div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+              <h3 style={{ fontSize: "1.15rem", margin: 0, fontWeight: 900, color: "var(--text-primary)" }}>
+                🗣️ Affirmation Recitation Lock-In
+              </h3>
               <button
                 type="button"
                 onClick={() => setAffirmationModalHabit(null)}
-                style={{ background: "transparent", border: "none", color: "var(--text-secondary)", fontSize: 20, cursor: "pointer" }}
+                style={{ background: "transparent", border: "none", color: "var(--text-secondary)", fontSize: 18, cursor: "pointer" }}
               >
                 ✕
               </button>
             </div>
 
-            <p style={{ color: "var(--text-secondary)", fontSize: "0.88rem", margin: "0 0 16px" }}>
-              Notebook instruction: <em>&ldquo;Fake it till you make it. Everyday say yourself the affirmation out loud with unshakeable confidence.&rdquo;</em>
-            </p>
-
-            {/* Glowing Affirmation Box */}
             <div
               style={{
-                padding: "1.4rem",
-                borderRadius: 12,
-                background: "linear-gradient(135deg, rgba(2, 132, 199, 0.15) 0%, rgba(14, 165, 233, 0.25) 100%)",
-                border: "1.5px solid var(--accent-brand)",
+                padding: "1.2rem",
+                borderRadius: 10,
+                background: "var(--bg-base)",
+                border: "1px solid var(--accent-brand)",
                 textAlign: "center",
-                marginBottom: 20,
+                marginBottom: 16,
               }}
             >
-              <div style={{ fontSize: 11, fontWeight: 800, color: "var(--accent-brand)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
-                Recite Out Loud
+              <div style={{ fontSize: 11, fontWeight: 800, color: "var(--accent-brand)", textTransform: "uppercase", marginBottom: 4 }}>
+                Recite Out Loud With Full Conviction
               </div>
-              <div
-                style={{
-                  fontSize: "1.4rem",
-                  fontWeight: 900,
-                  color: "var(--text-primary)",
-                  lineHeight: 1.4,
-                  letterSpacing: "-0.01em",
-                }}
-              >
+              <div style={{ fontSize: "1.3rem", fontWeight: 900, color: "var(--text-primary)", lineHeight: 1.4 }}>
                 &ldquo;{affirmationModalHabit.affirmation}&rdquo;
               </div>
-
-              <div style={{ marginTop: 12 }}>
-                <button
-                  type="button"
-                  onClick={() => speakAffirmation(affirmationModalHabit.affirmation)}
-                  style={{
-                    background: "rgba(255,255,255,0.08)",
-                    border: "1px solid var(--border-subtle)",
-                    color: "var(--text-primary)",
-                    borderRadius: 8,
-                    fontSize: 12,
-                    fontWeight: 700,
-                    padding: "5px 12px",
-                    cursor: "pointer",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                  }}
-                >
-                  <span>🔊</span> Listen Affirmation Audio
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => speakAffirmation(affirmationModalHabit.affirmation)}
+                style={{
+                  marginTop: 8,
+                  background: "transparent",
+                  border: "1px solid var(--border-subtle)",
+                  borderRadius: 6,
+                  padding: "4px 10px",
+                  fontSize: 11,
+                  color: "var(--text-primary)",
+                  cursor: "pointer",
+                }}
+              >
+                🔊 Listen Voice
+              </button>
             </div>
 
-            {/* Environment Cue Verification Checklist */}
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 12, fontWeight: 800, color: "var(--text-primary)", marginBottom: 8 }}>
-                Environment Design Checklist (Notebook Setup):
-              </div>
-              <div style={{ display: "grid", gap: 8 }}>
-                <label style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.88rem", color: "var(--text-primary)", cursor: "pointer" }}>
-                  <input
-                    type="checkbox"
-                    checked={envChecklist.notebook}
-                    onChange={(e) => setEnvChecklist((prev) => ({ ...prev, notebook: e.target.checked }))}
-                  />
-                  <span>Dedicated notebook opened & topic queue verified</span>
-                </label>
-                <label style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.88rem", color: "var(--text-primary)", cursor: "pointer" }}>
-                  <input
-                    type="checkbox"
-                    checked={envChecklist.phoneAway}
-                    onChange={(e) => setEnvChecklist((prev) => ({ ...prev, phoneAway: e.target.checked }))}
-                  />
-                  <span>Phone kept aside & notifications silenced</span>
-                </label>
-                <label style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.88rem", color: "var(--text-primary)", cursor: "pointer" }}>
-                  <input
-                    type="checkbox"
-                    checked={envChecklist.distractionsClosed}
-                    onChange={(e) => setEnvChecklist((prev) => ({ ...prev, distractionsClosed: e.target.checked }))}
-                  />
-                  <span>All unrelated browser tabs & apps closed</span>
-                </label>
-                <label style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.88rem", color: "var(--text-primary)", cursor: "pointer" }}>
-                  <input
-                    type="checkbox"
-                    checked={envChecklist.musicPlaying}
-                    onChange={(e) => setEnvChecklist((prev) => ({ ...prev, musicPlaying: e.target.checked }))}
-                  />
-                  <span>Fixed focus music / workout playlist running</span>
-                </label>
-              </div>
-            </div>
-
-            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
               <button
                 type="button"
                 onClick={() => setAffirmationModalHabit(null)}
-                className="btn-secondary"
-                style={{ padding: "8px 16px", fontSize: "0.88rem" }}
-              >
-                Close
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  toggleTimer(affirmationModalHabit.id);
-                  setAffirmationModalHabit(null);
-                  showToast("⚡ Environment locked in! Focus timer started.", "success");
-                }}
                 className="btn-lime"
-                style={{ padding: "8px 20px", fontSize: "0.88rem" }}
+                style={{ padding: "7px 18px", fontSize: "0.85rem" }}
               >
-                ✓ I Recited &amp; Environment is Set &rarr; Start Focus Block
+                ✓ I Recited & Done
               </button>
             </div>
           </div>
@@ -2693,91 +1465,7 @@ export default function TaskManager() {
       )}
 
       {/* ═══════════════════════════════════════════════════════════════════════
-          MODAL 2: 7-DAY REWARD LOOP UNLOCK MODAL
-      ════════════════════════════════════════════════════════════════════════ */}
-      {rewardModalHabit && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0, 0, 0, 0.8)",
-            backdropFilter: "blur(8px)",
-            zIndex: 9999,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "1rem",
-          }}
-        >
-          <div
-            className="glass-card"
-            style={{
-              width: "min(520px, 94vw)",
-              padding: "2rem",
-              borderRadius: 16,
-              background: "var(--bg-surface)",
-              border: "2px solid #10b981",
-              boxShadow: "0 20px 50px rgba(0, 0, 0, 0.4)",
-              animation: "slideDownFade 0.25s ease-out",
-            }}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 24 }}>🎁</span>
-                <h3 style={{ fontSize: "1.2rem", margin: 0, fontWeight: 900, color: "var(--text-primary)" }}>
-                  7-Day Reward Loop (Notebook Audit)
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setRewardModalHabit(null)}
-                style={{ background: "transparent", border: "none", color: "var(--text-secondary)", fontSize: 20, cursor: "pointer" }}
-              >
-                ✕
-              </button>
-            </div>
-
-            <div style={{ textAlign: "center", padding: "1.5rem 1rem" }}>
-              <div style={{ fontSize: 48, marginBottom: 10 }}>🎉</div>
-              <h4 style={{ fontSize: "1.25rem", margin: "0 0 8px", color: "#10b981", fontWeight: 900 }}>
-                {rewardModalHabit.currentStreak} Days Streak on {rewardModalHabit.title}
-              </h4>
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.92rem", marginBottom: 16 }}>
-                Your handwritten notebook reward condition for this pillar:
-              </p>
-
-              <div
-                style={{
-                  padding: "1.2rem",
-                  borderRadius: 12,
-                  background: "rgba(16, 185, 129, 0.15)",
-                  border: "1.5px solid #10b981",
-                  color: "var(--text-primary)",
-                  fontSize: "1.1rem",
-                  fontWeight: 800,
-                  lineHeight: 1.5,
-                }}
-              >
-                &ldquo;{rewardModalHabit.weeklyReward}&rdquo;
-              </div>
-            </div>
-
-            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 8 }}>
-              <button
-                type="button"
-                onClick={() => setRewardModalHabit(null)}
-                className="btn-lime"
-                style={{ padding: "8px 22px", fontSize: "0.9rem" }}
-              >
-                Claimed & Done ✓
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ═══════════════════════════════════════════════════════════════════════
-          MODAL 3: SUNDAY GEMINI AI POINTS EVALUATION REPORT
+          MODAL: SUNDAY EVALUATION REPORT MODAL
       ════════════════════════════════════════════════════════════════════════ */}
       {showEvaluationModal && evaluationResult && (
         <div
@@ -2796,155 +1484,65 @@ export default function TaskManager() {
           <div
             className="glass-card"
             style={{
-              width: "min(680px, 94vw)",
-              maxHeight: "90vh",
+              width: "min(640px, 94vw)",
+              maxHeight: "88vh",
               overflowY: "auto",
-              padding: "2rem",
-              borderRadius: 16,
+              padding: "1.8rem",
+              borderRadius: 14,
               background: "var(--bg-surface)",
               border: "2px solid var(--accent-brand)",
-              boxShadow: "0 20px 50px rgba(0, 0, 0, 0.4)",
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ fontSize: 26 }}>🏆</span>
-                <div>
-                  <h3 style={{ fontSize: "1.25rem", margin: 0, fontWeight: 900, color: "var(--text-primary)" }}>
-                    Sunday Weekly Streak Evaluation
-                  </h3>
-                  <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
-                    Calculated via Gemini AI Coach &bull; Evaluated out of 350 Points Max
-                  </div>
-                </div>
-              </div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+              <h3 style={{ fontSize: "1.2rem", margin: 0, fontWeight: 900, color: "var(--text-primary)" }}>
+                🏆 Sunday Evaluation Report
+              </h3>
               <button
                 type="button"
                 onClick={() => setShowEvaluationModal(false)}
-                style={{ background: "transparent", border: "none", color: "var(--text-secondary)", fontSize: 20, cursor: "pointer" }}
+                style={{ background: "transparent", border: "none", color: "var(--text-secondary)", fontSize: 18, cursor: "pointer" }}
               >
                 ✕
               </button>
             </div>
 
-            {/* Score & Grade Hero */}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "1.4rem",
-                borderRadius: 12,
-                background: "var(--bg-base)",
-                border: "1px solid var(--border-subtle)",
-                marginBottom: 16,
-              }}
-            >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "1rem", borderRadius: 10, background: "var(--bg-base)", marginBottom: 14 }}>
               <div>
-                <div style={{ fontSize: 12, fontWeight: 800, color: "var(--text-secondary)", textTransform: "uppercase" }}>
-                  Weekly Points Awarded
+                <div style={{ fontSize: "1.8rem", fontWeight: 900, color: "var(--accent-brand)" }}>
+                  {evaluationResult.totalWeeklyPoints} / 350 pts
                 </div>
-                <div style={{ fontSize: "2.4rem", fontWeight: 900, color: "var(--accent-brand)", lineHeight: 1.1, marginTop: 4 }}>
-                  {evaluationResult.totalWeeklyPoints}{" "}
-                  <span style={{ fontSize: "1.1rem", color: "var(--text-secondary)" }}>
-                    / 350 pts ({evaluationResult.percentage}%)
-                  </span>
-                </div>
-                <div style={{ fontSize: 11, color: "var(--accent-brand)", marginTop: 4, fontWeight: 600 }}>
-                  ⚡ Strict Rule Enforced: Never full 350 points awarded. Points reset to 0 for Sunday!
+                <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
+                  {evaluationResult.percentage}% weekly consistency score
                 </div>
               </div>
-
               <div
                 style={{
-                  width: 64,
-                  height: 64,
-                  borderRadius: 14,
+                  width: 52,
+                  height: 52,
+                  borderRadius: 12,
                   background: getGradeBadgeColor(evaluationResult.grade),
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: "2rem",
+                  fontSize: "1.8rem",
                   fontWeight: 900,
-                  color: "#ffffff",
-                  boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+                  color: "#fff",
                 }}
               >
                 {evaluationResult.grade}
               </div>
             </div>
 
-            {/* AI Review Summary */}
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 12, fontWeight: 800, color: "var(--text-primary)", marginBottom: 6 }}>
-                AI Coach Assessment:
-              </div>
-              <div
-                style={{
-                  fontSize: "0.92rem",
-                  lineHeight: 1.6,
-                  color: "var(--text-primary)",
-                  padding: "12px 14px",
-                  borderRadius: 8,
-                  background: "var(--bg-base)",
-                  border: "1px solid var(--border-subtle)",
-                }}
-              >
-                {evaluationResult.summaryReview}
-              </div>
-            </div>
-
-            {/* Per-Task Breakdown (Out of 70 pts each) */}
-            {Array.isArray(evaluationResult.perTaskBreakdown) && (
-              <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: 12, fontWeight: 800, color: "var(--text-primary)", marginBottom: 6 }}>
-                  Per-Streak Breakdown (70 pts max each):
-                </div>
-                <div style={{ display: "grid", gap: 8 }}>
-                  {evaluationResult.perTaskBreakdown.map((item, idx) => (
-                    <div
-                      key={idx}
-                      style={{
-                        padding: "10px 12px",
-                        borderRadius: 8,
-                        background: "var(--bg-base)",
-                        border: "1px solid var(--border-subtle)",
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        gap: 10,
-                      }}
-                    >
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--text-primary)" }}>
-                          {item.taskTitle}
-                        </div>
-                        <div style={{ fontSize: "0.8rem", color: "var(--text-secondary)", marginTop: 2 }}>
-                          {item.numbersLogged && <span>📊 {item.numbersLogged} &bull; </span>}
-                          {item.topicsRead && <span>🏷️ {item.topicsRead}</span>}
-                        </div>
-                        {item.verdict && (
-                          <div style={{ fontSize: "0.78rem", color: "var(--text-secondary)", fontStyle: "italic", marginTop: 2 }}>
-                            {item.verdict}
-                          </div>
-                        )}
-                      </div>
-
-                      <div style={{ fontWeight: 800, color: "var(--accent-brand)", fontSize: "1rem" }}>
-                        ⚡ {item.points} / 70 pts
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            <p style={{ fontSize: "0.9rem", color: "var(--text-primary)", lineHeight: 1.5, marginBottom: 16 }}>
+              {evaluationResult.summaryReview}
+            </p>
 
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
               <button
                 type="button"
                 onClick={() => setShowEvaluationModal(false)}
                 className="btn-lime"
-                style={{ padding: "8px 20px", fontSize: "0.9rem" }}
+                style={{ padding: "7px 18px", fontSize: "0.85rem" }}
               >
                 Done ✓
               </button>
@@ -2954,7 +1552,7 @@ export default function TaskManager() {
       )}
 
       {/* ═══════════════════════════════════════════════════════════════════════
-          MODAL 4: PAST SUNDAY EVALUATIONS ARCHIVE
+          MODAL: PAST SUNDAY EVALUATIONS ARCHIVE
       ════════════════════════════════════════════════════════════════════════ */}
       {showHistoryModal && (
         <div
@@ -2973,18 +1571,18 @@ export default function TaskManager() {
           <div
             className="glass-card"
             style={{
-              width: "min(600px, 94vw)",
-              maxHeight: "85vh",
+              width: "min(560px, 94vw)",
+              maxHeight: "80vh",
               overflowY: "auto",
-              padding: "1.8rem",
+              padding: "1.6rem",
               borderRadius: 14,
               background: "var(--bg-surface)",
               border: "1px solid var(--border-subtle)",
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-              <h3 style={{ fontSize: "1.2rem", margin: 0, fontWeight: 800, color: "var(--text-primary)" }}>
-                📜 Past Sunday Evaluation Archives
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+              <h3 style={{ fontSize: "1.15rem", margin: 0, fontWeight: 800, color: "var(--text-primary)" }}>
+                📜 Past Sunday Reports
               </h3>
               <button
                 type="button"
@@ -2995,12 +1593,12 @@ export default function TaskManager() {
               </button>
             </div>
 
-            <div style={{ display: "grid", gap: 10 }}>
+            <div style={{ display: "grid", gap: 8 }}>
               {evaluations.map((ev, idx) => (
                 <div
                   key={ev.id || idx}
                   style={{
-                    padding: "12px",
+                    padding: "10px 12px",
                     borderRadius: 8,
                     background: "var(--bg-base)",
                     border: "1px solid var(--border-subtle)",
@@ -3010,22 +1608,21 @@ export default function TaskManager() {
                   }}
                 >
                   <div>
-                    <div style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>
+                    <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
                       {new Date(ev.date).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })}
                     </div>
                     <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "var(--text-primary)", marginTop: 2 }}>
-                      Score: {ev.totalWeeklyPoints} / 350 ({ev.percentage || Math.round((ev.totalWeeklyPoints / 350) * 100)}%)
+                      {ev.totalWeeklyPoints} / 350 pts
                     </div>
                   </div>
-
                   <span
                     style={{
-                      padding: "4px 10px",
-                      borderRadius: 8,
+                      padding: "3px 8px",
+                      borderRadius: 6,
                       background: getGradeBadgeColor(ev.grade),
                       color: "#fff",
                       fontWeight: 800,
-                      fontSize: "0.9rem",
+                      fontSize: "0.85rem",
                     }}
                   >
                     Grade {ev.grade}
@@ -3041,31 +1638,21 @@ export default function TaskManager() {
         @keyframes slideInToast {
           from {
             opacity: 0;
-            transform: translateY(-12px) scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
-        @keyframes slideDownFade {
-          from {
-            opacity: 0;
-            transform: translateY(-8px);
+            transform: translateY(-10px);
           }
           to {
             opacity: 1;
             transform: translateY(0);
           }
         }
-        @keyframes pulseLockdown {
-          0%, 100% {
-            border-color: #e11d48;
-            box-shadow: 0 8px 30px rgba(225, 29, 72, 0.25);
+        @keyframes slideDownFade {
+          from {
+            opacity: 0;
+            transform: translateY(-6px);
           }
-          50% {
-            border-color: #f43f5e;
-            box-shadow: 0 12px 40px rgba(244, 63, 94, 0.45);
+          to {
+            opacity: 1;
+            transform: translateY(0);
           }
         }
       `}</style>

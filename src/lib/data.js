@@ -829,6 +829,16 @@ export async function getTasks() {
     tasks = readFile(TASKS_FILE, defaultTasks);
   }
 
+  // Ensure the 5 core atomic habit pillars are always seeded in DB and local store
+  const streakTasks = tasks.filter((t) => t.category === 'Streak');
+  if (streakTasks.length < 5) {
+    try {
+      tasks = await seedCoreHabits();
+    } catch (err) {
+      console.warn('Auto-seed core habits fallback:', err.message);
+    }
+  }
+
   return tasks.map(normalizeTask);
 }
 
@@ -1710,7 +1720,7 @@ export async function getVaultNotes() {
       if (record && record.content) {
         try {
           const parsed = JSON.parse(record.content);
-          if (Array.isArray(parsed) && parsed.length > 0) {
+          if (Array.isArray(parsed)) {
             return parsed;
           }
         } catch (e) {
@@ -1823,13 +1833,15 @@ export async function togglePinVaultNote(id) {
 export async function getVaultFolders() {
   const notes = await getVaultNotes();
   let storedFolders = [];
+  let dbQueried = false;
 
   if (prisma) {
     try {
       const dbFolders = await prisma.vaultFolderItem.findMany({
         orderBy: { createdAt: 'asc' },
       });
-      if (dbFolders && dbFolders.length > 0) {
+      dbQueried = true;
+      if (Array.isArray(dbFolders)) {
         storedFolders = dbFolders;
       }
     } catch (e) {
@@ -1837,7 +1849,7 @@ export async function getVaultFolders() {
     }
   }
 
-  if (storedFolders.length === 0) {
+  if (!dbQueried) {
     storedFolders = readFile(VAULT_FOLDERS_FILE, []);
   }
 
