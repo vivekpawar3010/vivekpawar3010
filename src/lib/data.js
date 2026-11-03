@@ -1,9 +1,4 @@
-import prisma from '@/lib/prisma';
-import defaultProfile from '@/data/profile';
-import defaultProjects from '@/data/projects';
-import defaultSkills from '@/data/skills';
-import defaultTasks from '@/data/tasks.json';
-import defaultVaultNotes from '@/data/vault.json';
+import prisma from './prisma.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -28,6 +23,12 @@ function readFile(filePath, fallback) {
   return fallback;
 }
 
+const defaultProfile = readFile(PROFILE_FILE, {});
+const defaultProjects = readFile(PROJECTS_FILE, []);
+const defaultSkills = readFile(SKILLS_FILE, []);
+const defaultTasks = readFile(TASKS_FILE, []);
+const defaultVaultNotes = readFile(VAULT_FILE, []);
+
 function writeFile(filePath, data) {
   try {
     fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
@@ -39,12 +40,44 @@ function writeFile(filePath, data) {
 // ── Profile Normalizer ───────────────────────────────────────────────────────
 export function normalizeProfile(raw) {
   if (!raw) return defaultProfile;
+
+  let parsedPhotos = [];
+  if (Array.isArray(raw.photos)) {
+    parsedPhotos = raw.photos;
+  } else if (typeof raw.photos === 'string' && raw.photos.startsWith('[')) {
+    try {
+      parsedPhotos = JSON.parse(raw.photos);
+    } catch {
+      parsedPhotos = [];
+    }
+  }
+
+  let parsedBackgrounds = {};
+  if (raw.themeBackgrounds && typeof raw.themeBackgrounds === 'object') {
+    parsedBackgrounds = raw.themeBackgrounds;
+  } else if (typeof raw.themeBackgrounds === 'string' && raw.themeBackgrounds.startsWith('{')) {
+    try {
+      parsedBackgrounds = JSON.parse(raw.themeBackgrounds);
+    } catch {
+      parsedBackgrounds = {};
+    }
+  }
+
   return {
     ...defaultProfile,
     ...raw,
     avatarUrl: raw.avatarUrl || defaultProfile.avatarUrl || '/images/avatar.png',
     activePhoto: raw.activePhoto || raw.avatarUrl || defaultProfile.activePhoto || '/images/vivek-portrait-cutout.png',
-    photos: Array.isArray(raw.photos) ? raw.photos : (defaultProfile.photos || []),
+    photos: parsedPhotos,
+    resumeUrl: raw.resumeUrl !== undefined ? raw.resumeUrl : (defaultProfile.resumeUrl || ''),
+    cgpa: raw.cgpa || defaultProfile.cgpa || '9.21 / 10',
+    finalSemSgpa: raw.finalSemSgpa || defaultProfile.finalSemSgpa || '10.00 / 10',
+    gateStatus: raw.gateStatus || defaultProfile.gateStatus || 'GATE 2026 Qualified',
+    themeBackgrounds: {
+      dark: parsedBackgrounds.dark || defaultProfile.themeBackgrounds?.dark || '/images/bg-theme-1.jpg',
+      warmAmber: parsedBackgrounds.warmAmber || defaultProfile.themeBackgrounds?.warmAmber || '/images/bg-theme-2.jpg',
+      electricCyan: parsedBackgrounds.electricCyan || defaultProfile.themeBackgrounds?.electricCyan || '/images/bg-theme-3.jpg',
+    },
     education: {
       degree: raw.education?.degree || raw.degree || defaultProfile.education.degree,
       institution: raw.education?.institution || raw.institution || defaultProfile.education.institution,
@@ -61,34 +94,42 @@ export async function getProfile() {
   const fileData = readFile(PROFILE_FILE, defaultProfile);
   if (prisma) {
     try {
-      let p = await prisma.profile.findFirst();
-      if (!p) {
+      const p = await prisma.profile.findFirst();
+      if (p) {
+        return normalizeProfile({
+          ...fileData,
+          ...p,
+        });
+      } else {
         // Seed default profile into database
-        p = await prisma.profile.create({
+        await prisma.profile.create({
           data: {
             id: 'profile-1',
-            name: defaultProfile.name,
-            role: defaultProfile.role,
-            tagline: defaultProfile.tagline,
-            about: defaultProfile.about,
-            degree: defaultProfile.education?.degree || '',
-            institution: defaultProfile.education?.institution || '',
-            period: defaultProfile.education?.period || '',
-            location: defaultProfile.location || '',
-            status: defaultProfile.status || '',
-            email: defaultProfile.email || '',
-            github: defaultProfile.github || '',
-            linkedin: defaultProfile.linkedin || '',
-            leetcode: defaultProfile.leetcode || '',
-            avatarUrl: defaultProfile.avatarUrl || '/images/avatar.png',
+            name: fileData.name || defaultProfile.name,
+            role: fileData.role || defaultProfile.role,
+            tagline: fileData.tagline || defaultProfile.tagline,
+            about: fileData.about || defaultProfile.about,
+            degree: fileData.education?.degree || fileData.degree || defaultProfile.education.degree,
+            institution: fileData.education?.institution || fileData.institution || defaultProfile.education.institution,
+            period: fileData.education?.period || fileData.period || defaultProfile.education.period,
+            location: fileData.location || defaultProfile.location,
+            status: fileData.status || defaultProfile.status,
+            email: fileData.email || defaultProfile.email,
+            github: fileData.github || defaultProfile.github,
+            linkedin: fileData.linkedin || defaultProfile.linkedin,
+            leetcode: fileData.leetcode || defaultProfile.leetcode,
+            avatarUrl: fileData.avatarUrl || defaultProfile.avatarUrl,
+            activePhoto: fileData.activePhoto || defaultProfile.activePhoto,
+            photos: JSON.stringify(fileData.photos || []),
+            resumeUrl: fileData.resumeUrl || defaultProfile.resumeUrl || '',
+            cgpa: fileData.cgpa || defaultProfile.cgpa || '9.21 / 10',
+            finalSemSgpa: fileData.finalSemSgpa || defaultProfile.finalSemSgpa || '10.00 / 10',
+            gateStatus: fileData.gateStatus || defaultProfile.gateStatus || 'GATE 2026 Qualified',
+            themeBackgrounds: JSON.stringify(fileData.themeBackgrounds || defaultProfile.themeBackgrounds || {}),
           },
         });
+        return normalizeProfile(fileData);
       }
-      return normalizeProfile({
-        ...p,
-        photos: fileData.photos || [],
-        activePhoto: fileData.activePhoto || p.avatarUrl || '/images/vivek-portrait-cutout.png',
-      });
     } catch (e) {
       console.warn('Prisma getProfile fallback to local file:', e.message);
     }
@@ -121,6 +162,13 @@ export async function updateProfile(data) {
           linkedin: normalizedInput.linkedin,
           leetcode: normalizedInput.leetcode,
           avatarUrl: normalizedInput.avatarUrl,
+          activePhoto: normalizedInput.activePhoto,
+          photos: JSON.stringify(normalizedInput.photos || []),
+          resumeUrl: normalizedInput.resumeUrl || '',
+          cgpa: normalizedInput.cgpa || '',
+          finalSemSgpa: normalizedInput.finalSemSgpa || '',
+          gateStatus: normalizedInput.gateStatus || '',
+          themeBackgrounds: JSON.stringify(normalizedInput.themeBackgrounds || {}),
         },
         update: {
           name: normalizedInput.name,
@@ -137,6 +185,13 @@ export async function updateProfile(data) {
           linkedin: normalizedInput.linkedin,
           leetcode: normalizedInput.leetcode,
           avatarUrl: normalizedInput.avatarUrl,
+          activePhoto: normalizedInput.activePhoto,
+          photos: JSON.stringify(normalizedInput.photos || []),
+          resumeUrl: normalizedInput.resumeUrl || '',
+          cgpa: normalizedInput.cgpa || '',
+          finalSemSgpa: normalizedInput.finalSemSgpa || '',
+          gateStatus: normalizedInput.gateStatus || '',
+          themeBackgrounds: JSON.stringify(normalizedInput.themeBackgrounds || {}),
         },
       });
     } catch (e) {
@@ -149,6 +204,45 @@ export async function updateProfile(data) {
 }
 
 // ── Projects ────────────────────────────────────────────────────────────────
+function mapDbProject(p) {
+  let parsedFeatures = [];
+  if (Array.isArray(p.keyFeatures)) {
+    parsedFeatures = p.keyFeatures;
+  } else if (typeof p.keyFeatures === 'string' && p.keyFeatures.startsWith('[')) {
+    try {
+      parsedFeatures = JSON.parse(p.keyFeatures);
+    } catch {
+      parsedFeatures = [];
+    }
+  }
+
+  const tagsArr = Array.isArray(p.tags)
+    ? p.tags
+    : typeof p.tags === 'string' && p.tags
+    ? p.tags.split(',').map((t) => t.trim()).filter(Boolean)
+    : [];
+
+  return {
+    id: p.id,
+    name: p.name,
+    subtitle: p.subtitle || '',
+    description: p.description || '',
+    category: p.category || 'Full Stack',
+    tags: tagsArr,
+    icon: p.icon || 'Globe',
+    link: p.link || p.liveUrl || '',
+    liveUrl: p.liveUrl || p.link || '',
+    github: p.github || p.githubUrl || '',
+    githubUrl: p.githubUrl || p.github || '',
+    featured: Boolean(p.featured),
+    order: p.order !== undefined ? p.order : 0,
+    problem: p.problem || '',
+    solution: p.solution || '',
+    keyFeatures: parsedFeatures,
+    architecture: p.architecture || '',
+  };
+}
+
 export async function getProjects() {
   if (prisma) {
     try {
@@ -156,30 +250,7 @@ export async function getProjects() {
         orderBy: { order: 'asc' },
       });
       if (dbProjects && dbProjects.length > 0) {
-        return dbProjects.map((p) => ({
-          ...p,
-          tags: p.tags ? p.tags.split(',').map((t) => t.trim()) : [],
-        }));
-      } else {
-        // Seed database with default projects
-        for (let i = 0; i < defaultProjects.length; i++) {
-          const dp = defaultProjects[i];
-          await prisma.project.create({
-            data: {
-              id: dp.id || `proj-${i}`,
-              name: dp.name,
-              subtitle: dp.subtitle || '',
-              description: dp.description || '',
-              category: dp.category || 'Full Stack',
-              tags: Array.isArray(dp.tags) ? dp.tags.join(', ') : dp.tags || '',
-              link: dp.link || '',
-              github: dp.github || '',
-              featured: Boolean(dp.featured),
-              order: i,
-            },
-          });
-        }
-        return defaultProjects;
+        return dbProjects.map(mapDbProject);
       }
     } catch (e) {
       console.warn('Prisma getProjects fallback:', e.message);
@@ -193,37 +264,62 @@ export async function addProject(projectData) {
     ? projectData.tags.join(', ')
     : projectData.tags || '';
 
+  const id = projectData.id || `proj-${Date.now()}`;
+  const keyFeaturesStr = JSON.stringify(
+    Array.isArray(projectData.keyFeatures) ? projectData.keyFeatures : []
+  );
+
+  const newProject = {
+    id,
+    name: projectData.name,
+    subtitle: projectData.subtitle || '',
+    description: projectData.description || '',
+    category: projectData.category || 'Full Stack',
+    tags: tagsStr.split(',').map((t) => t.trim()).filter(Boolean),
+    icon: projectData.icon || 'Globe',
+    link: projectData.link || projectData.liveUrl || '',
+    liveUrl: projectData.liveUrl || projectData.link || '',
+    github: projectData.github || projectData.githubUrl || '',
+    githubUrl: projectData.githubUrl || projectData.github || '',
+    featured: Boolean(projectData.featured),
+    order: Number(projectData.order) || 0,
+    problem: projectData.problem || '',
+    solution: projectData.solution || '',
+    keyFeatures: Array.isArray(projectData.keyFeatures) ? projectData.keyFeatures : [],
+    architecture: projectData.architecture || '',
+  };
+
   if (prisma) {
     try {
-      const created = await prisma.project.create({
+      await prisma.project.create({
         data: {
-          name: projectData.name,
-          subtitle: projectData.subtitle || '',
-          description: projectData.description || '',
-          category: projectData.category || 'Full Stack',
+          id: newProject.id,
+          name: newProject.name,
+          subtitle: newProject.subtitle,
+          description: newProject.description,
+          category: newProject.category,
           tags: tagsStr,
-          link: projectData.link || '',
-          github: projectData.github || '',
-          featured: Boolean(projectData.featured),
+          icon: newProject.icon,
+          link: newProject.link,
+          liveUrl: newProject.liveUrl,
+          github: newProject.github,
+          githubUrl: newProject.githubUrl,
+          featured: newProject.featured,
+          order: newProject.order,
+          problem: newProject.problem,
+          solution: newProject.solution,
+          keyFeatures: keyFeaturesStr,
+          architecture: newProject.architecture,
         },
       });
-      return {
-        ...created,
-        tags: created.tags.split(',').map((t) => t.trim()),
-      };
     } catch (e) {
       console.warn('Prisma addProject fallback:', e.message);
     }
   }
 
   const current = await getProjects();
-  const newProject = {
-    id: `proj-${Date.now()}`,
-    ...projectData,
-    tags: tagsStr.split(',').map((t) => t.trim()),
-    featured: Boolean(projectData.featured),
-  };
-  writeFile(PROJECTS_FILE, [newProject, ...current]);
+  const updated = [newProject, ...current.filter((p) => p.id !== id)];
+  writeFile(PROJECTS_FILE, updated);
   return newProject;
 }
 
@@ -231,6 +327,10 @@ export async function updateProject(id, projectData) {
   const tagsStr = Array.isArray(projectData.tags)
     ? projectData.tags.join(', ')
     : projectData.tags || '';
+
+  const keyFeaturesStr = JSON.stringify(
+    Array.isArray(projectData.keyFeatures) ? projectData.keyFeatures : []
+  );
 
   if (prisma) {
     try {
@@ -242,12 +342,19 @@ export async function updateProject(id, projectData) {
           description: projectData.description,
           category: projectData.category,
           tags: tagsStr,
-          link: projectData.link,
-          github: projectData.github,
+          icon: projectData.icon || 'Globe',
+          link: projectData.link || projectData.liveUrl || '',
+          liveUrl: projectData.liveUrl || projectData.link || '',
+          github: projectData.github || projectData.githubUrl || '',
+          githubUrl: projectData.githubUrl || projectData.github || '',
           featured: Boolean(projectData.featured),
+          order: Number(projectData.order) || 0,
+          problem: projectData.problem || '',
+          solution: projectData.solution || '',
+          keyFeatures: keyFeaturesStr,
+          architecture: projectData.architecture || '',
         },
       });
-      return true;
     } catch (e) {
       console.warn('Prisma updateProject fallback:', e.message);
     }
@@ -255,7 +362,14 @@ export async function updateProject(id, projectData) {
 
   const current = await getProjects();
   const updated = current.map((p) =>
-    p.id === id || p.name === id ? { ...p, ...projectData, tags: tagsStr.split(',').map((t) => t.trim()) } : p
+    p.id === id || p.name === id
+      ? {
+          ...p,
+          ...projectData,
+          tags: tagsStr.split(',').map((t) => t.trim()).filter(Boolean),
+          keyFeatures: Array.isArray(projectData.keyFeatures) ? projectData.keyFeatures : p.keyFeatures,
+        }
+      : p
   );
   writeFile(PROJECTS_FILE, updated);
   return true;
@@ -264,8 +378,7 @@ export async function updateProject(id, projectData) {
 export async function deleteProject(id) {
   if (prisma) {
     try {
-      await prisma.project.delete({ where: { id } });
-      return true;
+      await prisma.project.delete({ where: { id } }).catch(() => {});
     } catch (e) {
       console.warn('Prisma deleteProject fallback:', e.message);
     }
@@ -281,37 +394,28 @@ export async function deleteProject(id) {
 export async function getSkills() {
   if (prisma) {
     try {
-      const dbSkills = await prisma.skill.findMany();
+      const dbSkills = await prisma.skill.findMany({
+        orderBy: { createdAt: 'asc' },
+      });
       if (dbSkills && dbSkills.length > 0) {
-        // Group by category
         const groups = {};
         dbSkills.forEach((s) => {
           if (!groups[s.category]) {
-            groups[s.category] = { category: s.category, icon: '💡', items: [] };
+            groups[s.category] = {
+              category: s.category,
+              icon: s.categoryIcon || 'Code2',
+              items: [],
+            };
           }
           groups[s.category].items.push({
             id: s.id,
             name: s.name,
             level: s.level,
             badge: s.badge,
+            percentage: Number(s.percentage) || 85,
           });
         });
         return Object.values(groups);
-      } else {
-        // Seed database
-        for (const cat of defaultSkills) {
-          for (const item of cat.items) {
-            await prisma.skill.create({
-              data: {
-                category: cat.category,
-                name: item.name,
-                level: item.level || 'Intermediate',
-                badge: item.badge || null,
-              },
-            });
-          }
-        }
-        return defaultSkills;
       }
     } catch (e) {
       console.warn('Prisma getSkills fallback:', e.message);
@@ -342,9 +446,46 @@ export async function addSkill(categoryName, skillItem) {
   if (!found) {
     updated.push({
       category: categoryName,
-      icon: skillItem.categoryIcon || "Code2",
+      icon: skillItem.categoryIcon || 'Code2',
       items: [skillItem],
     });
+  }
+
+  // Sync to PostgreSQL
+  if (prisma) {
+    try {
+      const existing = await prisma.skill.findFirst({
+        where: {
+          category: categoryName,
+          name: skillItem.name,
+        },
+      });
+
+      if (existing) {
+        await prisma.skill.update({
+          where: { id: existing.id },
+          data: {
+            level: skillItem.level || 'Intermediate',
+            badge: skillItem.badge || null,
+            percentage: Number(skillItem.percentage) || 85,
+            categoryIcon: skillItem.categoryIcon || 'Code2',
+          },
+        });
+      } else {
+        await prisma.skill.create({
+          data: {
+            category: categoryName,
+            name: skillItem.name,
+            level: skillItem.level || 'Intermediate',
+            badge: skillItem.badge || null,
+            percentage: Number(skillItem.percentage) || 85,
+            categoryIcon: skillItem.categoryIcon || 'Code2',
+          },
+        });
+      }
+    } catch (e) {
+      console.warn('Prisma addSkill fallback:', e.message);
+    }
   }
 
   writeFile(SKILLS_FILE, updated);
@@ -362,11 +503,25 @@ export async function deleteSkill(categoryName, skillName) {
     }
     return cat;
   });
+
+  if (prisma) {
+    try {
+      await prisma.skill.deleteMany({
+        where: {
+          category: categoryName,
+          name: skillName,
+        },
+      });
+    } catch (e) {
+      console.warn('Prisma deleteSkill fallback:', e.message);
+    }
+  }
+
   writeFile(SKILLS_FILE, updated);
   return updated;
 }
 
-export async function addSkillCategory(categoryName, icon = "Code2") {
+export async function addSkillCategory(categoryName, icon = 'Code2') {
   const current = await getSkills();
   const exists = current.some((c) => c.category.toLowerCase() === categoryName.toLowerCase());
   if (!exists) {
@@ -379,19 +534,35 @@ export async function addSkillCategory(categoryName, icon = "Code2") {
 export async function deleteSkillCategory(categoryName) {
   const current = await getSkills();
   const updated = current.filter((c) => c.category.toLowerCase() !== categoryName.toLowerCase());
+
+  if (prisma) {
+    try {
+      await prisma.skill.deleteMany({
+        where: { category: categoryName },
+      });
+    } catch (e) {
+      console.warn('Prisma deleteSkillCategory fallback:', e.message);
+    }
+  }
+
   writeFile(SKILLS_FILE, updated);
   return updated;
 }
 
-// ── Tasks & Habit Streaks System ─────────────────────────────────────────────
+// ── Tasks & Streaks ─────────────────────────────────────────────────────────
 export function normalizeTask(t) {
   if (!t) return t;
   let extra = {};
-  if (t.dueDate && typeof t.dueDate === 'string' && t.dueDate.startsWith('{')) {
+  if (t.extraData && typeof t.extraData === 'string' && t.extraData.startsWith('{')) {
+    try {
+      extra = JSON.parse(t.extraData);
+    } catch {}
+  } else if (t.dueDate && typeof t.dueDate === 'string' && t.dueDate.startsWith('{')) {
     try {
       extra = JSON.parse(t.dueDate);
-    } catch (e) {}
+    } catch {}
   }
+
   const isStreak = t.category === 'Streak';
 
   const defaultFields = isStreak
@@ -402,11 +573,12 @@ export function normalizeTask(t) {
       ]
     : [];
 
-  const rawFields = Array.isArray(t.fields) && t.fields.length > 0
-    ? t.fields
-    : Array.isArray(extra.fields) && extra.fields.length > 0
-    ? extra.fields
-    : defaultFields;
+  const rawFields =
+    Array.isArray(t.fields) && t.fields.length > 0
+      ? t.fields
+      : Array.isArray(extra.fields) && extra.fields.length > 0
+      ? extra.fields
+      : defaultFields;
 
   return {
     ...t,
@@ -414,14 +586,16 @@ export function normalizeTask(t) {
     priority: t.priority || 'Medium',
     status: t.status || 'todo',
     fields: rawFields,
-    goalDays: Number(t.goalDays !== undefined ? t.goalDays : (extra.goalDays !== undefined ? extra.goalDays : (isStreak ? 30 : 0))),
-    currentStreak: Number(t.currentStreak !== undefined ? t.currentStreak : (extra.currentStreak || 0)),
-    bestStreak: Number(t.bestStreak !== undefined ? t.bestStreak : (extra.bestStreak || 0)),
-    lastCheckedDate: t.lastCheckedDate || extra.lastCheckedDate || null,
+    goalDays: Number(
+      t.goalDays !== undefined ? t.goalDays : extra.goalDays !== undefined ? extra.goalDays : isStreak ? 30 : 0
+    ),
+    currentStreak: Number(t.currentStreak !== undefined ? t.currentStreak : extra.currentStreak || 0),
+    bestStreak: Number(t.bestStreak !== undefined ? t.bestStreak : extra.bestStreak || 0),
+    lastCheckedDate: t.lastCheckedDate || extra.lastCheckedDate || t.lastChecked || null,
     dailyLog: t.dailyLog || extra.dailyLog || '',
-    history: Array.isArray(t.history) ? t.history : (Array.isArray(extra.history) ? extra.history : []),
-    weeklyPoints: Number(t.weeklyPoints !== undefined ? t.weeklyPoints : (extra.weeklyPoints || 0)),
-    totalPoints: Number(t.totalPoints !== undefined ? t.totalPoints : (extra.totalPoints || 0)),
+    history: Array.isArray(t.history) ? t.history : Array.isArray(extra.history) ? extra.history : [],
+    weeklyPoints: Number(t.weeklyPoints !== undefined ? t.weeklyPoints : extra.weeklyPoints || 0),
+    totalPoints: Number(t.totalPoints !== undefined ? t.totalPoints : extra.totalPoints || 0),
     lastEvaluatedDate: t.lastEvaluatedDate || extra.lastEvaluatedDate || null,
   };
 }
@@ -435,45 +609,13 @@ export async function getTasks() {
       });
       if (dbTasks && dbTasks.length > 0) {
         tasks = dbTasks;
-      } else {
-        // Seed default tasks
-        for (const t of defaultTasks) {
-          const serializedDueDate = t.category === 'Streak'
-            ? JSON.stringify({
-                fields: t.fields || [
-                  { id: 'number_done', label: 'Number / Problems Completed', type: 'number', target: '5' },
-                  { id: 'topics_read', label: 'Topics & Concepts Read', type: 'topics', target: 'DSA, System Design' },
-                  { id: 'daily_notes', label: 'Daily Reflection & Small Text', type: 'text', target: 'Notes' },
-                ],
-                goalDays: t.goalDays || 30,
-                currentStreak: t.currentStreak || 0,
-                bestStreak: t.bestStreak || 0,
-                lastCheckedDate: t.lastCheckedDate || null,
-                dailyLog: t.dailyLog || '',
-                history: t.history || [],
-                weeklyPoints: t.weeklyPoints || 0,
-                totalPoints: t.totalPoints || 0,
-              })
-            : t.dueDate;
-
-          await prisma.task.create({
-            data: {
-              id: t.id,
-              title: t.title,
-              category: t.category,
-              priority: t.priority,
-              status: t.status,
-              dueDate: serializedDueDate,
-            },
-          });
-        }
-        tasks = defaultTasks;
       }
     } catch (e) {
       console.warn('Prisma getTasks fallback:', e.message);
-      tasks = readFile(TASKS_FILE, defaultTasks);
     }
-  } else {
+  }
+
+  if (tasks.length === 0) {
     tasks = readFile(TASKS_FILE, defaultTasks);
   }
 
@@ -500,9 +642,8 @@ export async function addTask(taskData) {
       ]
     : [];
 
-  const configuredFields = Array.isArray(taskData.fields) && taskData.fields.length > 0
-    ? taskData.fields
-    : defaultFields;
+  const configuredFields =
+    Array.isArray(taskData.fields) && taskData.fields.length > 0 ? taskData.fields : defaultFields;
 
   const streakExtra = {
     fields: configuredFields,
@@ -522,7 +663,7 @@ export async function addTask(taskData) {
     category: taskData.category || 'General',
     priority: taskData.priority || 'Medium',
     status: isStreak ? 'in_progress' : 'todo',
-    dueDate: isStreak ? `${streakExtra.goalDays}-Day Goal` : (taskData.dueDate || 'Soon'),
+    dueDate: isStreak ? `${streakExtra.goalDays}-Day Goal` : taskData.dueDate || 'Soon',
     ...streakExtra,
     createdAt: new Date().toISOString().split('T')[0],
   };
@@ -536,7 +677,14 @@ export async function addTask(taskData) {
           category: newTask.category,
           priority: newTask.priority,
           status: newTask.status,
-          dueDate: isStreak ? JSON.stringify(streakExtra) : newTask.dueDate,
+          dueDate: newTask.dueDate,
+          goalDays: streakExtra.goalDays,
+          currentStreak: streakExtra.currentStreak,
+          bestStreak: streakExtra.bestStreak,
+          lastChecked: streakExtra.lastCheckedDate,
+          weeklyPoints: streakExtra.weeklyPoints,
+          totalPoints: streakExtra.totalPoints,
+          extraData: JSON.stringify(streakExtra),
         },
       });
     } catch (e) {
@@ -592,9 +740,7 @@ export async function checkInStreak(
     ? topics.split(',').map((s) => s.trim()).filter(Boolean)
     : [];
   const parsedNumber =
-    numberDone !== null && numberDone !== undefined && numberDone !== ''
-      ? Number(numberDone)
-      : undefined;
+    numberDone !== null && numberDone !== undefined && numberDone !== '' ? Number(numberDone) : undefined;
 
   let newStreak = task.currentStreak || 0;
   let newHistory = Array.isArray(task.history) ? [...task.history] : [];
@@ -612,7 +758,6 @@ export async function checkInStreak(
   };
 
   if (isAlreadyCheckedToday) {
-    // Update today's entry without double-counting streak days
     const existingLogIdx = newHistory.findIndex((h) => h.date === todayStr);
     if (existingLogIdx >= 0) {
       newHistory[existingLogIdx] = {
@@ -623,7 +768,6 @@ export async function checkInStreak(
       newHistory.push(logEntry);
     }
   } else {
-    // Check if consecutive from yesterday
     let isConsecutive = false;
     if (task.lastCheckedDate) {
       const lastDate = new Date(task.lastCheckedDate);
@@ -638,7 +782,6 @@ export async function checkInStreak(
     if (isConsecutive || newStreak === 0) {
       newStreak += 1;
     } else {
-      // Streak broken, reset to 1
       newStreak = 1;
     }
 
@@ -649,14 +792,12 @@ export async function checkInStreak(
   const goalDays = Number(task.goalDays) || 30;
   const isGoalReached = newStreak >= goalDays;
 
-  // Compile readable daily log string
   const summaryParts = [];
   if (parsedNumber !== undefined) summaryParts.push(`Count: ${parsedNumber}`);
   if (topicsArray.length > 0) summaryParts.push(`Topics: ${topicsArray.join(', ')}`);
   if (trimmedLog) summaryParts.push(trimmedLog);
   const combinedLog = summaryParts.join(' | ') || trimmedLog || 'Check-in completed';
 
-  // Rule: 5 tasks everyday, 50 points (10 points each task per day)
   const awardedPoints = isAlreadyCheckedToday ? 0 : 10;
 
   const updatedTask = {
@@ -690,6 +831,11 @@ export async function checkInStreak(
         where: { id },
         data: {
           status: updatedTask.status,
+          currentStreak: updatedTask.currentStreak,
+          bestStreak: updatedTask.bestStreak,
+          lastChecked: updatedTask.lastCheckedDate,
+          weeklyPoints: updatedTask.weeklyPoints,
+          extraData: JSON.stringify(streakExtra),
           dueDate: JSON.stringify(streakExtra),
         },
       });
@@ -737,7 +883,9 @@ export async function updateStreakGoal(id, newGoalDays) {
         await prisma.task.update({
           where: { id },
           data: {
-            dueDate: JSON.stringify(streakExtra),
+            goalDays: target.goalDays,
+            dueDate: `${target.goalDays}-Day Goal`,
+            extraData: JSON.stringify(streakExtra),
             status: target.status,
           },
         });
@@ -759,16 +907,28 @@ export async function evaluateSundayPoints() {
     throw new Error('No Streak tasks found to evaluate. Add streak tasks first!');
   }
 
-  // Call Gemini AI or intelligent heuristic rubric evaluated out of 350
   const evaluation = await evaluateStreaksWithGeminiAI(streakTasks);
 
-  // Archive evaluation into streak_evaluations.json
-  const existingEvals = readFile(STREAK_EVALUATIONS_FILE, []);
+  const existingEvals = await getStreakEvaluations();
   const newEvalRecord = {
     id: `eval-${Date.now()}`,
     ...evaluation,
   };
-  writeFile(STREAK_EVALUATIONS_FILE, [newEvalRecord, ...existingEvals]);
+  const updatedEvals = [newEvalRecord, ...existingEvals];
+
+  // Save evaluations to PostgreSQL
+  if (prisma) {
+    try {
+      await prisma.systemData.upsert({
+        where: { key: 'streak_evaluations' },
+        create: { key: 'streak_evaluations', value: JSON.stringify(updatedEvals) },
+        update: { value: JSON.stringify(updatedEvals) },
+      });
+    } catch (e) {
+      console.warn('Prisma save streak_evaluations fallback:', e.message);
+    }
+  }
+  writeFile(STREAK_EVALUATIONS_FILE, updatedEvals);
 
   // Apply points to tasks and RESET weeklyPoints to 0 for Sunday
   const updatedTasks = current.map((t) => {
@@ -781,7 +941,7 @@ export async function evaluateSundayPoints() {
       return {
         ...t,
         totalPoints: (t.totalPoints || 0) + awardedPoints,
-        weeklyPoints: 0, // Reset to zero for the fresh week!
+        weeklyPoints: 0,
         lastEvaluatedDate: new Date().toISOString(),
       };
     }
@@ -806,7 +966,12 @@ export async function evaluateSundayPoints() {
           };
           await prisma.task.update({
             where: { id: t.id },
-            data: { dueDate: JSON.stringify(streakExtra) },
+            data: {
+              weeklyPoints: 0,
+              totalPoints: t.totalPoints,
+              extraData: JSON.stringify(streakExtra),
+              dueDate: JSON.stringify(streakExtra),
+            },
           });
         }
       }
@@ -848,7 +1013,11 @@ export async function resetWeeklyPoints() {
           };
           await prisma.task.update({
             where: { id: t.id },
-            data: { dueDate: JSON.stringify(streakExtra) },
+            data: {
+              weeklyPoints: 0,
+              extraData: JSON.stringify(streakExtra),
+              dueDate: JSON.stringify(streakExtra),
+            },
           });
         }
       }
@@ -862,14 +1031,28 @@ export async function resetWeeklyPoints() {
 }
 
 export async function getStreakEvaluations() {
+  if (prisma) {
+    try {
+      const record = await prisma.systemData.findUnique({
+        where: { key: 'streak_evaluations' },
+      });
+      if (record && record.value) {
+        const parsed = JSON.parse(record.value);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn('Prisma getStreakEvaluations fallback:', e.message);
+    }
+  }
   return readFile(STREAK_EVALUATIONS_FILE, []);
 }
 
-// ── Gemini AI Streak Evaluator (350 Points System - Never Full 350) ──────────
+// ── Gemini AI Streak Evaluator ──────────────────────────────────────────────
 async function evaluateStreaksWithGeminiAI(streakTasks) {
   const apiKey = process.env.GEMINI_API_KEY;
   const now = new Date();
-  const dayName = now.toLocaleDateString('en-US', { weekday: 'long' });
   const isSunday = now.getDay() === 0;
 
   const taskDigest = streakTasks.map((t) => {
@@ -956,7 +1139,6 @@ Respond ONLY with valid JSON.`;
         const text = json.candidates?.[0]?.content?.parts?.[0]?.text;
         if (text) {
           const parsed = JSON.parse(text);
-          // Safety cap: never allow 350
           const safeTotal = Math.min(335, Math.max(0, Number(parsed.totalWeeklyPoints) || 0));
           return {
             ...parsed,
@@ -979,7 +1161,6 @@ Respond ONLY with valid JSON.`;
   const perTaskBreakdown = streakTasks.map((t) => {
     const recentLogs = (t.history || []).slice(-7);
     const daysChecked = recentLogs.length;
-    // Base points for days checked: up to 7 pts per day checked = 49 max
     const basePts = daysChecked * 7;
     const streakBonus = Math.min(Math.round((t.currentStreak || 0) * 1.2), 9);
 
@@ -988,7 +1169,6 @@ Respond ONLY with valid JSON.`;
     const uniqueTopics = Array.from(new Set(allTopics));
     const depthBonus = Math.min(uniqueTopics.length * 2 + (totalNumbers > 0 ? 3 : 0), 9);
 
-    // Strictly cap each task at max 67 out of 70 (NEVER 70)
     const rawTaskScore = basePts + streakBonus + depthBonus;
     const taskScore = Math.min(67, Math.max(15, rawTaskScore));
     totalPts += taskScore;
@@ -1008,7 +1188,6 @@ Respond ONLY with valid JSON.`;
     };
   });
 
-  // Strictly enforce never full 350 (cap at max 330)
   const totalWeeklyPoints = Math.min(330, Math.max(80, totalPts));
   const grade =
     totalWeeklyPoints >= 315
@@ -1042,8 +1221,7 @@ Respond ONLY with valid JSON.`;
 export async function deleteTask(id) {
   if (prisma) {
     try {
-      await prisma.task.delete({ where: { id } });
-      return await getTasks();
+      await prisma.task.delete({ where: { id } }).catch(() => {});
     } catch (e) {
       console.warn('Prisma deleteTask fallback:', e.message);
     }
@@ -1121,7 +1299,7 @@ export async function markMessageRead(id) {
 export async function deleteMessage(id) {
   if (prisma) {
     try {
-      await prisma.contactMessage.delete({ where: { id } });
+      await prisma.contactMessage.delete({ where: { id } }).catch(() => {});
       return await getMessages();
     } catch (e) {
       console.warn('Prisma deleteMessage fallback:', e.message);
@@ -1138,7 +1316,7 @@ export async function deleteMessage(id) {
 export async function getVaultNotes() {
   if (prisma) {
     try {
-      let record = await prisma.vaultNote.findUnique({
+      const record = await prisma.vaultNote.findUnique({
         where: { id: 'vault-notes-list' },
       });
       if (record && record.content) {
@@ -1150,14 +1328,6 @@ export async function getVaultNotes() {
         } catch (e) {
           console.warn('Failed parsing JSON from vaultNote content', e);
         }
-      } else {
-        // Seed default notes into database
-        await prisma.vaultNote.upsert({
-          where: { id: 'vault-notes-list' },
-          create: { id: 'vault-notes-list', content: JSON.stringify(defaultVaultNotes, null, 2) },
-          update: { content: JSON.stringify(defaultVaultNotes, null, 2) },
-        });
-        return defaultVaultNotes;
       }
     } catch (e) {
       console.warn('Prisma getVaultNotes fallback:', e.message);
@@ -1193,7 +1363,6 @@ export async function saveVaultNote(noteData) {
     updatedList = [newNote, ...current];
   }
 
-  // Sort notes: pinned first, then by updatedAt descending
   updatedList.sort((a, b) => {
     if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
     return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
@@ -1265,9 +1434,25 @@ export async function togglePinVaultNote(id) {
 // ── Vault Folders & Category Directory System ──────────────────────────────
 export async function getVaultFolders() {
   const notes = await getVaultNotes();
-  const storedFolders = readFile(VAULT_FOLDERS_FILE, []);
+  let storedFolders = [];
 
-  // Aggregate stats strictly for the stored folders (never resurrect demo/ghost folders)
+  if (prisma) {
+    try {
+      const dbFolders = await prisma.vaultFolderItem.findMany({
+        orderBy: { createdAt: 'asc' },
+      });
+      if (dbFolders && dbFolders.length > 0) {
+        storedFolders = dbFolders;
+      }
+    } catch (e) {
+      console.warn('Prisma getVaultFolders fallback:', e.message);
+    }
+  }
+
+  if (storedFolders.length === 0) {
+    storedFolders = readFile(VAULT_FOLDERS_FILE, []);
+  }
+
   const folderMap = new Map();
 
   storedFolders.forEach((f) => {
@@ -1283,7 +1468,6 @@ export async function getVaultFolders() {
     });
   });
 
-  // Calculate notes strictly for existing stored folders
   notes.forEach((n) => {
     const catName = (n.category || '').trim();
     if (!catName) return;
@@ -1306,7 +1490,7 @@ export async function createVaultFolder(folderName, color = 'cyan', description 
   const trimmed = folderName?.trim();
   if (!trimmed) throw new Error('Folder name cannot be empty');
 
-  const folders = readFile(VAULT_FOLDERS_FILE, []);
+  const folders = await getVaultFolders();
   if (folders.some((f) => f.name.toLowerCase() === trimmed.toLowerCase())) {
     throw new Error('A folder with this name already exists.');
   }
@@ -1318,8 +1502,23 @@ export async function createVaultFolder(folderName, color = 'cyan', description 
     description: description?.trim() || `Notes for ${trimmed}`,
   };
 
-  const updatedFolders = [...folders, newFolder];
-  writeFile(VAULT_FOLDERS_FILE, updatedFolders);
+  if (prisma) {
+    try {
+      await prisma.vaultFolderItem.create({
+        data: {
+          id: newFolder.id,
+          name: newFolder.name,
+          color: newFolder.color,
+          description: newFolder.description,
+        },
+      });
+    } catch (e) {
+      console.warn('Prisma createVaultFolder fallback:', e.message);
+    }
+  }
+
+  const fileFolders = readFile(VAULT_FOLDERS_FILE, []);
+  writeFile(VAULT_FOLDERS_FILE, [...fileFolders, newFolder]);
   return await getVaultFolders();
 }
 
@@ -1343,14 +1542,28 @@ export async function renameVaultFolder(oldFolder, newFolder) {
   const newTrimmed = newFolder?.trim();
   if (!oldTrimmed || !newTrimmed) throw new Error('Invalid folder names');
 
-  // Update folder definition
+  if (prisma) {
+    try {
+      const existing = await prisma.vaultFolderItem.findFirst({
+        where: { name: oldTrimmed },
+      });
+      if (existing) {
+        await prisma.vaultFolderItem.update({
+          where: { id: existing.id },
+          data: { name: newTrimmed },
+        });
+      }
+    } catch (e) {
+      console.warn('Prisma renameVaultFolder fallback:', e.message);
+    }
+  }
+
   const folders = readFile(VAULT_FOLDERS_FILE, []);
   const updatedFolders = folders.map((f) =>
     f.name.toLowerCase() === oldTrimmed.toLowerCase() ? { ...f, name: newTrimmed } : f
   );
   writeFile(VAULT_FOLDERS_FILE, updatedFolders);
 
-  // Update notes
   const notes = await getVaultNotes();
   const updatedNotes = notes.map((n) =>
     (n.category || '').toLowerCase() === oldTrimmed.toLowerCase()
@@ -1366,24 +1579,32 @@ export async function renameVaultFolder(oldFolder, newFolder) {
         update: { content: JSON.stringify(updatedNotes, null, 2) },
       });
     } catch (e) {
-      console.warn('Prisma renameVaultFolder error:', e.message);
+      console.warn('Prisma renameVaultFolder notes fallback:', e.message);
     }
   }
 
   writeFile(VAULT_FILE, updatedNotes);
-  return await getVaultNotes();
+  return await getVaultFolders();
 }
 
 export async function deleteVaultFolder(folderName, moveToFolder = '') {
   const trimmed = folderName?.trim();
   if (!trimmed) throw new Error('Folder name cannot be empty');
 
-  // Remove from folders list
+  if (prisma) {
+    try {
+      await prisma.vaultFolderItem.deleteMany({
+        where: { name: trimmed },
+      });
+    } catch (e) {
+      console.warn('Prisma deleteVaultFolder fallback:', e.message);
+    }
+  }
+
   const folders = readFile(VAULT_FOLDERS_FILE, []);
   const updatedFolders = folders.filter((f) => f.name.toLowerCase() !== trimmed.toLowerCase());
   writeFile(VAULT_FOLDERS_FILE, updatedFolders);
 
-  // Unlink category on notes in this deleted folder so no phantom folders appear
   const notes = await getVaultNotes();
   const updatedNotes = notes.map((n) =>
     (n.category || '').toLowerCase() === trimmed.toLowerCase()
@@ -1399,7 +1620,7 @@ export async function deleteVaultFolder(folderName, moveToFolder = '') {
         update: { content: JSON.stringify(updatedNotes, null, 2) },
       });
     } catch (e) {
-      console.warn('Prisma deleteVaultFolder error:', e.message);
+      console.warn('Prisma deleteVaultFolder notes fallback:', e.message);
     }
   }
 
@@ -1432,7 +1653,7 @@ export async function updateVaultNote(content) {
         writeFile(VAULT_FILE, parsed);
         return { content };
       }
-    } catch (e) {
+    } catch {
       // not JSON array
     }
   }

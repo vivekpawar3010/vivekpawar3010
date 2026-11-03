@@ -1,11 +1,28 @@
 import { NextResponse } from "next/server";
 import { getProjects, addProject, updateProject, deleteProject } from "@/lib/data";
+import prisma from "@/lib/prisma";
 import fs from "fs";
 import path from "path";
 
 const CATEGORIES_FILE = path.join(process.cwd(), "src", "data", "project_categories.json");
 
-function readCategories() {
+async function readCategories() {
+  if (prisma) {
+    try {
+      const record = await prisma.systemData.findUnique({
+        where: { key: "project_categories" },
+      });
+      if (record && record.value) {
+        const parsed = JSON.parse(record.value);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn("Prisma readCategories fallback:", e.message);
+    }
+  }
+
   try {
     if (fs.existsSync(CATEGORIES_FILE)) {
       return JSON.parse(fs.readFileSync(CATEGORIES_FILE, "utf-8"));
@@ -16,7 +33,19 @@ function readCategories() {
   return ["All", "Full Stack", "AI & Web", "Frontend"];
 }
 
-function writeCategories(categories) {
+async function writeCategories(categories) {
+  if (prisma) {
+    try {
+      await prisma.systemData.upsert({
+        where: { key: "project_categories" },
+        create: { key: "project_categories", value: JSON.stringify(categories) },
+        update: { value: JSON.stringify(categories) },
+      });
+    } catch (e) {
+      console.warn("Prisma writeCategories fallback:", e.message);
+    }
+  }
+
   try {
     fs.writeFileSync(CATEGORIES_FILE, JSON.stringify(categories, null, 2), "utf-8");
   } catch (err) {
@@ -27,7 +56,7 @@ function writeCategories(categories) {
 export async function GET() {
   try {
     const projects = await getProjects();
-    const categories = readCategories();
+    const categories = await readCategories();
     return NextResponse.json({ projects, categories });
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
@@ -41,41 +70,40 @@ export async function POST(request) {
     if (body.action === "add") {
       const newProject = await addProject(body.project);
       const projects = await getProjects();
-      const categories = readCategories();
+      const categories = await readCategories();
       return NextResponse.json({ success: true, project: newProject, projects, categories });
     }
 
     if (body.action === "update") {
       await updateProject(body.id, body.project);
       const projects = await getProjects();
-      const categories = readCategories();
+      const categories = await readCategories();
       return NextResponse.json({ success: true, projects, categories });
     }
 
     if (body.action === "delete") {
       await deleteProject(body.id);
       const projects = await getProjects();
-      const categories = readCategories();
+      const categories = await readCategories();
       return NextResponse.json({ success: true, projects, categories });
     }
 
     if (body.action === "add_category") {
-      const cat = (body.category || "").trim();
-      if (!cat) return NextResponse.json({ error: "Category name required" }, { status: 400 });
-      const current = readCategories();
-      if (!current.includes(cat)) {
-        current.push(cat);
-        writeCategories(current);
+      const current = await readCategories();
+      const trimmed = body.category?.trim();
+      if (trimmed && !current.includes(trimmed)) {
+        current.push(trimmed);
+        await writeCategories(current);
       }
       return NextResponse.json({ success: true, categories: current });
     }
 
     if (body.action === "delete_category") {
-      const cat = (body.category || "").trim();
-      const current = readCategories().filter((c) => c !== cat && c !== "All");
-      current.unshift("All");
-      writeCategories(current);
-      return NextResponse.json({ success: true, categories: current });
+      const current = await readCategories();
+      const filtered = current.filter((c) => c !== body.category && c !== "All");
+      const finalCats = ["All", ...filtered.filter((c) => c !== "All")];
+      await writeCategories(finalCats);
+      return NextResponse.json({ success: true, categories: finalCats });
     }
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });

@@ -8,57 +8,111 @@ datasource db {
 }
 
 model Profile {
-  id          String   @id @default("profile-1")
-  name        String   @default("Vivek Pawar")
-  role        String   @default("Full-Stack Developer & Android App Developer")
-  tagline     String   @default("Turning ideas into high-performance, scalable, and impactful digital products.")
-  about       String   @default("Final-year B.Tech CSE student (2022–2026) at SVERI's College of Engineering, Pandharpur. Passionate about Full-Stack Web Development, native Android apps, System Design, and AI integration.")
-  degree      String   @default("B.Tech in Computer Science and Engineering")
-  institution String   @default("SVERI's College of Engineering, Pandharpur")
-  period      String   @default("2022 – 2026")
-  location    String   @default("Maharashtra, India 🇮🇳")
-  status      String   @default("Open to Internships & Opportunities 🚀")
-  email       String   @default("vivekpawar.dev@gmail.com")
-  github      String   @default("https://github.com/vivekpawar3010")
-  linkedin    String   @default("https://linkedin.com/in/vivek-pawar-16548a275")
-  leetcode    String   @default("https://leetcode.com/u/vivek_pawar-3010/")
-  avatarUrl   String?  @default("/images/avatar.png")
-  updatedAt   DateTime @updatedAt
+  id               String   @id @default("profile-1")
+  name             String   @default("Vivek Pawar")
+  role             String   @default("Full-Stack Developer & Android App Developer")
+  tagline          String   @default("Turning ideas into high-performance, scalable, and impactful digital products.")
+  about            String   @default("Final-year B.Tech CSE student (2022–2026) at SVERI's College of Engineering, Pandharpur. Passionate about Full-Stack Web Development, native Android apps, System Design, and AI integration.")
+  degree           String   @default("B.Tech in Computer Science and Engineering")
+  institution      String   @default("SVERI's College of Engineering, Pandharpur")
+  period           String   @default("2022 – 2026")
+  location         String   @default("Maharashtra, India 🇮🇳")
+  status           String   @default("Open to Internships & Opportunities 🚀")
+  email            String   @default("vivekpawar.dev@gmail.com")
+  github           String   @default("https://github.com/vivekpawar3010")
+  linkedin         String   @default("https://linkedin.com/in/vivek-pawar-16548a275")
+  leetcode         String   @default("https://leetcode.com/u/vivek_pawar-3010/")
+  avatarUrl        String?  @default("/images/avatar.png")
+  activePhoto      String?  @default("/images/vivek-portrait-cutout.png")
+  photos           String?  @default("[]")
+  resumeUrl        String?  @default("")
+  cgpa             String?  @default("9.21 / 10")
+  finalSemSgpa     String?  @default("10.00 / 10")
+  gateStatus       String?  @default("GATE 2026 Qualified")
+  themeBackgrounds String?  @default("{}")
+  updatedAt        DateTime @updatedAt
 }
 
 model Project {
-  id          String   @id @default(cuid())
-  name        String
-  subtitle    String?
-  description String
-  category    String   @default("Full Stack")
-  tags        String   @default("React,Next.js") // Comma-separated or JSON
-  link        String
-  github      String?
-  featured    Boolean  @default(false)
-  order       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(cuid())
+  name         String
+  subtitle     String?
+  description  String
+  category     String   @default("Full Stack")
+  tags         String   @default("React,Next.js") // Comma-separated or JSON
+  icon         String?  @default("Globe")
+  link         String
+  liveUrl      String?
+  github       String?
+  githubUrl    String?
+  featured     Boolean  @default(false)
+  order        Int      @default(0)
+  problem      String?
+  solution     String?
+  keyFeatures  String?  @default("[]") // JSON string of features
+  architecture String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Skill {
-  id        String   @id @default(cuid())
-  category  String
-  name      String
-  level     String   @default("Intermediate")
-  badge     String?
-  createdAt DateTime @default(now())
+  id           String   @id @default(cuid())
+  category     String
+  name         String
+  level        String   @default("Intermediate")
+  badge        String?
+  percentage   Int?     @default(85)
+  categoryIcon String?  @default("Code2")
+  createdAt    DateTime @default(now())
 }
 
 model Task {
-  id        String   @id @default(cuid())
-  title     String
-  category  String   @default("General")
-  priority  String   @default("Medium")
-  status    String   @default("todo") // todo, in_progress, completed
-  dueDate   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(cuid())
+  title         String
+  category      String   @default("General")
+  priority      String   @default("Medium")
+  status        String   @default("todo") // todo, in_progress, completed
+  dueDate       String?
+  goalDays      Int?     @default(30)
+  currentStreak Int?     @default(0)
+  bestStreak    Int?     @default(0)
+  lastChecked   String?
+  weeklyPoints  Int?     @default(0)
+  totalPoints   Int?     @default(0)
+  extraData     String?  // JSON string storing fields, history, evaluations, logs
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model ExperienceItem {
+  id             String   @id @default(cuid())
+  type           String   @default("internship") // "internship" | "achievement"
+  role           String?
+  company        String?
+  title          String?
+  subtitle       String?
+  period         String?
+  location       String?
+  description    String?
+  highlights     String?  // JSON string array
+  tech           String?  // comma-separated or JSON array
+  category       String?
+  badge          String?
+  icon           String?  @default("Briefcase")
+  color          String?  @default("#38bdf8")
+  certificateUrl String?
+  order          Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model VaultFolderItem {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  color       String   @default("cyan")
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Friend {
@@ -87,5 +141,11 @@ model ContactMessage {
 model VaultNote {
   id        String   @id @default("main-notes")
   content   String   @default("")
+  updatedAt DateTime @updatedAt
+}
+
+model SystemData {
+  key       String   @id
+  value     String   @default("{}")
   updatedAt DateTime @updatedAt
 }
