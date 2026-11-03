@@ -1,29 +1,407 @@
 [
   {
-    "id": "task-1793460507351",
-    "title": "Read/Practice the DSA Topics Everyday (Enter the list of topics you done)",
+    "id": "habit-dsa-breakthrough",
+    "title": "Complete DSA Breakthrough & Skill Up Every Week",
     "category": "Streak",
     "priority": "High",
     "status": "in_progress",
-    "dueDate": "{\"goalDays\":30,\"currentStreak\":1,\"bestStreak\":1,\"lastCheckedDate\":\"2026-10-31\",\"dailyLog\":\"\",\"history\":[{\"id\":\"log-1793460525699\",\"date\":\"2026-10-31\",\"note\":\"Streak check-in completed.\",\"completed\":true}],\"weeklyPoints\":0,\"totalPoints\":12,\"lastEvaluatedDate\":\"2026-10-31T15:28:53.243Z\"}",
-    "createdAt": "2026-10-31T15:28:27.354Z",
-    "updatedAt": "2026-10-31T15:28:53.245Z",
     "goalDays": 30,
-    "currentStreak": 1,
-    "bestStreak": 1,
-    "lastCheckedDate": "2026-10-31",
-    "dailyLog": "",
-    "history": [
+    "currentStreak": 0,
+    "bestStreak": 0,
+    "why": "To become the best in logical & problem-solving skills to crack high-package roles at top MNCs.",
+    "minimumAction": "Read New / Old topic of DSA everyday (Minimum 10 min habit easier). Scale up to 1-2 problems.",
+    "timerMinutes": 10,
+    "environmentCue": "Dedicated notebook for topics read + next day's queue; phone kept aside; tracked strictly in Portfolio Task Manager.",
+    "weeklyReward": "Calculate weekly progress in every 7 days and eat something tasty based on improvement.",
+    "penaltyRule": "Miss Once, Not Twice: If missed 2nd day, DRY WEEK starts immediately (No sweets, no junk food, no parties, no chai for 7 days).",
+    "affirmation": "I am the best in DSA.",
+    "topicsMasterList": [
       {
-        "id": "log-1793460525699",
-        "date": "2026-10-31",
-        "note": "Streak check-in completed.",
-        "completed": true
+        "name": "Arrays & Strings",
+        "status": "mastered"
+      },
+      {
+        "name": "Two Pointers & Sliding Window",
+        "status": "in_progress"
+      },
+      {
+        "name": "Binary Search",
+        "status": "pending"
+      },
+      {
+        "name": "Linked Lists & Doubly Linked Lists",
+        "status": "pending"
+      },
+      {
+        "name": "Stacks & Queues",
+        "status": "pending"
+      },
+      {
+        "name": "Trees & Binary Search Trees",
+        "status": "pending"
+      },
+      {
+        "name": "Graphs (BFS, DFS & Topological Sort)",
+        "status": "pending"
+      },
+      {
+        "name": "Dynamic Programming (1D & 2D)",
+        "status": "pending"
+      },
+      {
+        "name": "Greedy Algorithms & Heaps",
+        "status": "pending"
+      },
+      {
+        "name": "Tries & Advanced Data Structures",
+        "status": "pending"
+      }
+    ],
+    "nextDayQueue": "Two Pointers & Sliding Window edge cases",
+    "fields": [
+      {
+        "id": "f_num",
+        "label": "Problems Solved",
+        "type": "number",
+        "target": "2"
+      },
+      {
+        "id": "f_topics",
+        "label": "Topics & Concepts Read",
+        "type": "topics",
+        "target": "Sliding Window, Binary Search"
+      },
+      {
+        "id": "f_notes",
+        "label": "Daily Reflection & Breakthrough",
+        "type": "text",
+        "target": "Key insights from notebook"
       }
     ],
     "weeklyPoints": 0,
-    "totalPoints": 12,
-    "lastEvaluatedDate": "2026-10-31T15:28:53.243Z"
+    "totalPoints": 0,
+    "lastCheckedDate": null,
+    "dailyLog": "",
+    "history": [],
+    "dueDate": "30-Day Goal",
+    "createdAt": "2026-11-03T04:22:15.801Z",
+    "updatedAt": "2026-11-03T04:58:36.302Z",
+    "lastEvaluatedDate": null,
+    "missedDaysCount": 0,
+    "isWarning": false,
+    "isDryWeek": false
+  },
+  {
+    "id": "habit-everyday-coding",
+    "title": "EveryDay Coding Practice (Tech Stack & Architecture)",
+    "category": "Streak",
+    "priority": "High",
+    "status": "in_progress",
+    "goalDays": 30,
+    "currentStreak": 0,
+    "bestStreak": 0,
+    "why": "To learn & develop new technologies to command higher salaries and land roles at top MNCs.",
+    "minimumAction": "Do coding or read one core technology/architecture topic everyday (Minimum 10 min habit easier).",
+    "timerMinutes": 10,
+    "environmentCue": "Close all distracting apps/tabs and play fixed coding focus music playlist.",
+    "weeklyReward": "In every 7 days review completed topics list, eat tasty food, or buy something for yourself.",
+    "penaltyRule": "Miss Once, Not Twice: If missed 2nd day, DRY WEEK starts immediately (No sweets, no junk food, no parties, no chai for 7 days).",
+    "affirmation": "I am the best at coding and tech.",
+    "topicsMasterList": [
+      {
+        "name": "Next.js 15 & React 19 Server Components",
+        "status": "in_progress"
+      },
+      {
+        "name": "Node.js & Microservices Architecture",
+        "status": "pending"
+      },
+      {
+        "name": "Database Indexing & Optimization (PostgreSQL)",
+        "status": "pending"
+      },
+      {
+        "name": "REST, GraphQL & gRPC APIs",
+        "status": "pending"
+      },
+      {
+        "name": "Redis Caching & Message Queues",
+        "status": "pending"
+      },
+      {
+        "name": "Docker & Containerization",
+        "status": "pending"
+      },
+      {
+        "name": "Distributed System Design & Scalability",
+        "status": "pending"
+      },
+      {
+        "name": "CI/CD Pipelines & Cloud Deployment",
+        "status": "pending"
+      }
+    ],
+    "nextDayQueue": "Server Actions and Streaming in Next.js 15",
+    "fields": [
+      {
+        "id": "f_num",
+        "label": "Commits / Modules Completed",
+        "type": "number",
+        "target": "1"
+      },
+      {
+        "id": "f_topics",
+        "label": "Tech Stack & Architecture Concept",
+        "type": "topics",
+        "target": "Next.js 15, PostgreSQL, Redis"
+      },
+      {
+        "id": "f_notes",
+        "label": "Coding Reflection & Architecture Notes",
+        "type": "text",
+        "target": "Notes on implementation"
+      }
+    ],
+    "weeklyPoints": 0,
+    "totalPoints": 0,
+    "lastCheckedDate": null,
+    "dailyLog": "",
+    "history": [],
+    "dueDate": "30-Day Goal",
+    "createdAt": "2026-11-03T04:25:58.163Z",
+    "updatedAt": "2026-11-03T04:58:36.302Z",
+    "lastEvaluatedDate": null,
+    "missedDaysCount": 0,
+    "isWarning": false,
+    "isDryWeek": false
+  },
+  {
+    "id": "habit-work-projects",
+    "title": "EveryDay Work On At Least 1–2 Projects",
+    "category": "Streak",
+    "priority": "High",
+    "status": "in_progress",
+    "goalDays": 30,
+    "currentStreak": 0,
+    "bestStreak": 0,
+    "why": "To become a top-tier software engineer and build useful, production-grade software products.",
+    "minimumAction": "20 minutes of system analysis, feature coding, or code review every single day.",
+    "timerMinutes": 20,
+    "environmentCue": "Close all unrelated tabs/apps and play fixed focus music to update and analyze projects.",
+    "weeklyReward": "In every 7 days audit project changelog; eat something tasty, buy something, or play/watch something you want.",
+    "penaltyRule": "Miss Once, Not Twice: If missed 2nd day, DRY WEEK starts immediately (No sweets, no junk food, no parties, no chai for 7 days).",
+    "affirmation": "I am the best at analyzing and improving projects.",
+    "topicsMasterList": [
+      {
+        "name": "Vivek Pawar Portfolio & Admin Suite",
+        "status": "in_progress"
+      },
+      {
+        "name": "AI Portfolio Engine & Workflow Automation",
+        "status": "pending"
+      },
+      {
+        "name": "Production SaaS MVP Architecture",
+        "status": "pending"
+      },
+      {
+        "name": "Codebase Refactoring & Performance Audits",
+        "status": "pending"
+      },
+      {
+        "name": "API Contract Testing & Security Hardening",
+        "status": "pending"
+      },
+      {
+        "name": "Database Schema Migration & Index Tuning",
+        "status": "pending"
+      }
+    ],
+    "nextDayQueue": "Refactor API route response handling & error boundaries",
+    "fields": [
+      {
+        "id": "f_num",
+        "label": "Features / Fixes Implemented",
+        "type": "number",
+        "target": "1"
+      },
+      {
+        "id": "f_topics",
+        "label": "Projects Worked On",
+        "type": "topics",
+        "target": "Portfolio, Admin Suite, AI Engine"
+      },
+      {
+        "id": "f_notes",
+        "label": "Project Changelog & Analysis",
+        "type": "text",
+        "target": "Key improvements made today"
+      }
+    ],
+    "weeklyPoints": 0,
+    "totalPoints": 0,
+    "lastCheckedDate": null,
+    "dailyLog": "",
+    "history": [],
+    "dueDate": "30-Day Goal",
+    "createdAt": "2026-11-03T04:58:36.302Z",
+    "updatedAt": "2026-11-03T04:58:36.302Z",
+    "lastEvaluatedDate": null,
+    "missedDaysCount": 0,
+    "isWarning": false,
+    "isDryWeek": false
+  },
+  {
+    "id": "habit-career-communication",
+    "title": "Career Focus: Interview, Presentation & Communication Skill Up",
+    "category": "Streak",
+    "priority": "High",
+    "status": "in_progress",
+    "goalDays": 30,
+    "currentStreak": 0,
+    "bestStreak": 0,
+    "why": "To communicate & present skills in front of anyone to project capability and unshakeable confidence.",
+    "minimumAction": "Watch a video or practice speaking with an AI/peer to simulate scenarios & learn new communication/negotiation frameworks daily (15 min).",
+    "timerMinutes": 15,
+    "environmentCue": "Close everything except mobile/device and communicate clearly with full vocal presence.",
+    "weeklyReward": "Review communication breakthroughs every 7 days and reward yourself.",
+    "penaltyRule": "Miss Once, Not Twice: If missed 2nd day, DRY WEEK starts immediately (No sweets, no junk food, no parties, no chai for 7 days).",
+    "affirmation": "I am the best in negotiation and communication.",
+    "topicsMasterList": [
+      {
+        "name": "Technical System Design Pitch",
+        "status": "in_progress"
+      },
+      {
+        "name": "Behavioral Interview STAR Framework",
+        "status": "pending"
+      },
+      {
+        "name": "Salary Negotiation & Value Framing",
+        "status": "pending"
+      },
+      {
+        "name": "High-Impact Demo & Presentation Delivery",
+        "status": "pending"
+      },
+      {
+        "name": "Confident Vocal Delivery & Executive Presence",
+        "status": "pending"
+      },
+      {
+        "name": "Active Listening & Question Asking Frameworks",
+        "status": "pending"
+      }
+    ],
+    "nextDayQueue": "Practice 2-minute architectural elevator pitch",
+    "fields": [
+      {
+        "id": "f_num",
+        "label": "Mock Scenarios / Sessions Practiced",
+        "type": "number",
+        "target": "1"
+      },
+      {
+        "id": "f_topics",
+        "label": "Frameworks & Scenarios Practiced",
+        "type": "topics",
+        "target": "STAR Framework, Negotiation, Vocal Delivery"
+      },
+      {
+        "id": "f_notes",
+        "label": "Communication Breakthroughs & Feedback",
+        "type": "text",
+        "target": "Observations on vocal tone & pacing"
+      }
+    ],
+    "weeklyPoints": 0,
+    "totalPoints": 0,
+    "lastCheckedDate": null,
+    "dailyLog": "",
+    "history": [],
+    "dueDate": "30-Day Goal",
+    "createdAt": "2026-11-03T04:58:36.302Z",
+    "updatedAt": "2026-11-03T04:58:36.302Z",
+    "lastEvaluatedDate": null,
+    "missedDaysCount": 0,
+    "isWarning": false,
+    "isDryWeek": false
+  },
+  {
+    "id": "habit-exercise-sleep",
+    "title": "EveryDay Exercise & 6–7 Hours of Quality Sleep",
+    "category": "Streak",
+    "priority": "High",
+    "status": "in_progress",
+    "goalDays": 30,
+    "currentStreak": 0,
+    "bestStreak": 0,
+    "why": "To build a strong, muscular, and healthy body for myself and my future family.",
+    "minimumAction": "Push-ups (3 × 10–15), Squats (3 × 15), Plank (3 × 30 sec), Pull-ups (3 × 5), eat healthy, and lock in 6–7 hours of sleep.",
+    "timerMinutes": 30,
+    "environmentCue": "Play fixed workout music and train for 30–60 minutes.",
+    "weeklyReward": "Analyze physique/strength progress every 7 days and buy something healthy.",
+    "penaltyRule": "Miss Once, Not Twice: If missed 2nd day, DRY WEEK (No sweets/junk/chai/parties) + 2X TRAINING WEEK (Double workout sets/volume for 7 days) starts immediately.",
+    "affirmation": "I have the best physique and powerful muscles with an attractive body.",
+    "topicsMasterList": [
+      {
+        "name": "Push-ups Protocol (3 × 10–15 reps)",
+        "status": "in_progress"
+      },
+      {
+        "name": "Squats Protocol (3 × 15 reps)",
+        "status": "in_progress"
+      },
+      {
+        "name": "Plank Core Hold (3 × 30 sec)",
+        "status": "in_progress"
+      },
+      {
+        "name": "Pull-ups Protocol (3 × 5 reps)",
+        "status": "pending"
+      },
+      {
+        "name": "6–7 Hours Sleep & Circadian Routine",
+        "status": "pending"
+      },
+      {
+        "name": "High-Protein Clean Nutrition",
+        "status": "pending"
+      }
+    ],
+    "nextDayQueue": "Morning Calisthenics: Push-ups + Plank + Pull-ups",
+    "fields": [
+      {
+        "id": "f_num",
+        "label": "Workout Sets Completed (Push-ups/Squats/Plank)",
+        "type": "number",
+        "target": "12"
+      },
+      {
+        "id": "f_topics",
+        "label": "Exercises Done & Sleep Hours",
+        "type": "topics",
+        "target": "Push-ups, Squats, Plank, 7h Sleep"
+      },
+      {
+        "id": "f_notes",
+        "label": "Physical State & Energy Reflection",
+        "type": "text",
+        "target": "Energy levels & muscle recovery note"
+      }
+    ],
+    "weeklyPoints": 0,
+    "totalPoints": 0,
+    "lastCheckedDate": null,
+    "dailyLog": "",
+    "history": [],
+    "dueDate": "30-Day Goal",
+    "createdAt": "2026-11-03T04:58:36.302Z",
+    "updatedAt": "2026-11-03T04:58:36.302Z",
+    "lastEvaluatedDate": null,
+    "missedDaysCount": 0,
+    "isWarning": false,
+    "isDryWeek": false
   },
   {
     "id": "task-6",
@@ -32,17 +410,32 @@
     "priority": "Low",
     "status": "completed",
     "dueDate": "Done",
-    "createdAt": "2026-10-26T14:53:46.563Z",
-    "updatedAt": "2026-10-26T14:53:46.563Z",
-    "goalDays": 0,
+    "goalDays": 30,
     "currentStreak": 0,
     "bestStreak": 0,
+    "lastChecked": null,
+    "weeklyPoints": 0,
+    "totalPoints": 0,
+    "extraData": "{\"fields\":[],\"history\":[],\"dailyLog\":\"\",\"lastCheckedDate\":null,\"lastEvaluatedDate\":null}",
+    "createdAt": "2026-10-26T14:53:46.563Z",
+    "updatedAt": "2026-11-03T02:11:09.065Z",
+    "fields": [],
     "lastCheckedDate": null,
     "dailyLog": "",
     "history": [],
-    "weeklyPoints": 0,
-    "totalPoints": 0,
-    "lastEvaluatedDate": null
+    "lastEvaluatedDate": null,
+    "why": "",
+    "minimumAction": "",
+    "timerMinutes": 10,
+    "environmentCue": "",
+    "weeklyReward": "",
+    "penaltyRule": "Miss Once, Not Twice: If missed 2nd day, DRY WEEK starts immediately.",
+    "affirmation": "",
+    "topicsMasterList": [],
+    "nextDayQueue": "",
+    "missedDaysCount": 0,
+    "isWarning": false,
+    "isDryWeek": false
   },
   {
     "id": "task-5",
@@ -51,17 +444,32 @@
     "priority": "High",
     "status": "completed",
     "dueDate": "Nov 02",
-    "createdAt": "2026-10-26T14:53:46.466Z",
-    "updatedAt": "2026-10-31T14:44:14.261Z",
-    "goalDays": 0,
+    "goalDays": 30,
     "currentStreak": 0,
     "bestStreak": 0,
+    "lastChecked": null,
+    "weeklyPoints": 0,
+    "totalPoints": 0,
+    "extraData": "{\"fields\":[],\"history\":[],\"dailyLog\":\"\",\"lastCheckedDate\":null,\"lastEvaluatedDate\":null}",
+    "createdAt": "2026-10-26T14:53:46.466Z",
+    "updatedAt": "2026-11-03T02:11:09.228Z",
+    "fields": [],
     "lastCheckedDate": null,
     "dailyLog": "",
     "history": [],
-    "weeklyPoints": 0,
-    "totalPoints": 0,
-    "lastEvaluatedDate": null
+    "lastEvaluatedDate": null,
+    "why": "",
+    "minimumAction": "",
+    "timerMinutes": 10,
+    "environmentCue": "",
+    "weeklyReward": "",
+    "penaltyRule": "Miss Once, Not Twice: If missed 2nd day, DRY WEEK starts immediately.",
+    "affirmation": "",
+    "topicsMasterList": [],
+    "nextDayQueue": "",
+    "missedDaysCount": 0,
+    "isWarning": false,
+    "isDryWeek": false
   },
   {
     "id": "task-4",
@@ -70,17 +478,32 @@
     "priority": "Medium",
     "status": "completed",
     "dueDate": "Oct 28",
-    "createdAt": "2026-10-26T14:53:46.356Z",
-    "updatedAt": "2026-10-31T14:44:14.735Z",
-    "goalDays": 0,
+    "goalDays": 30,
     "currentStreak": 0,
     "bestStreak": 0,
+    "lastChecked": null,
+    "weeklyPoints": 0,
+    "totalPoints": 0,
+    "extraData": "{\"fields\":[],\"history\":[],\"dailyLog\":\"\",\"lastCheckedDate\":null,\"lastEvaluatedDate\":null}",
+    "createdAt": "2026-10-26T14:53:46.356Z",
+    "updatedAt": "2026-11-03T02:11:09.355Z",
+    "fields": [],
     "lastCheckedDate": null,
     "dailyLog": "",
     "history": [],
-    "weeklyPoints": 0,
-    "totalPoints": 0,
-    "lastEvaluatedDate": null
+    "lastEvaluatedDate": null,
+    "why": "",
+    "minimumAction": "",
+    "timerMinutes": 10,
+    "environmentCue": "",
+    "weeklyReward": "",
+    "penaltyRule": "Miss Once, Not Twice: If missed 2nd day, DRY WEEK starts immediately.",
+    "affirmation": "",
+    "topicsMasterList": [],
+    "nextDayQueue": "",
+    "missedDaysCount": 0,
+    "isWarning": false,
+    "isDryWeek": false
   },
   {
     "id": "task-3",
@@ -89,17 +512,32 @@
     "priority": "Medium",
     "status": "completed",
     "dueDate": "Oct 25",
-    "createdAt": "2026-10-26T14:53:46.223Z",
-    "updatedAt": "2026-10-31T14:44:02.049Z",
-    "goalDays": 0,
+    "goalDays": 30,
     "currentStreak": 0,
     "bestStreak": 0,
+    "lastChecked": null,
+    "weeklyPoints": 0,
+    "totalPoints": 0,
+    "extraData": "{\"fields\":[],\"history\":[],\"dailyLog\":\"\",\"lastCheckedDate\":null,\"lastEvaluatedDate\":null}",
+    "createdAt": "2026-10-26T14:53:46.223Z",
+    "updatedAt": "2026-11-03T02:11:09.492Z",
+    "fields": [],
     "lastCheckedDate": null,
     "dailyLog": "",
     "history": [],
-    "weeklyPoints": 0,
-    "totalPoints": 0,
-    "lastEvaluatedDate": null
+    "lastEvaluatedDate": null,
+    "why": "",
+    "minimumAction": "",
+    "timerMinutes": 10,
+    "environmentCue": "",
+    "weeklyReward": "",
+    "penaltyRule": "Miss Once, Not Twice: If missed 2nd day, DRY WEEK starts immediately.",
+    "affirmation": "",
+    "topicsMasterList": [],
+    "nextDayQueue": "",
+    "missedDaysCount": 0,
+    "isWarning": false,
+    "isDryWeek": false
   },
   {
     "id": "task-2",
@@ -108,17 +546,32 @@
     "priority": "High",
     "status": "completed",
     "dueDate": "Tomorrow",
-    "createdAt": "2026-10-26T14:53:46.104Z",
-    "updatedAt": "2026-10-31T14:44:03.952Z",
-    "goalDays": 0,
+    "goalDays": 30,
     "currentStreak": 0,
     "bestStreak": 0,
+    "lastChecked": null,
+    "weeklyPoints": 0,
+    "totalPoints": 0,
+    "extraData": "{\"fields\":[],\"history\":[],\"dailyLog\":\"\",\"lastCheckedDate\":null,\"lastEvaluatedDate\":null}",
+    "createdAt": "2026-10-26T14:53:46.104Z",
+    "updatedAt": "2026-11-03T02:11:09.715Z",
+    "fields": [],
     "lastCheckedDate": null,
     "dailyLog": "",
     "history": [],
-    "weeklyPoints": 0,
-    "totalPoints": 0,
-    "lastEvaluatedDate": null
+    "lastEvaluatedDate": null,
+    "why": "",
+    "minimumAction": "",
+    "timerMinutes": 10,
+    "environmentCue": "",
+    "weeklyReward": "",
+    "penaltyRule": "Miss Once, Not Twice: If missed 2nd day, DRY WEEK starts immediately.",
+    "affirmation": "",
+    "topicsMasterList": [],
+    "nextDayQueue": "",
+    "missedDaysCount": 0,
+    "isWarning": false,
+    "isDryWeek": false
   },
   {
     "id": "task-1",
@@ -127,16 +580,31 @@
     "priority": "High",
     "status": "completed",
     "dueDate": "Today",
-    "createdAt": "2026-10-26T14:53:45.636Z",
-    "updatedAt": "2026-10-31T14:44:15.243Z",
-    "goalDays": 0,
+    "goalDays": 30,
     "currentStreak": 0,
     "bestStreak": 0,
+    "lastChecked": null,
+    "weeklyPoints": 0,
+    "totalPoints": 0,
+    "extraData": "{\"fields\":[],\"history\":[],\"dailyLog\":\"\",\"lastCheckedDate\":null,\"lastEvaluatedDate\":null}",
+    "createdAt": "2026-10-26T14:53:45.636Z",
+    "updatedAt": "2026-11-03T02:11:09.893Z",
+    "fields": [],
     "lastCheckedDate": null,
     "dailyLog": "",
     "history": [],
-    "weeklyPoints": 0,
-    "totalPoints": 0,
-    "lastEvaluatedDate": null
+    "lastEvaluatedDate": null,
+    "why": "",
+    "minimumAction": "",
+    "timerMinutes": 10,
+    "environmentCue": "",
+    "weeklyReward": "",
+    "penaltyRule": "Miss Once, Not Twice: If missed 2nd day, DRY WEEK starts immediately.",
+    "affirmation": "",
+    "topicsMasterList": [],
+    "nextDayQueue": "",
+    "missedDaysCount": 0,
+    "isWarning": false,
+    "isDryWeek": false
   }
 ]

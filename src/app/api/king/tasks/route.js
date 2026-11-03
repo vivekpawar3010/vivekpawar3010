@@ -9,6 +9,8 @@ import {
   evaluateSundayPoints,
   resetWeeklyPoints,
   getStreakEvaluations,
+  seedCoreHabits,
+  updateHabitMeta,
 } from '@/lib/data';
 
 export async function GET() {
@@ -24,6 +26,12 @@ export async function GET() {
 export async function POST(request) {
   try {
     const body = await request.json();
+
+    // 0. Seed or Reset the 5 Core Atomic Habits (From Notebook)
+    if (body.action === 'seed_core_habits') {
+      const tasks = await seedCoreHabits();
+      return NextResponse.json({ success: true, tasks, message: '5 Core Habit Pillars seeded successfully!' });
+    }
 
     // 1. Add Task (General or Streak with max 5 enforcement & custom fields)
     if (body.action === 'add') {
@@ -55,12 +63,23 @@ export async function POST(request) {
         body.date,
         body.fieldValues,
         body.topics,
-        body.numberDone
+        body.numberDone,
+        body.nextDayQueue,
+        body.completedTopic
       );
       return NextResponse.json({ success: true, tasks });
     }
 
-    // 3. Update Streak Goal Days
+    // 3. Update Habit Metadata (topicsMasterList, nextDayQueue, timerMinutes)
+    if (body.action === 'update_habit_meta') {
+      if (!body.id) {
+        return NextResponse.json({ error: 'Task ID is required to update habit metadata.' }, { status: 400 });
+      }
+      const tasks = await updateHabitMeta(body.id, body.meta || {});
+      return NextResponse.json({ success: true, tasks });
+    }
+
+    // 4. Update Streak Goal Days
     if (body.action === 'update_goal') {
       if (!body.id || !body.goalDays) {
         return NextResponse.json({ error: 'Task ID and goal days required.' }, { status: 400 });
@@ -69,7 +88,7 @@ export async function POST(request) {
       return NextResponse.json({ success: true, tasks });
     }
 
-    // 4. Sunday Gemini AI Points Evaluation & Reset
+    // 5. Sunday Gemini AI Points Evaluation & Reset
     if (body.action === 'evaluate_sunday_points') {
       const result = await evaluateSundayPoints();
       return NextResponse.json({
@@ -79,19 +98,19 @@ export async function POST(request) {
       });
     }
 
-    // 5. Reset Weekly Points to Zero
+    // 6. Reset Weekly Points to Zero
     if (body.action === 'reset_weekly_points') {
       const tasks = await resetWeeklyPoints();
       return NextResponse.json({ success: true, tasks });
     }
 
-    // 6. Update Status (General workflow tasks)
+    // 7. Update Status (General workflow tasks)
     if (body.action === 'update_status') {
       const tasks = await updateTaskStatus(body.id, body.status);
       return NextResponse.json({ success: true, tasks });
     }
 
-    // 7. Delete Task
+    // 8. Delete Task
     if (body.action === 'delete') {
       const tasks = await deleteTask(body.id);
       return NextResponse.json({ success: true, tasks });

@@ -549,6 +549,171 @@ export async function deleteSkillCategory(categoryName) {
   return updated;
 }
 
+// ── Tasks & Streaks: 5 Core Atomic Habit Pillars (Extracted from Notebook) ──
+export const CORE_ATOMIC_HABITS = [
+  {
+    id: "habit-dsa-breakthrough",
+    title: "Complete DSA Breakthrough & Skill Up Every Week",
+    category: "Streak",
+    priority: "High",
+    status: "in_progress",
+    goalDays: 30,
+    currentStreak: 0,
+    bestStreak: 0,
+    why: "To become the best in logical & problem-solving skills to crack high-package roles at top MNCs.",
+    minimumAction: "Read New / Old topic of DSA everyday (Minimum 10 min habit easier). Scale up to 1-2 problems.",
+    timerMinutes: 10,
+    environmentCue: "Dedicated notebook for topics read + next day's queue; phone kept aside; tracked strictly in Portfolio Task Manager.",
+    weeklyReward: "Calculate weekly progress in every 7 days and eat something tasty based on improvement.",
+    penaltyRule: "Miss Once, Not Twice: If missed 2nd day, DRY WEEK starts immediately (No sweets, no junk food, no parties, no chai for 7 days).",
+    affirmation: "I am the best in DSA.",
+    topicsMasterList: [
+      { name: "Arrays & Strings", status: "mastered" },
+      { name: "Two Pointers & Sliding Window", status: "in_progress" },
+      { name: "Binary Search", status: "pending" },
+      { name: "Linked Lists & Doubly Linked Lists", status: "pending" },
+      { name: "Stacks & Queues", status: "pending" },
+      { name: "Trees & Binary Search Trees", status: "pending" },
+      { name: "Graphs (BFS, DFS & Topological Sort)", status: "pending" },
+      { name: "Dynamic Programming (1D & 2D)", status: "pending" },
+      { name: "Greedy Algorithms & Heaps", status: "pending" },
+      { name: "Tries & Advanced Data Structures", status: "pending" }
+    ],
+    nextDayQueue: "Two Pointers & Sliding Window edge cases",
+    fields: [
+      { id: "f_num", label: "Problems Solved", type: "number", target: "2" },
+      { id: "f_topics", label: "Topics & Concepts Read", type: "topics", target: "Sliding Window, Binary Search" },
+      { id: "f_notes", label: "Daily Reflection & Breakthrough", type: "text", target: "Key insights from notebook" }
+    ]
+  },
+  {
+    id: "habit-everyday-coding",
+    title: "EveryDay Coding Practice (Tech Stack & Architecture)",
+    category: "Streak",
+    priority: "High",
+    status: "in_progress",
+    goalDays: 30,
+    currentStreak: 0,
+    bestStreak: 0,
+    why: "To learn & develop new technologies to command higher salaries and land roles at top MNCs.",
+    minimumAction: "Do coding or read one core technology/architecture topic everyday (Minimum 10 min habit easier).",
+    timerMinutes: 10,
+    environmentCue: "Close all distracting apps/tabs and play fixed coding focus music playlist.",
+    weeklyReward: "In every 7 days review completed topics list, eat tasty food, or buy something for yourself.",
+    penaltyRule: "Miss Once, Not Twice: If missed 2nd day, DRY WEEK starts immediately (No sweets, no junk food, no parties, no chai for 7 days).",
+    affirmation: "I am the best at coding and tech.",
+    topicsMasterList: [
+      { name: "Next.js 15 & React 19 Server Components", status: "in_progress" },
+      { name: "Node.js & Microservices Architecture", status: "pending" },
+      { name: "Database Indexing & Optimization (PostgreSQL)", status: "pending" },
+      { name: "REST, GraphQL & gRPC APIs", status: "pending" },
+      { name: "Redis Caching & Message Queues", status: "pending" },
+      { name: "Docker & Containerization", status: "pending" },
+      { name: "Distributed System Design & Scalability", status: "pending" },
+      { name: "CI/CD Pipelines & Cloud Deployment", status: "pending" }
+    ],
+    nextDayQueue: "Server Actions and Streaming in Next.js 15",
+    fields: [
+      { id: "f_num", label: "Commits / Modules Completed", type: "number", target: "1" },
+      { id: "f_topics", label: "Tech Stack & Architecture Concept", type: "topics", target: "Next.js 15, PostgreSQL, Redis" },
+      { id: "f_notes", label: "Coding Reflection & Architecture Notes", type: "text", target: "Notes on implementation" }
+    ]
+  },
+  {
+    id: "habit-work-projects",
+    title: "EveryDay Work On At Least 1–2 Projects",
+    category: "Streak",
+    priority: "High",
+    status: "in_progress",
+    goalDays: 30,
+    currentStreak: 0,
+    bestStreak: 0,
+    why: "To become a top-tier software engineer and build useful, production-grade software products.",
+    minimumAction: "20 minutes of system analysis, feature coding, or code review every single day.",
+    timerMinutes: 20,
+    environmentCue: "Close all unrelated tabs/apps and play fixed focus music to update and analyze projects.",
+    weeklyReward: "In every 7 days audit project changelog; eat something tasty, buy something, or play/watch something you want.",
+    penaltyRule: "Miss Once, Not Twice: If missed 2nd day, DRY WEEK starts immediately (No sweets, no junk food, no parties, no chai for 7 days).",
+    affirmation: "I am the best at analyzing and improving projects.",
+    topicsMasterList: [
+      { name: "Vivek Pawar Portfolio & Admin Suite", status: "in_progress" },
+      { name: "AI Portfolio Engine & Workflow Automation", status: "pending" },
+      { name: "Production SaaS MVP Architecture", status: "pending" },
+      { name: "Codebase Refactoring & Performance Audits", status: "pending" },
+      { name: "API Contract Testing & Security Hardening", status: "pending" },
+      { name: "Database Schema Migration & Index Tuning", status: "pending" }
+    ],
+    nextDayQueue: "Refactor API route response handling & error boundaries",
+    fields: [
+      { id: "f_num", label: "Features / Fixes Implemented", type: "number", target: "1" },
+      { id: "f_topics", label: "Projects Worked On", type: "topics", target: "Portfolio, Admin Suite, AI Engine" },
+      { id: "f_notes", label: "Project Changelog & Analysis", type: "text", target: "Key improvements made today" }
+    ]
+  },
+  {
+    id: "habit-career-communication",
+    title: "Career Focus: Interview, Presentation & Communication Skill Up",
+    category: "Streak",
+    priority: "High",
+    status: "in_progress",
+    goalDays: 30,
+    currentStreak: 0,
+    bestStreak: 0,
+    why: "To communicate & present skills in front of anyone to project capability and unshakeable confidence.",
+    minimumAction: "Watch a video or practice speaking with an AI/peer to simulate scenarios & learn new communication/negotiation frameworks daily (15 min).",
+    timerMinutes: 15,
+    environmentCue: "Close everything except mobile/device and communicate clearly with full vocal presence.",
+    weeklyReward: "Review communication breakthroughs every 7 days and reward yourself.",
+    penaltyRule: "Miss Once, Not Twice: If missed 2nd day, DRY WEEK starts immediately (No sweets, no junk food, no parties, no chai for 7 days).",
+    affirmation: "I am the best in negotiation and communication.",
+    topicsMasterList: [
+      { name: "Technical System Design Pitch", status: "in_progress" },
+      { name: "Behavioral Interview STAR Framework", status: "pending" },
+      { name: "Salary Negotiation & Value Framing", status: "pending" },
+      { name: "High-Impact Demo & Presentation Delivery", status: "pending" },
+      { name: "Confident Vocal Delivery & Executive Presence", status: "pending" },
+      { name: "Active Listening & Question Asking Frameworks", status: "pending" }
+    ],
+    nextDayQueue: "Practice 2-minute architectural elevator pitch",
+    fields: [
+      { id: "f_num", label: "Mock Scenarios / Sessions Practiced", type: "number", target: "1" },
+      { id: "f_topics", label: "Frameworks & Scenarios Practiced", type: "topics", target: "STAR Framework, Negotiation, Vocal Delivery" },
+      { id: "f_notes", label: "Communication Breakthroughs & Feedback", type: "text", target: "Observations on vocal tone & pacing" }
+    ]
+  },
+  {
+    id: "habit-exercise-sleep",
+    title: "EveryDay Exercise & 6–7 Hours of Quality Sleep",
+    category: "Streak",
+    priority: "High",
+    status: "in_progress",
+    goalDays: 30,
+    currentStreak: 0,
+    bestStreak: 0,
+    why: "To build a strong, muscular, and healthy body for myself and my future family.",
+    minimumAction: "Push-ups (3 × 10–15), Squats (3 × 15), Plank (3 × 30 sec), Pull-ups (3 × 5), eat healthy, and lock in 6–7 hours of sleep.",
+    timerMinutes: 30,
+    environmentCue: "Play fixed workout music and train for 30–60 minutes.",
+    weeklyReward: "Analyze physique/strength progress every 7 days and buy something healthy.",
+    penaltyRule: "Miss Once, Not Twice: If missed 2nd day, DRY WEEK (No sweets/junk/chai/parties) + 2X TRAINING WEEK (Double workout sets/volume for 7 days) starts immediately.",
+    affirmation: "I have the best physique and powerful muscles with an attractive body.",
+    topicsMasterList: [
+      { name: "Push-ups Protocol (3 × 10–15 reps)", status: "in_progress" },
+      { name: "Squats Protocol (3 × 15 reps)", status: "in_progress" },
+      { name: "Plank Core Hold (3 × 30 sec)", status: "in_progress" },
+      { name: "Pull-ups Protocol (3 × 5 reps)", status: "pending" },
+      { name: "6–7 Hours Sleep & Circadian Routine", status: "pending" },
+      { name: "High-Protein Clean Nutrition", status: "pending" }
+    ],
+    nextDayQueue: "Morning Calisthenics: Push-ups + Plank + Pull-ups",
+    fields: [
+      { id: "f_num", label: "Workout Sets Completed (Push-ups/Squats/Plank)", type: "number", target: "12" },
+      { id: "f_topics", label: "Exercises Done & Sleep Hours", type: "topics", target: "Push-ups, Squats, Plank, 7h Sleep" },
+      { id: "f_notes", label: "Physical State & Energy Reflection", type: "text", target: "Energy levels & muscle recovery note" }
+    ]
+  }
+];
+
 // ── Tasks & Streaks ─────────────────────────────────────────────────────────
 export function normalizeTask(t) {
   if (!t) return t;
@@ -565,8 +730,13 @@ export function normalizeTask(t) {
 
   const isStreak = t.category === 'Streak';
 
+  // Find matching habit template if available
+  const habitTemplate = CORE_ATOMIC_HABITS.find(
+    (h) => h.id === t.id || t.title?.toLowerCase().includes(h.title.toLowerCase().slice(0, 15))
+  );
+
   const defaultFields = isStreak
-    ? [
+    ? habitTemplate?.fields || [
         { id: 'number_done', label: 'Number / Problems Completed', type: 'number', target: '5' },
         { id: 'topics_read', label: 'Topics & Concepts Read', type: 'topics', target: 'DSA, System Design' },
         { id: 'daily_notes', label: 'Daily Reflection & Small Text', type: 'text', target: 'Notes' },
@@ -580,6 +750,26 @@ export function normalizeTask(t) {
       ? extra.fields
       : defaultFields;
 
+  const lastCheckedDate = t.lastCheckedDate || extra.lastCheckedDate || t.lastChecked || null;
+  const todayStr = new Date().toISOString().split('T')[0];
+
+  let missedDaysCount = 0;
+  let isWarning = false;
+  let isDryWeek = false;
+
+  if (isStreak && lastCheckedDate) {
+    const today = new Date(todayStr);
+    const checked = new Date(lastCheckedDate);
+    const diffDays = Math.floor((today.getTime() - checked.getTime()) / (1000 * 3600 * 24));
+    if (diffDays === 2) {
+      missedDaysCount = 1;
+      isWarning = true;
+    } else if (diffDays >= 3) {
+      missedDaysCount = diffDays - 1;
+      isDryWeek = true;
+    }
+  }
+
   return {
     ...t,
     category: t.category || 'General',
@@ -587,16 +777,36 @@ export function normalizeTask(t) {
     status: t.status || 'todo',
     fields: rawFields,
     goalDays: Number(
-      t.goalDays !== undefined ? t.goalDays : extra.goalDays !== undefined ? extra.goalDays : isStreak ? 30 : 0
+      t.goalDays !== undefined ? t.goalDays : extra.goalDays !== undefined ? extra.goalDays : habitTemplate?.goalDays || (isStreak ? 30 : 0)
     ),
     currentStreak: Number(t.currentStreak !== undefined ? t.currentStreak : extra.currentStreak || 0),
     bestStreak: Number(t.bestStreak !== undefined ? t.bestStreak : extra.bestStreak || 0),
-    lastCheckedDate: t.lastCheckedDate || extra.lastCheckedDate || t.lastChecked || null,
+    lastCheckedDate,
     dailyLog: t.dailyLog || extra.dailyLog || '',
     history: Array.isArray(t.history) ? t.history : Array.isArray(extra.history) ? extra.history : [],
     weeklyPoints: Number(t.weeklyPoints !== undefined ? t.weeklyPoints : extra.weeklyPoints || 0),
     totalPoints: Number(t.totalPoints !== undefined ? t.totalPoints : extra.totalPoints || 0),
     lastEvaluatedDate: t.lastEvaluatedDate || extra.lastEvaluatedDate || null,
+
+    // Atomic Habits 5 Pillars Attributes
+    why: t.why || extra.why || habitTemplate?.why || '',
+    minimumAction: t.minimumAction || extra.minimumAction || habitTemplate?.minimumAction || '',
+    timerMinutes: Number(t.timerMinutes || extra.timerMinutes || habitTemplate?.timerMinutes || 10),
+    environmentCue: t.environmentCue || extra.environmentCue || habitTemplate?.environmentCue || '',
+    weeklyReward: t.weeklyReward || extra.weeklyReward || habitTemplate?.weeklyReward || '',
+    penaltyRule: t.penaltyRule || extra.penaltyRule || habitTemplate?.penaltyRule || 'Miss Once, Not Twice: If missed 2nd day, DRY WEEK starts immediately.',
+    affirmation: t.affirmation || extra.affirmation || habitTemplate?.affirmation || '',
+    topicsMasterList: Array.isArray(t.topicsMasterList) && t.topicsMasterList.length > 0
+      ? t.topicsMasterList
+      : Array.isArray(extra.topicsMasterList) && extra.topicsMasterList.length > 0
+      ? extra.topicsMasterList
+      : habitTemplate?.topicsMasterList || [],
+    nextDayQueue: t.nextDayQueue || extra.nextDayQueue || habitTemplate?.nextDayQueue || '',
+
+    // Streak penalty flags
+    missedDaysCount,
+    isWarning,
+    isDryWeek,
   };
 }
 
@@ -722,7 +932,9 @@ export async function checkInStreak(
   customDate = null,
   fieldValues = {},
   topics = [],
-  numberDone = null
+  numberDone = null,
+  nextDayQueue = null,
+  completedTopic = null
 ) {
   const current = await getTasks();
   const taskIndex = current.findIndex((t) => t.id === id);
@@ -800,6 +1012,18 @@ export async function checkInStreak(
 
   const awardedPoints = isAlreadyCheckedToday ? 0 : 10;
 
+  // Handle updated master topics if a topic was completed
+  let updatedTopicsMasterList = Array.isArray(task.topicsMasterList) ? [...task.topicsMasterList] : [];
+  if (completedTopic) {
+    updatedTopicsMasterList = updatedTopicsMasterList.map((tm) =>
+      tm.name.toLowerCase() === completedTopic.toLowerCase()
+        ? { ...tm, status: 'mastered' }
+        : tm
+    );
+  }
+
+  const updatedNextDayQueue = nextDayQueue !== null ? nextDayQueue.trim() : task.nextDayQueue;
+
   const updatedTask = {
     ...task,
     currentStreak: newStreak,
@@ -809,6 +1033,11 @@ export async function checkInStreak(
     history: newHistory,
     weeklyPoints: (task.weeklyPoints || 0) + awardedPoints,
     status: isGoalReached ? 'completed' : 'in_progress',
+    topicsMasterList: updatedTopicsMasterList,
+    nextDayQueue: updatedNextDayQueue,
+    missedDaysCount: 0,
+    isWarning: false,
+    isDryWeek: false,
   };
 
   const updatedList = [...current];
@@ -826,6 +1055,15 @@ export async function checkInStreak(
         history: updatedTask.history,
         weeklyPoints: updatedTask.weeklyPoints,
         totalPoints: updatedTask.totalPoints,
+        why: updatedTask.why,
+        minimumAction: updatedTask.minimumAction,
+        timerMinutes: updatedTask.timerMinutes,
+        environmentCue: updatedTask.environmentCue,
+        weeklyReward: updatedTask.weeklyReward,
+        penaltyRule: updatedTask.penaltyRule,
+        affirmation: updatedTask.affirmation,
+        topicsMasterList: updatedTask.topicsMasterList,
+        nextDayQueue: updatedTask.nextDayQueue,
       };
       await prisma.task.update({
         where: { id },
@@ -846,6 +1084,156 @@ export async function checkInStreak(
 
   writeFile(TASKS_FILE, updatedList);
   return updatedList;
+}
+
+export async function updateHabitMeta(id, meta = {}) {
+  const current = await getTasks();
+  const taskIndex = current.findIndex((t) => t.id === id);
+  if (taskIndex === -1) throw new Error('Habit not found');
+
+  const task = current[taskIndex];
+  const updatedTask = {
+    ...task,
+    ...meta,
+    topicsMasterList: Array.isArray(meta.topicsMasterList) ? meta.topicsMasterList : task.topicsMasterList,
+    nextDayQueue: meta.nextDayQueue !== undefined ? meta.nextDayQueue : task.nextDayQueue,
+    timerMinutes: meta.timerMinutes !== undefined ? Number(meta.timerMinutes) : task.timerMinutes,
+    goalDays: meta.goalDays !== undefined ? Number(meta.goalDays) : task.goalDays,
+  };
+
+  const updatedList = [...current];
+  updatedList[taskIndex] = updatedTask;
+
+  if (prisma) {
+    try {
+      const streakExtra = {
+        fields: updatedTask.fields,
+        goalDays: updatedTask.goalDays,
+        currentStreak: updatedTask.currentStreak,
+        bestStreak: updatedTask.bestStreak,
+        lastCheckedDate: updatedTask.lastCheckedDate,
+        dailyLog: updatedTask.dailyLog,
+        history: updatedTask.history,
+        weeklyPoints: updatedTask.weeklyPoints,
+        totalPoints: updatedTask.totalPoints,
+        why: updatedTask.why,
+        minimumAction: updatedTask.minimumAction,
+        timerMinutes: updatedTask.timerMinutes,
+        environmentCue: updatedTask.environmentCue,
+        weeklyReward: updatedTask.weeklyReward,
+        penaltyRule: updatedTask.penaltyRule,
+        affirmation: updatedTask.affirmation,
+        topicsMasterList: updatedTask.topicsMasterList,
+        nextDayQueue: updatedTask.nextDayQueue,
+      };
+
+      await prisma.task.update({
+        where: { id },
+        data: {
+          extraData: JSON.stringify(streakExtra),
+          dueDate: `${updatedTask.goalDays}-Day Goal`,
+          goalDays: updatedTask.goalDays,
+        },
+      });
+    } catch (e) {
+      console.warn('Prisma updateHabitMeta fallback:', e.message);
+    }
+  }
+
+  writeFile(TASKS_FILE, updatedList);
+  return updatedList;
+}
+
+export async function seedCoreHabits() {
+  const current = await getTasks();
+  const nonStreakTasks = current.filter((t) => t.category !== 'Streak');
+
+  const seededTasks = CORE_ATOMIC_HABITS.map((habit) => {
+    // Preserve existing streak, history, and points if existing task matches
+    const existing = current.find(
+      (t) =>
+        t.id === habit.id ||
+        t.title?.toLowerCase().includes(habit.title.toLowerCase().slice(0, 15))
+    );
+
+    const merged = {
+      ...habit,
+      currentStreak: existing?.currentStreak || 0,
+      bestStreak: existing?.bestStreak || 0,
+      weeklyPoints: existing?.weeklyPoints || 0,
+      totalPoints: existing?.totalPoints || 0,
+      lastCheckedDate: existing?.lastCheckedDate || null,
+      dailyLog: existing?.dailyLog || '',
+      history: existing?.history || [],
+      dueDate: `${habit.goalDays}-Day Goal`,
+      createdAt: existing?.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    return normalizeTask(merged);
+  });
+
+  const updatedTasks = [...seededTasks, ...nonStreakTasks];
+
+  if (prisma) {
+    try {
+      for (const t of seededTasks) {
+        const streakExtra = {
+          fields: t.fields,
+          goalDays: t.goalDays,
+          currentStreak: t.currentStreak,
+          bestStreak: t.bestStreak,
+          lastCheckedDate: t.lastCheckedDate,
+          dailyLog: t.dailyLog,
+          history: t.history,
+          weeklyPoints: t.weeklyPoints,
+          totalPoints: t.totalPoints,
+          why: t.why,
+          minimumAction: t.minimumAction,
+          timerMinutes: t.timerMinutes,
+          environmentCue: t.environmentCue,
+          weeklyReward: t.weeklyReward,
+          penaltyRule: t.penaltyRule,
+          affirmation: t.affirmation,
+          topicsMasterList: t.topicsMasterList,
+          nextDayQueue: t.nextDayQueue,
+        };
+
+        await prisma.task.upsert({
+          where: { id: t.id },
+          create: {
+            id: t.id,
+            title: t.title,
+            category: t.category,
+            priority: t.priority,
+            status: t.status,
+            dueDate: t.dueDate,
+            goalDays: t.goalDays,
+            currentStreak: t.currentStreak,
+            bestStreak: t.bestStreak,
+            lastChecked: t.lastCheckedDate,
+            weeklyPoints: t.weeklyPoints,
+            totalPoints: t.totalPoints,
+            extraData: JSON.stringify(streakExtra),
+          },
+          update: {
+            title: t.title,
+            category: t.category,
+            priority: t.priority,
+            status: t.status,
+            dueDate: t.dueDate,
+            goalDays: t.goalDays,
+            extraData: JSON.stringify(streakExtra),
+          },
+        });
+      }
+    } catch (e) {
+      console.warn('Prisma seedCoreHabits fallback:', e.message);
+    }
+  }
+
+  writeFile(TASKS_FILE, updatedTasks);
+  return updatedTasks.map(normalizeTask);
 }
 
 export async function updateStreakGoal(id, newGoalDays) {
